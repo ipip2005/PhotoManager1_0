@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <GridView 
+        android:background="#AA000000"
+        android:numColumns="3"
+        android:verticalSpacing="10dip"
+        android:horizontalSpacing="10dip"
+        android:padding="10dip"
+      	android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:id="@+id/maptapimageshowgridview">
+            
+    </GridView>
+    
+	<ImageView
+   	    android:layout_width="match_parent"
+   	    android:layout_height="2dip"
+   	    android:background="#ffB4B4C8"/>
+	<Button
+	    android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:id="@+id/maptapimageshowokbutton"
+    	android:padding="0dip"
+    	android:textSize="@dimen/image_info_font_size"
+    	android:textColor="#ffffffff"
+    	android:background="#00ffffff"
+    	android:text="确定"/>
+</LinearLayout>

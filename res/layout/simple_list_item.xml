@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/list_back"
+    android:orientation="vertical" >
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+		<TextView
+            android:id="@+id/item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textColor="#eeeeee"
+            android:textSize="23sp" />
+	</RelativeLayout>
+    <LinearLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp" >
+        
+        <ImageView
+            android:id="@+id/imageView"
+            android:contentDescription="@string/iv_content_descrip"
+            android:layout_width="0.0dip"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            />
+		
+        <ImageView
+            android:id="@+id/imageView1"
+            android:contentDescription="@string/iv_content_descrip"
+            android:layout_width="0.0dip"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp" />
+        
+        <ImageView
+            android:id="@+id/imageView2"
+            android:contentDescription="@string/iv_content_descrip"
+            android:layout_width="0.0dip"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp" />
+        
+        <ImageView
+            android:id="@+id/imageView3"
+            android:contentDescription="@string/iv_content_descrip"
+            android:layout_width="0.0dip"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
+
+</LinearLayout>

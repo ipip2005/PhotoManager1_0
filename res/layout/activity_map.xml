@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+	
+ 	<RelativeLayout
+ 	    android:layout_width="match_parent"
+ 	    android:layout_height="match_parent"
+ 	    >
+		<com.baidu.mapapi.map.MapView 
+	    	android:id="@+id/bmapView"
+    		android:layout_width="fill_parent" 
+    		android:layout_height="fill_parent" 
+    		android:clickable="true"     
+		/>
+		
+		<LinearLayout
+	    	android:id="@+id/mapSearchBlock"
+	   	 	android:orientation="vertical"
+	    	android:visibility="gone"
+	    	android:layout_alignParentTop="true"
+	    	android:alpha="0.8"
+	    	android:background="#000000"
+    		android:layout_width="match_parent"
+    		android:layout_height="wrap_content">
+    		<LinearLayout
+    		    android:alpha="0.9"
+       			android:layout_width="match_parent"
+        		android:layout_height="50dip"
+        		android:orientation="horizontal" >
+
+        		<TextView
+            		android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            		android:text="在" >
+        		</TextView>
+
+        		<EditText
+            		android:id="@+id/city"
+            		android:layout_width="wrap_content"
+            		android:layout_height="match_parent"
+            		/>
+
+        		<TextView
+            		android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            		android:text="内找" >
+        		</TextView>
+
+        		<AutoCompleteTextView
+            		android:id="@+id/searchkey"
+            		android:layout_width="0dip"
+            		android:layout_height="wrap_content"
+            		android:layout_weight="0.88"
+            		/>
+        
+        		<TextView
+            		android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            		android:text="附近的图片" />
+    		</LinearLayout>
+      
+     		<LinearLayout
+     		    android:alpha="0.9"
+        		android:layout_width="fill_parent"
+       			android:layout_height="50dip"
+        		android:orientation="horizontal" >
+        	
+				<Button
+		    		android:id="@+id/closeSearch"
+		    		android:layout_width="0dip"
+		    		android:layout_weight="12"
+		    		android:layout_height="wrap_content"
+		    		android:padding="10dip"
+		    		android:background="@drawable/button_style"
+		    		android:onClick="closeSearch"
+		    		android:text="关闭"
+		    		/>
+        		<Button
+            		android:id="@+id/map_next_data"
+            		android:layout_width="0dip"
+            		android:layout_weight="12"
+            		android:layout_height="wrap_content"
+            		android:padding="10dip"
+            		android:background="@drawable/button_style"
+            		android:onClick="goToNextPage"
+            		android:text="下一组数据" />
+        
+        		<Button
+            		android:id="@+id/search"
+            		android:layout_height="wrap_content"
+            		android:layout_width="0dip"
+            		android:layout_weight="20"
+            		android:padding="10dip"
+            		android:background="@drawable/button_style"
+            		android:onClick="searchButtonProcess"
+            		android:text="开始" />
+    		</LinearLayout>
+ 		</LinearLayout>
+		
+		<LinearLayout
+         	android:layout_alignParentBottom="true"
+         	android:layout_marginBottom="20dip"
+         	android:layout_width="match_parent"
+         	android:layout_height="wrap_content"
+         	android:orientation="horizontal">
+        	<RelativeLayout 
+        	    android:layout_width="0dp"
+        	    android:layout_weight="1"
+        	    android:layout_height="wrap_content">
+				<Button
+         			android:id="@+id/locButton"
+         			android:layout_width="40dp"
+         			android:layout_height="40dp"
+         			android:layout_centerInParent="true"
+         			android:text="定位" 
+         			android:onClick="resetCenterPoint"
+         			android:background="@drawable/locate"
+         			android:alpha="0.8"
+         			android:textColor="#FF000000" />
+			</RelativeLayout>
+			<RelativeLayout 
+        	    android:layout_width="0dp"
+        	    android:layout_weight="1"
+        	    android:layout_height="wrap_content">
+				<Button
+         			android:id="@+id/locButton"
+         			android:layout_width="40dp"
+         			android:layout_height="40dp"
+         			android:layout_centerInParent="true"
+         			android:text="搜索" 
+         			android:onClick="showSearchPanel"
+         			android:background="@drawable/button_style"
+         			android:textColor="#FF000000" />
+			</RelativeLayout>
+			<RelativeLayout 
+        	    android:layout_width="0dp"
+        	    android:layout_weight="1"
+        	    android:layout_height="wrap_content">
+			</RelativeLayout>
+		</LinearLayout>
+	</RelativeLayout>
+</LinearLayout>
