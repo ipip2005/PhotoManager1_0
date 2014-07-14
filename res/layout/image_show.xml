@@ -32,8 +32,8 @@
     	            android:paddingTop="10dip"
     	            android:paddingBottom="10dip"
     	            android:textSize="@dimen/image_back_font_size"
-    	            android:textColor="#ffffffff"
     	            android:background="#00ffffff"
+    	            android:textColor="@drawable/text_color"
     	           	/>
     	   		<ImageView
     	   		    android:layout_width="0dip"
@@ -60,7 +60,7 @@
     	            android:padding="10dip"
     	            android:textSize="@dimen/image_back_font_size"
     	            android:textColor="#ffffffff"
-    	            android:background="#00ffffff"
+    	            android:background="@drawable/btn_bg"
     	            android:text="详细信息"
     	            android:onClick="listInfomation"
     	            />
@@ -71,7 +71,7 @@
     	            android:padding="10dip"
     	            android:textSize="@dimen/image_back_font_size"
     	            android:textColor="#ffffffff"
-    	            android:background="#00ffffff"
+    	            android:background="@drawable/btn_bg"
     	            android:text="幻灯片"
     	            android:onClick="slidePictures"
     	            />

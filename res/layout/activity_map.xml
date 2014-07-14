@@ -53,13 +53,9 @@
             		android:id="@+id/searchkey"
             		android:layout_width="0dip"
             		android:layout_height="wrap_content"
-            		android:layout_weight="0.88"
+            		android:layout_weight="1"
             		/>
         
-        		<TextView
-            		android:layout_width="wrap_content"
-            		android:layout_height="wrap_content"
-            		android:text="附近的图片" />
     		</LinearLayout>
       
      		<LinearLayout
@@ -115,9 +111,8 @@
          			android:layout_width="40dp"
          			android:layout_height="40dp"
          			android:layout_centerInParent="true"
-         			android:text="定位" 
          			android:onClick="resetCenterPoint"
-         			android:background="@drawable/locate"
+         			android:background="@drawable/locate_style"
          			android:alpha="0.8"
          			android:textColor="#FF000000" />
 			</RelativeLayout>
@@ -130,9 +125,8 @@
          			android:layout_width="40dp"
          			android:layout_height="40dp"
          			android:layout_centerInParent="true"
-         			android:text="搜索" 
          			android:onClick="showSearchPanel"
-         			android:background="@drawable/button_style"
+         			android:background="@drawable/map_search_style"
          			android:textColor="#FF000000" />
 			</RelativeLayout>
 			<RelativeLayout 

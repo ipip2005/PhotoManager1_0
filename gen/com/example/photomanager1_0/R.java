@@ -28,26 +28,35 @@ public final class R {
         public static final int image_info_font_size=0x7f050004;
     }
     public static final class drawable {
-        public static final int button_down=0x7f020000;
-        public static final int button_on=0x7f020001;
-        public static final int button_style=0x7f020002;
-        public static final int home_btn_bg=0x7f020003;
-        public static final int home_btn_bg_d=0x7f020004;
-        public static final int home_btn_bg_n=0x7f020005;
-        public static final int home_btn_bg_s=0x7f020006;
-        public static final int ic_launcher=0x7f020007;
-        public static final int icon_1=0x7f020008;
-        public static final int icon_1_n=0x7f020009;
-        public static final int icon_2_n=0x7f02000a;
-        public static final int icon_3=0x7f02000b;
-        public static final int icon_3_n=0x7f02000c;
-        public static final int icon_4=0x7f02000d;
-        public static final int icon_4_n=0x7f02000e;
-        public static final int icon_gcoding=0x7f02000f;
-        public static final int list_back=0x7f020010;
-        public static final int locate=0x7f020011;
-        public static final int maintab_toolbar_bg=0x7f020012;
-        public static final int transparent=0x7f020013;
+        public static final int btn_bg=0x7f020000;
+        public static final int button_down=0x7f020001;
+        public static final int button_on=0x7f020002;
+        public static final int button_style=0x7f020003;
+        public static final int home_btn_bg=0x7f020004;
+        public static final int home_btn_bg_d=0x7f020005;
+        public static final int home_btn_bg_n=0x7f020006;
+        public static final int home_btn_bg_s=0x7f020007;
+        public static final int ic_launcher=0x7f020008;
+        public static final int icon_1=0x7f020009;
+        public static final int icon_1_n=0x7f02000a;
+        public static final int icon_2_n=0x7f02000b;
+        public static final int icon_3=0x7f02000c;
+        public static final int icon_3_n=0x7f02000d;
+        public static final int icon_4=0x7f02000e;
+        public static final int icon_4_n=0x7f02000f;
+        public static final int icon_gcoding=0x7f020010;
+        public static final int list_back=0x7f020011;
+        public static final int locate=0x7f020012;
+        public static final int locate_press=0x7f020013;
+        public static final int locate_style=0x7f020014;
+        public static final int maintab_toolbar_bg=0x7f020015;
+        public static final int map_search=0x7f020016;
+        public static final int map_search_press=0x7f020017;
+        public static final int map_search_style=0x7f020018;
+        public static final int text_color=0x7f020019;
+        public static final int transparent=0x7f02001c;
+        public static final int trash_button=0x7f02001a;
+        public static final int trash_button_press=0x7f02001b;
     }
     public static final class id {
         public static final int MyListView=0x7f09000c;

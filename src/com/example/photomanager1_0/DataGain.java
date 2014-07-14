@@ -178,6 +178,9 @@ public class DataGain {
 		doing++;
 		pool.execute(t);
 	}
+	public void delData(int index){
+		
+	}
 	private class MyThread implements Runnable{
 		private int id;
 		public MyThread(int index){

@@ -28,6 +28,6 @@
     	android:padding="0dip"
     	android:textSize="@dimen/image_info_font_size"
     	android:textColor="#ffffffff"
-    	android:background="#00ffffff"
+    	android:background="@drawable/btn_bg"
     	android:text="确定"/>
 </LinearLayout>
