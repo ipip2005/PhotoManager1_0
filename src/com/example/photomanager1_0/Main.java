@@ -2,13 +2,10 @@ package com.example.photomanager1_0;
 
 import java.util.Calendar;
 
-import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.Window;
 import android.widget.RadioGroup;
@@ -16,11 +13,11 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TabHost;
 import android.widget.Toast;
 
+@SuppressWarnings("deprecation")
 public class Main extends TabActivity implements OnCheckedChangeListener{
 	private TabHost tHost;
 	private RadioGroup mGroup;
 	private Intent iTimeline,iPlace,iMap,iTag;
-	private Toast mToast;
 	private Calendar lastBack;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,8 +32,6 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 		mGroup = (RadioGroup) findViewById(R.id.main_tab);
 		mGroup.setOnCheckedChangeListener(this);
 		iTimeline = new Intent(Main.this, TimelineActivity.class);
-		Log.i("cursor_i", ""+String.valueOf(tHost==null)+String.valueOf(iTimeline==null)+
-				String.valueOf(getResources().getDrawable(R.drawable.icon_1_n)==null));
 		tHost.addTab(tHost.newTabSpec("iTimeline").setIndicator(" ±º‰÷·", getResources().getDrawable(R.drawable.icon_1_n))
 				.setContent(iTimeline));
 		

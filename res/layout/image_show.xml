@@ -3,17 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <FrameLayout 
+    <RelativeLayout 
         android:id="@+id/ivImageFrame"
         android:padding="0dip"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    	<ImageView
+        <com.example.photomanager1_0.JazzyViewPager
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/image_show_view_pager"
+            android:flipInterval="30"
+            android:persistentDrawingCache="animation"
+            />
+    	<!--ImageView
     	    android:padding="0dip"
 	    	android:id="@+id/ivImageShow"
 	    	android:scaleType="center"
 	    	android:layout_width="match_parent"
-	    	android:layout_height="match_parent"/>
+	    	android:layout_height="match_parent"/-->
     	<LinearLayout
     	    android:id="@+id/ivImageCover"
     	    android:orientation="vertical"
@@ -64,7 +71,7 @@
     	            android:text="详细信息"
     	            android:onClick="listInfomation"
     	            />
-    	        <Button
+    	        <!--Button
     	            android:layout_width="wrap_content"
     	            android:layout_height="wrap_content"
     	            android:id="@+id/ivSlideButton"
@@ -74,8 +81,8 @@
     	            android:background="@drawable/btn_bg"
     	            android:text="幻灯片"
     	            android:onClick="slidePictures"
-    	            />
+    	            /-->
     	    </LinearLayout>
     	</LinearLayout>
-	</FrameLayout>
+	</RelativeLayout>
 </LinearLayout>

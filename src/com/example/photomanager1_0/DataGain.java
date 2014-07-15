@@ -1,18 +1,13 @@
 package com.example.photomanager1_0;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,7 +22,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Thumbnails;
-import android.util.Log;
 
 public class DataGain {
 	private Cursor cursor;
@@ -40,8 +34,6 @@ public class DataGain {
 	private int done,doing;
 	private int cacheOrder[];
 	//signal for thread security
-	private int[] signal;
-	private int sp,sn;
 	private ArrayList<PicInfo> mPicInfoList;
 	private ArrayList<ArrayList<Integer>> mSet2,mSet3,mSet4;
 	private ArrayList<Integer> PSet;
@@ -51,7 +43,7 @@ public class DataGain {
         MediaStore.Images.Media.LATITUDE,
         MediaStore.Images.Media.LONGITUDE,
         MediaStore.Images.Media._ID,
-        MediaStore.Images.Media.DATA
+        MediaStore.Images.Media.DATA,
 	};
 	ExecutorService pool = Executors.newFixedThreadPool(3);
 	public DataGain(ContentResolver contentResolver,
@@ -67,8 +59,6 @@ public class DataGain {
 		p=0;
 		done=0;doing=0;
 		mHandler = handler;
-		signal = new int[n];
-		sp=0;sn=0;
 		cacheOrder = new int[n];
 		preData();
 	}

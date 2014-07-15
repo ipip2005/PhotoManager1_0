@@ -2,28 +2,29 @@ package com.example.photomanager1_0;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.example.photomanager1_0.JazzyViewPager.TransitionEffect;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -32,32 +33,32 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.ScaleAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-public class ShowImageActivity extends Activity implements OnClickListener{
-	Bitmap bitmap =null;
-	private ImageView iv;
+public class ShowImageActivity extends Activity{
 	private LinearLayout ll;
-	private FrameLayout fl;
 	private InfoDialog mDialog;
 	private String fileRoute;
+	private JazzyViewPager mViewPager;
+	private MyViewPagerAdapter mAdapter;
 	//the number of the bitmap in PicInfoList, which is not the source ID
 	private int id;
+	private int n;
 	//origin width and height of the bitmap
 	private int o_width,o_height;
-	private Animation a;
+	private Animation anim_s,anim_f;
 	private Button b;
+	private Bitmap[] bitmapCache;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.image_show);
 		id = getIntent().getIntExtra("image",-1);
-		fileRoute = TimelineActivity.PicInfoList.get(id).fileRoute;
-		Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().
+		n = TimelineActivity.PicInfoList.size();
+		/*Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().
 				  appendPath(Long.toString(TimelineActivity.PicInfoList.get(id).id)).build();
 		try {
 			bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
@@ -65,12 +66,21 @@ public class ShowImageActivity extends Activity implements OnClickListener{
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		createScaledBitmap();
-		iv = (ImageView)findViewById(R.id.ivImageShow);
-		iv.setImageBitmap(bitmap);
-		iv.setOnClickListener(this);
+		createScaledBitmap();*/
+		mViewPager = (JazzyViewPager)findViewById(R.id.image_show_view_pager);
+		mViewPager.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				if (ll.getVisibility() == View.VISIBLE)
+					ll.setVisibility(View.INVISIBLE); else
+					ll.setVisibility(View.VISIBLE);
+			}
+			
+		});
+		InitViewPager();
 		ll=(LinearLayout)findViewById(R.id.ivImageCover);
-		fl=(FrameLayout)findViewById(R.id.ivImageFrame);
 		b = (Button)findViewById(R.id.ivBackButton);
 		b.setText(" < ПаІб("+(id+1)+"/"+TimelineActivity.PicInfoList.size()+")");
 		b.setOnClickListener(new OnClickListener(){
@@ -84,23 +94,92 @@ public class ShowImageActivity extends Activity implements OnClickListener{
 		});
 		initAnimation();
 	}
+	private void InitViewPager(){
+	
+		bitmapCache = new Bitmap[n];
+		List<Integer> list = new ArrayList<Integer>();
+		for (int i=0;i<n;i++) list.add(i);
+		mAdapter = new MyViewPagerAdapter(this);
+		mViewPager.setAdapter(mAdapter);
+		mViewPager.setCurrentItem(id);
+		mViewPager.setFadeEnabled(true);
+		mViewPager.setTransitionEffect(TransitionEffect.Tablet);
+		mViewPager.setPageMargin(30);
+		mViewPager.setOnPageChangeListener(new MyOnPageChangeListener());
+	}
+	private class MyViewPagerAdapter extends PagerAdapter{
+		private Context mContext;
+		public MyViewPagerAdapter(Context context){
+			mContext = context;
+		}
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ;
+		}
+
+		@Override
+		public boolean isViewFromObject(View arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			return arg0 == (View)arg1;
+		}
+		
+		@Override
+		public Object instantiateItem(ViewGroup container, int position){
+			ImageView iv = new ImageView(mContext);
+			Bitmap bm = null;
+			if (bitmapCache[position]!=null && bitmapCache[position].isRecycled()==false)
+				bm = bitmapCache[position]; else
+				bm = getBitmapById(position);
+			iv.setImageBitmap(bm);
+			((ViewPager)container).addView(iv,0);
+			mViewPager.setObjectForPosition(iv, position);
+			return iv;	
+		}
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object){
+			container.removeView((View)object);
+		}
+	}
+	private class MyOnPageChangeListener implements OnPageChangeListener{
+		@Override
+		public void onPageScrollStateChanged(int arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onPageSelected(int arg0) {
+			// TODO Auto-generated method stub
+			id = arg0;
+			b.setText(" < ПаІб("+(id+1)+"/"+TimelineActivity.PicInfoList.size()+")");
+			int idl = last_id(last_id(last_id(id)));
+			int idn = (id+3)%n;
+			recycle(idl);
+			recycle(idn);
+		}
+		
+	}
 	private void initAnimation(){
-		a = new ScaleAnimation(1f, 1.2f, 1f, 1.2f, Animation.RELATIVE_TO_PARENT, 0.5f, Animation.RELATIVE_TO_PARENT, 0.5f);
-		a.setDuration(4000);
-		a.setRepeatMode(Animation.RESTART);
-		a.setRepeatCount(Animation.INFINITE);
-		a.setAnimationListener(new AnimationListener(){
+		anim_s = new ScaleAnimation(1f, 1.2f, 1f, 1.2f, Animation.RELATIVE_TO_PARENT, 0.5f, Animation.RELATIVE_TO_PARENT, 0.5f);
+		anim_s.setDuration(4000);
+		anim_s.setAnimationListener(new AnimationListener(){
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				// TODO Auto-generated method stub
-				
+				slideNext();
 			}
 
 			@Override
 			public void onAnimationRepeat(Animation animation) {
-				// TODO Auto-generated method stub		
-				getNextBitmap();
+				// TODO Auto-generated method stub			
 			}
 
 			@Override
@@ -111,57 +190,84 @@ public class ShowImageActivity extends Activity implements OnClickListener{
 			
 		});
 	}
-	private void getNextBitmap(){
-		int n = TimelineActivity.PicInfoList.size();
-		if (id == n - 1) id = 0; else id++;
-		iv.setImageBitmap(null);
-		bitmap.recycle();
-		bitmap=null;
-		Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().
-				  appendPath(Long.toString(TimelineActivity.PicInfoList.get(id).id)).build();
+	private int last_id(int id){
+		return (id + n - 1) % n;
+	}
+	private int next_id(int id){
+		return (id + 1) % n;
+	}
+	/*
+	 * get a scaled bitmap using ID in PicInfoList array.
+	 */
+	private Bitmap getBitmapById(int id){
+		bitmapCache[id] = null;
+		String fileRoute = TimelineActivity.PicInfoList.get(id).fileRoute;
 		try {
-			bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+			BitmapFactory.Options op = new BitmapFactory.Options();
+			op.inJustDecodeBounds = true;
+			op.inSampleSize = 1;
+			bitmapCache[id] = BitmapFactory.decodeFile(fileRoute, op);
+			int o_w = op.outWidth;
+			createScaledBitmap(op);
+			op.inJustDecodeBounds = false;
+			op.inSampleSize = o_w/op.outWidth;
+			//Log.w("photo", "id:"+id+"   "+op.inSampleSize+" "+o_w+" "+op.outWidth);
+			op.inPurgeable = true;
+			op.inInputShareable = true;
+			op.inPreferredConfig = Bitmap.Config.RGB_565;
+			bitmapCache[id] = BitmapFactory.decodeFile(fileRoute, op);
+			//bm = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		createScaledBitmap();
-		iv.setImageBitmap(bitmap);
-		b.setText(" < ПаІб("+(id+1)+"/"+TimelineActivity.PicInfoList.size()+")");
+		
+		return bitmapCache[id];
 	}
-	private void createScaledBitmap(){
-		o_width = bitmap.getWidth();
-		o_height = bitmap.getHeight();
+	private void recycle(int id){
+		if (bitmapCache[id]!=null) {
+			//Log.w("photo", "recycle: "+id);
+			bitmapCache[id].recycle();
+			bitmapCache[id]=null;
+		}
+	}
+	/*
+	 * scale the bitmap width&height to fit screen better, for saving memories...
+	 */
+	private void createScaledBitmap(BitmapFactory.Options op){
+		o_width = op.outWidth;
+		o_height = op.outHeight;
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		int width = dm.widthPixels+1;
 		int height = dm.heightPixels+1;
 		int t_width;
 		int t_height;
-		if (bitmap.getWidth()>width || bitmap.getHeight()>height){
+		if (o_width>width || o_height>height){
 			t_width = width;
-			t_height = bitmap.getHeight()*width/bitmap.getWidth();
+			t_height = o_height*width/o_width;
 			if (t_height>height){
 				t_width = t_width*height/t_height;
 				t_height = height;
 			}
 		} else
-		if (bitmap.getWidth()<width && bitmap.getHeight()<height){
+		if (o_width<width && o_height<height){
 			t_width = width;
-			t_height = bitmap.getHeight()*width/bitmap.getWidth();
+			t_height = o_height*width/o_width;
 			if (t_height>height){
 				t_width = t_width*height/t_height;
 				t_height = height;
 			}
 		} else {
-			t_width = bitmap.getWidth();
-			t_height = bitmap.getHeight();
+			t_width = o_width;
+			t_height = o_height;
 		}
-		Bitmap temp = bitmap;
-		bitmap = Bitmap.createScaledBitmap(temp, t_width, t_height, true);
-		temp.recycle();
+		op.outWidth = t_width;
+		op.outHeight = t_height;
 	}
-	
+	/*
+	 * when click 'info' button, invoke this
+	 */
 	public void listInfomation(View v){
 		//create a dialog to list picture parameters
 		mDialog = new InfoDialog(this);
@@ -182,16 +288,36 @@ public class ShowImageActivity extends Activity implements OnClickListener{
 		
 		mDialog.show();
 	}
-	
-	public void slidePictures(View v){
+	/*
+	 * invoke in cycles, show next picture
+	 */
+	private void slideNext(){
+		id = next_id(id);
+		mViewPager.setCurrentItem(id);
+		startSlide();
+	}
+	/*
+	 * set the animation of the picture on sliding
+	 */
+	public void startSlide(){
 		Log.i("photo","slide");
+		ImageView iv = (ImageView)mViewPager.getChildAt(id);
 		iv.clearAnimation();
-		fl.removeView(ll);
-		iv.setAnimation(a);
-		iv.startAnimation(a);
+		iv.setAnimation(anim_s);
+		iv.startAnimation(anim_s);
+	}
+	public void slidePictures(View v){
+		startSlide();
+	}
+	/*
+	 * when the image was clicked, stop sliding
+	 */
+	public void stopSliding(){
+		
 	}
 	@SuppressLint("InlinedApi")
 	private ArrayList<String> getPicInfo(){
+		fileRoute = TimelineActivity.PicInfoList.get(id).fileRoute;
 		ArrayList<String> info = new ArrayList<String>();
 		ExifInterface et = null;
 		try {
@@ -275,9 +401,7 @@ public class ShowImageActivity extends Activity implements OnClickListener{
 	@Override
 	public void finish()
 	{
-		if (bitmap!=null){
-			bitmap.recycle();
-		}
+		for (int i=0;i<n;i++) recycle(i);
 		super.finish();
 	}
 	@Override
@@ -287,16 +411,6 @@ public class ShowImageActivity extends Activity implements OnClickListener{
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		iv.clearAnimation();
-		if (fl.getChildCount()==1){
-			fl.addView(ll);
-		} else{
-			fl.removeView(ll);
-		}
 	}
 	private class InfoDialog extends Dialog{
 		Context context;

@@ -1,30 +1,20 @@
 package com.example.photomanager1_0;
 
 import java.util.ArrayList;
-import java.util.Date;
-
-
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
-import android.text.format.Time;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
@@ -177,7 +167,7 @@ public class TimelineActivity extends Activity implements OnTouchListener, OnIte
 		return Math.sqrt(x * x + y * y);
 	}
 	private void upGranularity(){
-		if (granularity == 4) return;
+		if (granularity == 4 || mSet.size()==1) return;
 		granularity++;
 		mSet = dg.getSet(granularity);
 		mAdapter.notifyDataSetChanged();
