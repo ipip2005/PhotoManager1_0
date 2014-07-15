@@ -20,7 +20,9 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" android:logo="@drawable/ic_launcher" android:theme="@style/AppBaseTheme">"
+        android:label="@string/app_name" 
+        android:logo="@drawable/ic_launcher" 
+        android:theme="@style/AppBaseTheme">"
         	<meta-data
        	      android:name="com.baidu.lbsapi.API_KEY"
        	      android:value="QAaFXdFL9zmSvhisoiQAVgTz"/>
@@ -35,8 +37,8 @@
             </intent-filter>
         </service>
         <activity
-            android:name="com.example.photomanager1_0.Main"
             android:theme="@android:style/Theme.NoTitleBar"
+            android:name="com.example.photomanager1_0.Main"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,7 +63,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:theme="@android:style/Theme.NoTitleBar"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:name="com.example.photomanager1_0.ShowImageActivity"
             android:label="@string/app_name" >
         </activity>

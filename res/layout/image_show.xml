@@ -8,6 +8,7 @@
         android:padding="0dip"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        
         <com.example.photomanager1_0.JazzyViewPager
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -15,6 +16,7 @@
             android:flipInterval="30"
             android:persistentDrawingCache="animation"
             />
+        
     	<!--ImageView
     	    android:padding="0dip"
 	    	android:id="@+id/ivImageShow"
@@ -50,6 +52,7 @@
     	   		    />
     	    </LinearLayout>
     	    <ImageView
+    	        android:id="@+id/image_show_center_image"
     	        android:layout_width="match_parent"
     	        android:layout_height="0dip"
     	        android:background="@null"
@@ -84,5 +87,7 @@
     	            /-->
     	    </LinearLayout>
     	</LinearLayout>
+    	
+    	
 	</RelativeLayout>
 </LinearLayout>

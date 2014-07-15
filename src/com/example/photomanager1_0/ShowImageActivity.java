@@ -23,7 +23,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -36,6 +38,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 public class ShowImageActivity extends Activity{
 	private LinearLayout ll;
@@ -51,6 +54,7 @@ public class ShowImageActivity extends Activity{
 	private Animation anim_s,anim_f;
 	private Button b;
 	private Bitmap[] bitmapCache;
+	private float px=0, py=0;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,19 +72,8 @@ public class ShowImageActivity extends Activity{
 		}
 		createScaledBitmap();*/
 		mViewPager = (JazzyViewPager)findViewById(R.id.image_show_view_pager);
-		mViewPager.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				if (ll.getVisibility() == View.VISIBLE)
-					ll.setVisibility(View.INVISIBLE); else
-					ll.setVisibility(View.VISIBLE);
-			}
-			
-		});
 		InitViewPager();
-		ll=(LinearLayout)findViewById(R.id.ivImageCover);
+		
 		b = (Button)findViewById(R.id.ivBackButton);
 		b.setText(" < ПаІб("+(id+1)+"/"+TimelineActivity.PicInfoList.size()+")");
 		b.setOnClickListener(new OnClickListener(){
@@ -95,7 +88,55 @@ public class ShowImageActivity extends Activity{
 		initAnimation();
 	}
 	private void InitViewPager(){
-	
+		ll = (LinearLayout)findViewById(R.id.ivImageCover);
+		RelativeLayout rl = (RelativeLayout)findViewById(R.id.ivImageFrame);
+		//ImageView cv = (ImageView)findViewById(R.id.image_show_center_image);
+		/*rl.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Log.w("photo", "onClick");
+				if (ll.getVisibility() == View.VISIBLE)
+					ll.setVisibility(View.INVISIBLE); else
+					ll.setVisibility(View.VISIBLE);
+			}
+			
+		});*/
+		mViewPager.setOnTouchListener(new OnTouchListener(){
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				switch (event.getAction()){
+				case MotionEvent.ACTION_DOWN:
+					px = event.getX();
+					py = event.getY();
+					break;
+				case MotionEvent.ACTION_UP:
+					if (px-event.getX()<5 && py-event.getY()<5){
+						if (ll.getVisibility() == View.VISIBLE)
+							ll.setVisibility(View.INVISIBLE); else
+							ll.setVisibility(View.VISIBLE);
+					}
+					break;
+				}
+				return false;
+			}
+			
+		});
+		/*
+		mViewPager.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Log.w("photo", "onClick");
+				if (ll.getVisibility() == View.VISIBLE)
+					ll.setVisibility(View.INVISIBLE); else
+					ll.setVisibility(View.VISIBLE);
+			}
+			
+		});*/
 		bitmapCache = new Bitmap[n];
 		List<Integer> list = new ArrayList<Integer>();
 		for (int i=0;i<n;i++) list.add(i);

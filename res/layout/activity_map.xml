@@ -127,6 +127,7 @@
          			android:layout_centerInParent="true"
          			android:onClick="showSearchPanel"
          			android:background="@drawable/map_search_style"
+         			android:alpha="0.8"
          			android:textColor="#FF000000" />
 			</RelativeLayout>
 			<RelativeLayout 
