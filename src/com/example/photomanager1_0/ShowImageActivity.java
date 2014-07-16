@@ -40,106 +40,106 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-public class ShowImageActivity extends Activity{
+/**
+ * @author ipip
+ *  2014年7月16日下午2:50:37
+ */
+public class ShowImageActivity extends Activity {
 	private LinearLayout ll;
 	private InfoDialog mDialog;
 	private String fileRoute;
 	private JazzyViewPager mViewPager;
 	private MyViewPagerAdapter mAdapter;
-	//the number of the bitmap in PicInfoList, which is not the source ID
+	// the number of the bitmap in PicInfoList, which is not the source ID
 	private int id;
 	private int n;
-	//origin width and height of the bitmap
-	private int o_width,o_height;
-	private Animation anim_s,anim_f;
+	// origin width and height of the bitmap
+	private int o_width, o_height;
+	private Animation anim_s, anim_f;
 	private Button b;
 	private Bitmap[] bitmapCache;
-	private float px=0, py=0;
+	private float px = 0, py = 0;
+
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.image_show);
-		id = getIntent().getIntExtra("image",-1);
+		setContentView(R.layout.image_show);
+		id = getIntent().getIntExtra("image", -1);
 		n = TimelineActivity.PicInfoList.size();
-		/*Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().
-				  appendPath(Long.toString(TimelineActivity.PicInfoList.get(id).id)).build();
-		try {
-			bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		createScaledBitmap();*/
-		mViewPager = (JazzyViewPager)findViewById(R.id.image_show_view_pager);
+		/*
+		 * Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().
+		 * appendPath
+		 * (Long.toString(TimelineActivity.PicInfoList.get(id).id)).build(); try
+		 * { bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
+		 * uri); } catch (Exception e) { // TODO: handle exception
+		 * e.printStackTrace(); } createScaledBitmap();
+		 */
+		mViewPager = (JazzyViewPager) findViewById(R.id.image_show_view_pager);
 		InitViewPager();
-		
-		b = (Button)findViewById(R.id.ivBackButton);
-		b.setText(" < 相册("+(id+1)+"/"+TimelineActivity.PicInfoList.size()+")");
-		b.setOnClickListener(new OnClickListener(){
+
+		b = (Button) findViewById(R.id.ivBackButton);
+		b.setText(" < 相册(" + (id + 1) + "/"
+				+ TimelineActivity.PicInfoList.size() + ")");
+		b.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				ShowImageActivity.this.finish();
 			}
-			
+
 		});
 		initAnimation();
 	}
-	private void InitViewPager(){
-		ll = (LinearLayout)findViewById(R.id.ivImageCover);
-		RelativeLayout rl = (RelativeLayout)findViewById(R.id.ivImageFrame);
-		//ImageView cv = (ImageView)findViewById(R.id.image_show_center_image);
-		/*rl.setOnClickListener(new OnClickListener(){
 
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				Log.w("photo", "onClick");
-				if (ll.getVisibility() == View.VISIBLE)
-					ll.setVisibility(View.INVISIBLE); else
-					ll.setVisibility(View.VISIBLE);
-			}
-			
-		});*/
-		mViewPager.setOnTouchListener(new OnTouchListener(){
+	private void InitViewPager() {
+		ll = (LinearLayout) findViewById(R.id.ivImageCover);
+		RelativeLayout rl = (RelativeLayout) findViewById(R.id.ivImageFrame);
+		// ImageView cv = (ImageView)findViewById(R.id.image_show_center_image);
+		/*
+		 * rl.setOnClickListener(new OnClickListener(){
+		 * 
+		 * @Override public void onClick(View arg0) { // TODO Auto-generated
+		 * method stub Log.w("photo", "onClick"); if (ll.getVisibility() ==
+		 * View.VISIBLE) ll.setVisibility(View.INVISIBLE); else
+		 * ll.setVisibility(View.VISIBLE); }
+		 * 
+		 * });
+		 */
+		mViewPager.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
-				switch (event.getAction()){
+				switch (event.getAction()) {
 				case MotionEvent.ACTION_DOWN:
 					px = event.getX();
 					py = event.getY();
 					break;
 				case MotionEvent.ACTION_UP:
-					if (px-event.getX()<5 && py-event.getY()<5){
+					if (px - event.getX() < 5 && py - event.getY() < 5) {
 						if (ll.getVisibility() == View.VISIBLE)
-							ll.setVisibility(View.INVISIBLE); else
+							ll.setVisibility(View.INVISIBLE);
+						else
 							ll.setVisibility(View.VISIBLE);
 					}
 					break;
 				}
 				return false;
 			}
-			
+
 		});
 		/*
-		mViewPager.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				Log.w("photo", "onClick");
-				if (ll.getVisibility() == View.VISIBLE)
-					ll.setVisibility(View.INVISIBLE); else
-					ll.setVisibility(View.VISIBLE);
-			}
-			
-		});*/
+		 * mViewPager.setOnClickListener(new OnClickListener(){
+		 * 
+		 * @Override public void onClick(View arg0) { // TODO Auto-generated
+		 * method stub Log.w("photo", "onClick"); if (ll.getVisibility() ==
+		 * View.VISIBLE) ll.setVisibility(View.INVISIBLE); else
+		 * ll.setVisibility(View.VISIBLE); }
+		 * 
+		 * });
+		 */
 		bitmapCache = new Bitmap[n];
-		List<Integer> list = new ArrayList<Integer>();
-		for (int i=0;i<n;i++) list.add(i);
 		mAdapter = new MyViewPagerAdapter(this);
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setCurrentItem(id);
@@ -148,69 +148,80 @@ public class ShowImageActivity extends Activity{
 		mViewPager.setPageMargin(30);
 		mViewPager.setOnPageChangeListener(new MyOnPageChangeListener());
 	}
-	private class MyViewPagerAdapter extends PagerAdapter{
+
+	private class MyViewPagerAdapter extends PagerAdapter {
 		private Context mContext;
-		public MyViewPagerAdapter(Context context){
+
+		public MyViewPagerAdapter(Context context) {
 			mContext = context;
 		}
+
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
-			return n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ;
+			return n;
 		}
 
 		@Override
 		public boolean isViewFromObject(View arg0, Object arg1) {
 			// TODO Auto-generated method stub
-			return arg0 == (View)arg1;
+			return arg0 == (View) arg1;
 		}
-		
+
 		@Override
-		public Object instantiateItem(ViewGroup container, int position){
+		public Object instantiateItem(ViewGroup container, int position) {
 			ImageView iv = new ImageView(mContext);
 			Bitmap bm = null;
-			if (bitmapCache[position]!=null && bitmapCache[position].isRecycled()==false)
-				bm = bitmapCache[position]; else
+			if (bitmapCache[position] != null
+					&& bitmapCache[position].isRecycled() == false)
+				bm = bitmapCache[position];
+			else
 				bm = getBitmapById(position);
 			iv.setImageBitmap(bm);
-			((ViewPager)container).addView(iv,0);
+			((ViewPager) container).addView(iv, 0);
 			mViewPager.setObjectForPosition(iv, position);
-			return iv;	
+			return iv;
 		}
+
 		@Override
-		public void destroyItem(ViewGroup container, int position, Object object){
-			container.removeView((View)object);
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			container.removeView((View) object);
 		}
 	}
-	private class MyOnPageChangeListener implements OnPageChangeListener{
+
+	private class MyOnPageChangeListener implements OnPageChangeListener {
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onPageScrolled(int arg0, float arg1, int arg2) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onPageSelected(int arg0) {
 			// TODO Auto-generated method stub
 			id = arg0;
-			b.setText(" < 相册("+(id+1)+"/"+TimelineActivity.PicInfoList.size()+")");
+			b.setText(" < 相册(" + (id + 1) + "/"
+					+ TimelineActivity.PicInfoList.size() + ")");
 			int idl = last_id(last_id(last_id(id)));
-			int idn = (id+3)%n;
+			int idn = (id + 3) % n;
 			recycle(idl);
 			recycle(idn);
 		}
-		
+
 	}
-	private void initAnimation(){
-		anim_s = new ScaleAnimation(1f, 1.2f, 1f, 1.2f, Animation.RELATIVE_TO_PARENT, 0.5f, Animation.RELATIVE_TO_PARENT, 0.5f);
+
+	private void initAnimation() {
+		anim_s = new ScaleAnimation(1f, 1.2f, 1f, 1.2f,
+				Animation.RELATIVE_TO_PARENT, 0.5f,
+				Animation.RELATIVE_TO_PARENT, 0.5f);
 		anim_s.setDuration(4000);
-		anim_s.setAnimationListener(new AnimationListener(){
+		anim_s.setAnimationListener(new AnimationListener() {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
@@ -220,27 +231,30 @@ public class ShowImageActivity extends Activity{
 
 			@Override
 			public void onAnimationRepeat(Animation animation) {
-				// TODO Auto-generated method stub			
+				// TODO Auto-generated method stub
 			}
 
 			@Override
 			public void onAnimationStart(Animation animation) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 		});
 	}
-	private int last_id(int id){
+
+	private int last_id(int id) {
 		return (id + n - 1) % n;
 	}
-	private int next_id(int id){
+
+	private int next_id(int id) {
 		return (id + 1) % n;
 	}
+
 	/*
 	 * get a scaled bitmap using ID in PicInfoList array.
 	 */
-	private Bitmap getBitmapById(int id){
+	private Bitmap getBitmapById(int id) {
 		bitmapCache[id] = null;
 		String fileRoute = TimelineActivity.PicInfoList.get(id).fileRoute;
 		try {
@@ -251,52 +265,56 @@ public class ShowImageActivity extends Activity{
 			int o_w = op.outWidth;
 			createScaledBitmap(op);
 			op.inJustDecodeBounds = false;
-			op.inSampleSize = o_w/op.outWidth;
-			//Log.w("photo", "id:"+id+"   "+op.inSampleSize+" "+o_w+" "+op.outWidth);
+			op.inSampleSize = o_w / op.outWidth;
+			// Log.w("photo",
+			// "id:"+id+"   "+op.inSampleSize+" "+o_w+" "+op.outWidth);
 			op.inPurgeable = true;
 			op.inInputShareable = true;
 			op.inPreferredConfig = Bitmap.Config.RGB_565;
 			bitmapCache[id] = BitmapFactory.decodeFile(fileRoute, op);
-			//bm = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+			// bm = MediaStore.Images.Media.getBitmap(getContentResolver(),
+			// uri);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		
+
 		return bitmapCache[id];
 	}
-	private void recycle(int id){
-		if (bitmapCache[id]!=null) {
-			//Log.w("photo", "recycle: "+id);
+
+	private void recycle(int id) {
+		if (bitmapCache[id] != null) {
+			// Log.w("photo", "recycle: "+id);
 			bitmapCache[id].recycle();
-			bitmapCache[id]=null;
+			bitmapCache[id] = null;
 		}
 	}
+
 	/*
-	 * scale the bitmap width&height to fit screen better, for saving memories...
+	 * scale the bitmap width&height to fit screen better, for saving
+	 * memories...
 	 */
-	private void createScaledBitmap(BitmapFactory.Options op){
+	private void createScaledBitmap(BitmapFactory.Options op) {
 		o_width = op.outWidth;
 		o_height = op.outHeight;
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
-		int width = dm.widthPixels+1;
-		int height = dm.heightPixels+1;
+		int width = dm.widthPixels + 1;
+		int height = dm.heightPixels + 1;
 		int t_width;
 		int t_height;
-		if (o_width>width || o_height>height){
+		if (o_width > width || o_height > height) {
 			t_width = width;
-			t_height = o_height*width/o_width;
-			if (t_height>height){
-				t_width = t_width*height/t_height;
+			t_height = o_height * width / o_width;
+			if (t_height > height) {
+				t_width = t_width * height / t_height;
 				t_height = height;
 			}
-		} else
-		if (o_width<width && o_height<height){
+		} else if (o_width < width && o_height < height) {
 			t_width = width;
-			t_height = o_height*width/o_width;
-			if (t_height>height){
-				t_width = t_width*height/t_height;
+			t_height = o_height * width / o_width;
+			if (t_height > height) {
+				t_width = t_width * height / t_height;
 				t_height = height;
 			}
 		} else {
@@ -306,58 +324,64 @@ public class ShowImageActivity extends Activity{
 		op.outWidth = t_width;
 		op.outHeight = t_height;
 	}
+
 	/*
 	 * when click 'info' button, invoke this
 	 */
-	public void listInfomation(View v){
-		//create a dialog to list picture parameters
+	public void listInfomation(View v) {
+		// create a dialog to list picture parameters
 		mDialog = new InfoDialog(this);
-		//Button in the dialog
-		
-		//use WindowManager to manager mydialog's attributes
+		// Button in the dialog
+
+		// use WindowManager to manager mydialog's attributes
 		Window mWindow = mDialog.getWindow();
 		WindowManager.LayoutParams lp = mWindow.getAttributes();
 		mWindow.setGravity(Gravity.CENTER);
 		lp.alpha = 0.6f;
-		
+
 		DisplayMetrics dm = new DisplayMetrics();
-    	getWindowManager().getDefaultDisplay().getMetrics(dm);
-		lp.width = (int)(dm.widthPixels*0.95);
-		lp.height = (int)(dm.heightPixels*0.9);
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		lp.width = (int) (dm.widthPixels * 0.95);
+		lp.height = (int) (dm.heightPixels * 0.9);
 		mDialog.getWindow().setAttributes(lp);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
 		mDialog.show();
 	}
+
 	/*
 	 * invoke in cycles, show next picture
 	 */
-	private void slideNext(){
+	private void slideNext() {
 		id = next_id(id);
 		mViewPager.setCurrentItem(id);
 		startSlide();
 	}
+
 	/*
 	 * set the animation of the picture on sliding
 	 */
-	public void startSlide(){
-		Log.i("photo","slide");
-		ImageView iv = (ImageView)mViewPager.getChildAt(id);
+	public void startSlide() {
+		Log.i("photo", "slide");
+		ImageView iv = (ImageView) mViewPager.getChildAt(id);
 		iv.clearAnimation();
 		iv.setAnimation(anim_s);
 		iv.startAnimation(anim_s);
 	}
-	public void slidePictures(View v){
+
+	public void slidePictures(View v) {
 		startSlide();
 	}
+
 	/*
 	 * when the image was clicked, stop sliding
 	 */
-	public void stopSliding(){
-		
+	public void stopSliding() {
+
 	}
+
 	@SuppressLint("InlinedApi")
-	private ArrayList<String> getPicInfo(){
+	private ArrayList<String> getPicInfo() {
 		fileRoute = TimelineActivity.PicInfoList.get(id).fileRoute;
 		ArrayList<String> info = new ArrayList<String>();
 		ExifInterface et = null;
@@ -367,17 +391,17 @@ public class ShowImageActivity extends Activity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (et==null){
+		if (et == null) {
 			info.add("信息获取失败...");
 			return info;
 		}
-		
+
 		int fileSplitPlace = fileRoute.lastIndexOf('/');
-		info.add("名称:"+fileRoute.substring(fileSplitPlace+1));
-		info.add("路径:"+fileRoute.substring(0, fileSplitPlace-1));
+		info.add("名称:" + fileRoute.substring(fileSplitPlace + 1));
+		info.add("路径:" + fileRoute.substring(0, fileSplitPlace - 1));
 		int fileSize = 0;
 		File f = new File(fileRoute);
-		if (f.exists()){
+		if (f.exists()) {
 			FileInputStream fis;
 			try {
 				fis = new FileInputStream(f);
@@ -389,88 +413,116 @@ public class ShowImageActivity extends Activity{
 			}
 		}
 		String strSize;
-		if (fileSize<1048576){
-			strSize = ""+fileSize/1024+"KB";
-		} else strSize = ""+1.0*(int)(1.0*fileSize/1048576*100)/100+"MB";
-		info.add("文件大小: "+strSize+"("+fileSize+"Byte)");
-		info.add("宽高: "+o_width+"*"+o_height);
-		if (et.getAttribute(ExifInterface.TAG_DATETIME)!=null)
-			info.add("拍摄日期: "+et.getAttribute(ExifInterface.TAG_DATETIME).replaceFirst(":", "/").replaceFirst(":", "/"));
-		if (TimelineActivity.PicInfoList.get(id).lalitude!=0)
-			info.add("经纬度: "+TimelineActivity.PicInfoList.get(id).lalitude+","+TimelineActivity.PicInfoList.get(id).longitude);
-		if (et.getAttribute(ExifInterface.TAG_APERTURE)!=null)
-			info.add("光圈值: "+et.getAttribute(ExifInterface.TAG_APERTURE));
-		if (et.getAttribute(ExifInterface.TAG_MAKE)!=null)
-			info.add("制造者: "+et.getAttribute(ExifInterface.TAG_MAKE));
-		if (et.getAttribute(ExifInterface.TAG_MODEL)!=null)
-			info.add("设备型号: "+et.getAttribute(ExifInterface.TAG_MODEL));
-		if (et.getAttribute(ExifInterface.TAG_FLASH)!=null)
-			info.add("闪光灯: "+et.getAttribute(ExifInterface.TAG_FLASH));
-		info.add("焦距: "+et.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH,-1)+"mm");
-		if (et.getAttribute(ExifInterface.TAG_EXPOSURE_TIME)!=null)
-			info.add("曝光时间: "+et.getAttribute(ExifInterface.TAG_EXPOSURE_TIME)+"ms");
-		if (et.getAttribute(ExifInterface.TAG_WHITE_BALANCE)!=null)
-			info.add("白平衡: "+((et.getAttribute(ExifInterface.TAG_WHITE_BALANCE).equals(String.valueOf(ExifInterface.WHITEBALANCE_AUTO)))?"自动":"手动"));
-		if (et.getAttribute(ExifInterface.TAG_ISO)!=null)
-			info.add("感光度: "+et.getAttribute(ExifInterface.TAG_ISO));
-		if (et.getAttribute(ExifInterface.TAG_ORIENTATION)!=null){
-			String ori="";
-			switch (Integer.valueOf(et.getAttribute(ExifInterface.TAG_ORIENTATION))){
-			case(ExifInterface.ORIENTATION_NORMAL):
-				ori = "正常";break;
-			case(ExifInterface.ORIENTATION_UNDEFINED):
-				ori = "未定义的方向";break;
-			case(ExifInterface.ORIENTATION_FLIP_VERTICAL):
-				ori = "垂直翻转";break;
-			case(ExifInterface.ORIENTATION_FLIP_HORIZONTAL):
-				ori = "水平翻转";break;
-			case(ExifInterface.ORIENTATION_ROTATE_90):
-				ori = "旋转90度";break;
-			case(ExifInterface.ORIENTATION_ROTATE_180):
-				ori = "旋转180度";break;
-			case(ExifInterface.ORIENTATION_ROTATE_270):
-				ori = "旋转270度";break;
-			case(ExifInterface.ORIENTATION_TRANSPOSE):
-				ori = "翻转";break;
-			case(ExifInterface.ORIENTATION_TRANSVERSE):
-				ori = "横向";break;
+		if (fileSize < 1048576) {
+			strSize = "" + fileSize / 1024 + "KB";
+		} else
+			strSize = "" + 1.0 * (int) (1.0 * fileSize / 1048576 * 100) / 100
+					+ "MB";
+		info.add("文件大小: " + strSize + "(" + fileSize + "Byte)");
+		info.add("宽高: " + o_width + "*" + o_height);
+		if (et.getAttribute(ExifInterface.TAG_DATETIME) != null)
+			info.add("拍摄日期: "
+					+ et.getAttribute(ExifInterface.TAG_DATETIME)
+							.replaceFirst(":", "/").replaceFirst(":", "/"));
+		if (TimelineActivity.PicInfoList.get(id).lalitude != 0)
+			info.add("经纬度: " + TimelineActivity.PicInfoList.get(id).lalitude
+					+ "," + TimelineActivity.PicInfoList.get(id).longitude);
+		if (et.getAttribute(ExifInterface.TAG_APERTURE) != null)
+			info.add("光圈值: " + et.getAttribute(ExifInterface.TAG_APERTURE));
+		if (et.getAttribute(ExifInterface.TAG_MAKE) != null)
+			info.add("制造者: " + et.getAttribute(ExifInterface.TAG_MAKE));
+		if (et.getAttribute(ExifInterface.TAG_MODEL) != null)
+			info.add("设备型号: " + et.getAttribute(ExifInterface.TAG_MODEL));
+		if (et.getAttribute(ExifInterface.TAG_FLASH) != null)
+			info.add("闪光灯: " + et.getAttribute(ExifInterface.TAG_FLASH));
+		info.add("焦距: "
+				+ et.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, -1)
+				+ "mm");
+		if (et.getAttribute(ExifInterface.TAG_EXPOSURE_TIME) != null)
+			info.add("曝光时间: "
+					+ et.getAttribute(ExifInterface.TAG_EXPOSURE_TIME) + "ms");
+		if (et.getAttribute(ExifInterface.TAG_WHITE_BALANCE) != null)
+			info.add("白平衡: "
+					+ ((et.getAttribute(ExifInterface.TAG_WHITE_BALANCE)
+							.equals(String
+									.valueOf(ExifInterface.WHITEBALANCE_AUTO))) ? "自动"
+							: "手动"));
+		if (et.getAttribute(ExifInterface.TAG_ISO) != null)
+			info.add("感光度: " + et.getAttribute(ExifInterface.TAG_ISO));
+		if (et.getAttribute(ExifInterface.TAG_ORIENTATION) != null) {
+			String ori = "";
+			switch (Integer.valueOf(et
+					.getAttribute(ExifInterface.TAG_ORIENTATION))) {
+			case (ExifInterface.ORIENTATION_NORMAL):
+				ori = "正常";
+				break;
+			case (ExifInterface.ORIENTATION_UNDEFINED):
+				ori = "未定义的方向";
+				break;
+			case (ExifInterface.ORIENTATION_FLIP_VERTICAL):
+				ori = "垂直翻转";
+				break;
+			case (ExifInterface.ORIENTATION_FLIP_HORIZONTAL):
+				ori = "水平翻转";
+				break;
+			case (ExifInterface.ORIENTATION_ROTATE_90):
+				ori = "旋转90度";
+				break;
+			case (ExifInterface.ORIENTATION_ROTATE_180):
+				ori = "旋转180度";
+				break;
+			case (ExifInterface.ORIENTATION_ROTATE_270):
+				ori = "旋转270度";
+				break;
+			case (ExifInterface.ORIENTATION_TRANSPOSE):
+				ori = "翻转";
+				break;
+			case (ExifInterface.ORIENTATION_TRANSVERSE):
+				ori = "横向";
+				break;
 			}
-			info.add("拍摄方向: "+ori);
+			info.add("拍摄方向: " + ori);
 		}
 		return info;
 	}
+
 	@Override
-	public void finish()
-	{
-		for (int i=0;i<n;i++) recycle(i);
+	public void finish() {
+		for (int i = 0; i < n; i++)
+			recycle(i);
 		super.finish();
 	}
+
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event){
-		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 			finish();
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	private class InfoDialog extends Dialog{
+
+	private class InfoDialog extends Dialog {
 		Context context;
+
 		public InfoDialog(Context context) {
 			super(context);
 			// TODO Auto-generated constructor stub
 			this.context = context;
 		}
+
 		public InfoDialog(Context context, int theme) {
-			super(context,theme);
+			super(context, theme);
 			// TODO Auto-generated constructor stub
 			this.context = context;
 		}
+
 		@Override
-		protected void onCreate(Bundle savedInstanceState){
+		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			this.setContentView(R.layout.image_show_info);
-			Button okButton = (Button)findViewById(R.id.ivInfoOkButton);
-			okButton.setOnClickListener(new View.OnClickListener(){
+			Button okButton = (Button) findViewById(R.id.ivInfoOkButton);
+			okButton.setOnClickListener(new View.OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
@@ -478,10 +530,11 @@ public class ShowImageActivity extends Activity{
 					mDialog.dismiss();
 				}
 			});
-			
+
 			ListView lv = (ListView) findViewById(R.id.ivInfoListView);
 			ArrayList<String> info = getPicInfo();
-			lv.setAdapter(new ArrayAdapter<String>(ShowImageActivity.this,R.layout.small_font,R.id.info_tv,info));
+			lv.setAdapter(new ArrayAdapter<String>(ShowImageActivity.this,
+					R.layout.small_font, R.id.info_tv, info));
 		}
 	}
 }

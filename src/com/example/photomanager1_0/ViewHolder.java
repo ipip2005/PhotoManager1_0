@@ -5,10 +5,9 @@ import android.widget.TextView;
 
 public class ViewHolder {
 	public ViewHolder(){
-		subimage = new ImageView[3];
 	}
 	public TextView title;
 	public TextView text;
-	public ImageView image;
-	public ImageView[] subimage;
+	public JazzyViewPager jViewPager;
+	public int holder_id = -1;
 }
