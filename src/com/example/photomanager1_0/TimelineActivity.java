@@ -139,26 +139,26 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 						.findViewById(R.id.item_title);
 				holder.text = (TextView) convertView
 						.findViewById(R.id.item_more);
-				holder.jViewPager = (JazzyViewPager) convertView
+				holder.viewPager = (MyViewPager) convertView
 						.findViewById(R.id.timeline_view_pager);
 				holder.holder_id = position;
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.jViewPager.removeAllViews();
+			holder.viewPager.removeAllViews();
 			holder.holder_id = position;
-			holder.jViewPager.setAdapter(new MyViewPagerAdapter(
+			holder.viewPager.setAdapter(new MyViewPagerAdapter(
 					TimelineActivity.this, mSet.get(position),
-					holder.jViewPager));
+					holder.viewPager));
 			// holder.jViewPager.setFadeEnabled(true);
 			// holder.jViewPager.setTransitionEffect(TransitionEffect.Tablet);
-			holder.jViewPager.setPageMargin(30);
-			holder.jViewPager.setOffscreenPageLimit(5);
+			holder.viewPager.setPageMargin(30);
+			holder.viewPager.setOffscreenPageLimit(5);
 			// Log.w("ViewPager",
 			// ""+mSet.get(position).size()+" "+holder.holder_id + " "+
 			// position);
-			holder.jViewPager.setCurrentItem(0);
+			holder.viewPager.setCurrentItem(0);
 			String openFlag = "";
 			if (mSet.get(position).size() > 1)
 				openFlag = ">>>";
@@ -171,10 +171,10 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	private class MyViewPagerAdapter extends PagerAdapter {
 		private Context mContext;
 		private ArrayList<Integer> set;
-		private JazzyViewPager mViewPager;
+		private ViewPager mViewPager;
 
 		public MyViewPagerAdapter(Context context, ArrayList<Integer> set,
-				JazzyViewPager viewPager) {
+				ViewPager viewPager) {
 			mContext = context;
 			this.set = set;
 			mViewPager = viewPager;
@@ -205,7 +205,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			else
 				iv.setImageBitmap(PicInfoList.get(set.get(position)).bitmap);
 			((ViewPager) container).addView(iv, 0);
-			mViewPager.setObjectForPosition(iv, position);
 			return iv;
 		}
 
@@ -450,4 +449,5 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			return super.dispatchTouchEvent(ev);
 		}
 	}
+	
 }

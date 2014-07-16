@@ -23,7 +23,7 @@
             android:textSize="23sp"
 		    />
 	</RelativeLayout>
-    <com.example.photomanager1_0.JazzyViewPager
+    <com.example.photomanager1_0.MyViewPager
             android:layout_width="match_parent"
             android:layout_height="100dip"
             android:id="@+id/timeline_view_pager"
