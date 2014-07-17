@@ -37,11 +37,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 /**
- * @author ipip
- *  2014年7月16日下午2:50:37
+ * @author ipip 2014年7月16日下午2:50:37
  */
 public class ShowImageActivity extends Activity {
 	private LinearLayout ll;
@@ -54,7 +52,7 @@ public class ShowImageActivity extends Activity {
 	private int n;
 	// origin width and height of the bitmap
 	private int o_width, o_height;
-	private Animation anim_s, anim_f;
+	private Animation anim_s;
 	private Button b;
 	private Bitmap[] bitmapCache;
 	private float px = 0, py = 0;
@@ -66,14 +64,6 @@ public class ShowImageActivity extends Activity {
 		setContentView(R.layout.image_show);
 		id = getIntent().getIntExtra("image", -1);
 		n = TimelineActivity.PicInfoList.size();
-		/*
-		 * Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().
-		 * appendPath
-		 * (Long.toString(TimelineActivity.PicInfoList.get(id).id)).build(); try
-		 * { bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
-		 * uri); } catch (Exception e) { // TODO: handle exception
-		 * e.printStackTrace(); } createScaledBitmap();
-		 */
 		mViewPager = (JazzyViewPager) findViewById(R.id.image_show_view_pager);
 		InitViewPager();
 
@@ -94,18 +84,6 @@ public class ShowImageActivity extends Activity {
 
 	private void InitViewPager() {
 		ll = (LinearLayout) findViewById(R.id.ivImageCover);
-		RelativeLayout rl = (RelativeLayout) findViewById(R.id.ivImageFrame);
-		// ImageView cv = (ImageView)findViewById(R.id.image_show_center_image);
-		/*
-		 * rl.setOnClickListener(new OnClickListener(){
-		 * 
-		 * @Override public void onClick(View arg0) { // TODO Auto-generated
-		 * method stub Log.w("photo", "onClick"); if (ll.getVisibility() ==
-		 * View.VISIBLE) ll.setVisibility(View.INVISIBLE); else
-		 * ll.setVisibility(View.VISIBLE); }
-		 * 
-		 * });
-		 */
 		mViewPager.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -503,18 +481,15 @@ public class ShowImageActivity extends Activity {
 	}
 
 	private class InfoDialog extends Dialog {
-		Context context;
 
 		public InfoDialog(Context context) {
 			super(context);
 			// TODO Auto-generated constructor stub
-			this.context = context;
 		}
 
 		public InfoDialog(Context context, int theme) {
 			super(context, theme);
 			// TODO Auto-generated constructor stub
-			this.context = context;
 		}
 
 		@Override

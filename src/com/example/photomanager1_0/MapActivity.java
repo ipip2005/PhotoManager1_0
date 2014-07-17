@@ -633,20 +633,17 @@ public class MapActivity extends Activity {
 	}
 
 	private class ImageDialog extends Dialog {
-		private Context context;
 		private Window window;
 
 		public ImageDialog(Context context) {
 			super(context);
 			// TODO Auto-generated constructor stub
-			this.context = context;
 
 		}
 
 		public ImageDialog(Context context, int theme) {
 			super(context, theme);
 			// TODO Auto-generated constructor stub
-			this.context = context;
 		}
 
 		public void showDialog(int x, int y) {
