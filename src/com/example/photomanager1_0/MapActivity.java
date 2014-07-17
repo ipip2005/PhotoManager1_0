@@ -577,11 +577,6 @@ public class MapActivity extends Activity {
 			});
 			return true;
 		}
-		/*
-		 * @Override public boolean onTap(GeoPoint pt , MapView mMapView){ if
-		 * (pop != null){ pop.hidePop(); mMapView.removeView(button); } return
-		 * false; }
-		 */
 
 	}
 
