@@ -1,6 +1,5 @@
 package com.example.photomanager1_0;
 
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ViewHolder {
@@ -8,6 +7,6 @@ public class ViewHolder {
 	}
 	public TextView title;
 	public TextView text;
-	public JazzyViewPager jViewPager;
+	public MyViewPager mViewPager;
 	public int holder_id = -1;
 }

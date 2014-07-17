@@ -1,7 +1,6 @@
 package com.example.photomanager1_0;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import android.graphics.Bitmap;
 

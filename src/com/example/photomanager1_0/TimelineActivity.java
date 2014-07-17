@@ -1,15 +1,12 @@
 package com.example.photomanager1_0;
 
 import java.util.ArrayList;
-
-import com.example.photomanager1_0.JazzyViewPager.TransitionEffect;
+import java.util.Calendar;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,14 +16,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.ScaleAnimation;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -36,8 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 /**
- * @author ipip
- *  2014年7月16日下午2:50:04
+ * @author ipip 2014年7月16日下午2:50:04
  */
 public class TimelineActivity extends Activity implements OnItemClickListener {
 	static public ArrayList<PicInfo> PicInfoList;
@@ -56,9 +51,9 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	// The mapping set, to get the real index in PicInfoList.
 	private ArrayList<ArrayList<Integer>> mSet;
 	// The Animation for listView.
-	private Animation myLayoutAnimation, myAnimation;
+	private Animation myLayoutAnimation, myAnimation, myAnimationB;
 	private LayoutAnimationController lac;
-
+	public static Calendar lastClickImage = Calendar.getInstance();
 	@SuppressLint("HandlerLeak")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +61,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		setContentView(R.layout.activity_timeline);
 		preData();
 		listView = new MyListView(this);
-		LinearLayout ll = (LinearLayout)findViewById(R.id.timeline_ll);
+		LinearLayout ll = (LinearLayout) findViewById(R.id.timeline_ll);
 		ll.addView(listView);
 		mAdapter = new PictureAdapter(this);
 		listView.setAdapter(mAdapter);
@@ -81,6 +76,11 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
 				0.5f);
 		myAnimation.setDuration(250);
+		
+		myAnimationB = new ScaleAnimation(1.5f, 0.9f, 1.5f, 0.9f,
+				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
+				0.5f);
+		myAnimationB.setDuration(400);
 		listView.setAnimation(myAnimation);
 	}
 
@@ -89,6 +89,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	 * bitmaps.
 	 */
 	private void preData() {
+		lastClickImage.setTimeInMillis(0);
 		handler = new Handler() {
 			public void handleMessage(Message msg) {
 				mAdapter.notifyDataSetChanged();
@@ -139,26 +140,26 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 						.findViewById(R.id.item_title);
 				holder.text = (TextView) convertView
 						.findViewById(R.id.item_more);
-				holder.jViewPager = (JazzyViewPager) convertView
+				holder.mViewPager = (MyViewPager) convertView
 						.findViewById(R.id.timeline_view_pager);
 				holder.holder_id = position;
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.jViewPager.removeAllViews();
+			holder.mViewPager.removeAllViews();
 			holder.holder_id = position;
-			holder.jViewPager.setAdapter(new MyViewPagerAdapter(
+			holder.mViewPager.setAdapter(new MyViewPagerAdapter(
 					TimelineActivity.this, mSet.get(position),
-					holder.jViewPager));
+					holder.mViewPager));
 			// holder.jViewPager.setFadeEnabled(true);
 			// holder.jViewPager.setTransitionEffect(TransitionEffect.Tablet);
-			holder.jViewPager.setPageMargin(30);
-			holder.jViewPager.setOffscreenPageLimit(5);
+			holder.mViewPager.setPageMargin(30);
+			holder.mViewPager.setOffscreenPageLimit(5);
 			// Log.w("ViewPager",
 			// ""+mSet.get(position).size()+" "+holder.holder_id + " "+
 			// position);
-			holder.jViewPager.setCurrentItem(0);
+			holder.mViewPager.setCurrentItem(0);
 			String openFlag = "";
 			if (mSet.get(position).size() > 1)
 				openFlag = ">>>";
@@ -168,13 +169,13 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		}
 	}
 
-	private class MyViewPagerAdapter extends PagerAdapter {
+	private class MyViewPagerAdapter extends PagerAdapter{
 		private Context mContext;
 		private ArrayList<Integer> set;
-		private JazzyViewPager mViewPager;
+		private MyViewPager mViewPager;
 
 		public MyViewPagerAdapter(Context context, ArrayList<Integer> set,
-				JazzyViewPager viewPager) {
+				MyViewPager viewPager) {
 			mContext = context;
 			this.set = set;
 			mViewPager = viewPager;
@@ -202,22 +203,72 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			ImageView iv = new ImageView(mContext);
 			if (PicInfoList.get(set.get(position)).bitmap == null)
 				dg.getData(set.get(position));
-			else
-				iv.setImageBitmap(PicInfoList.get(set.get(position)).bitmap);
+			iv.setImageBitmap(PicInfoList.get(set.get(position)).bitmap);
+			iv.setTag(set.get(position));
+			iv.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					if (Calendar.getInstance().getTimeInMillis() - lastClickImage.getTimeInMillis()<10000) return;
+					lastClickImage = Calendar.getInstance();
+					Animation cAnimation = new ScaleAnimation(1.0f, 0.95f, 1.0f, 0.95f,
+							Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
+							0.5f);
+					cAnimation.setDuration(200);
+					v.setAnimation(cAnimation);
+					
+					Animation dAnimation = new ScaleAnimation(0.95f, 1.0f, 0.95f, 1.0f,
+							Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
+							0.5f);
+					dAnimation.setDuration(200);
+					dAnimation.setStartTime(200);
+					v.setAnimation(dAnimation);
+					
+					v.startAnimation(cAnimation);
+					v.startAnimation(dAnimation);		
+					Intent intent = new Intent(TimelineActivity.this,
+							ShowImageActivity.class);
+					intent.putExtra("image", (Integer)v.getTag());
+					startActivity(intent);
+					new Handler().postDelayed(new MyRunnable((Integer)v.getTag()), 0);
+					/*
+					*/
+				}
+				
+			});
 			((ViewPager) container).addView(iv, 0);
-			mViewPager.setObjectForPosition(iv, position);
 			return iv;
 		}
-
+		
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
 			container.removeView((View) object);
 		}
+		
+		private class MyRunnable implements Runnable{
+			int mTag;
+			public MyRunnable(int tag){
+				mTag = tag;
+			}
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		}
 	}
-
+	
 	private String dealTitle(ArrayList<Integer> list) {
 		String st = PicInfoList.get(list.get(0)).title;
 		String ed = PicInfoList.get(list.get(list.size() - 1)).title;
+		
+		if (list.size() == 1){
+			Calendar c = PicInfoList.get(list.get(0)).mdate;
+			return st + " " +c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE);
+		}
+		
 		if (st.equals(ed))
 			return st;
 		else
@@ -239,27 +290,29 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		listView.setSelection(0);
 		listView.startLayoutAnimation();
 		listView.clearAnimation();
-		listView.setAnimation(myAnimation);
-		listView.startAnimation(myAnimation);
+		listView.setAnimation(myAnimationB);
+		listView.startAnimation(myAnimationB);
 	}
 
 	private void downGranularity(int index) {
 		granularity--;
-		if (granularity == 1) {
-			mAdapter.notifyDataSetChanged();
-			listView.setSelection(mSet.get(index).get(0));
-		} else {
-			int id = mSet.get(index).get(0);
-			mSet = dg.getSet(granularity);
-			mAdapter.notifyDataSetChanged();
-			for (int i = 1; i <= mSet.size(); i++) {
-				if (i == mSet.size())
-					listView.setSelection(i - 1);
-				else if (PicInfoList.get(id).mdate.after(PicInfoList.get(mSet
-						.get(i).get(0)).mdate)) {
-					listView.setSelection(i - 1);
-					break;
-				}
+		int id = mSet.get(index).get(0);
+		mSet = dg.getSet(granularity);
+		mAdapter.notifyDataSetChanged();
+		for (int i = 0; i < mSet.size(); i++) {
+			if (i == mSet.size()-1 || id < mSet.get(i+1).get(0)) {
+				Log.w("ViewPager", ""+id+" "+i+" "+mSet.get(i).get(0));
+				listView.setTag(i);
+				new Handler().post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						listView.setSelection((Integer)listView.getTag());
+					}
+					
+				});
+				break;
 			}
 		}
 		listView.startLayoutAnimation();
@@ -268,118 +321,34 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		listView.startAnimation(myAnimation);
 	}
 	/*
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		// TODO Auto-generated method stub
-		Log.w("ViewPager", "onTouch event.getPointerCount()"+event.getPointerCount());
-		switch (event.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_DOWN:
-		case MotionEvent.ACTION_POINTER_DOWN:
-			if (event.getPointerCount() == 2)
-				dst = measureFingers(event);
-			break;
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_POINTER_UP:
-			
-			if (event.getPointerCount() == 1 && ndst < dst) {
-				upGranularity();
-				dst = -1;
-			}
-			break;
-		
-		case MotionEvent.ACTION_MOVE:
-			if (event.getPointerCount() >= 2) {
-				ndst = measureFingers(event);
-			}
-			break;
-		}
-		if (event.getPointerCount() >= 2)
-			return true;
-		return super.onTouchEvent(event);
-	}*/
-	/*
 	 * (non-Javadoc)
-	 * @see android.app.Activity#dispatchTouchEvent(android.view.MotionEvent)
-	
-	
-/*
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev){
-		Log.w("ViewPager", ""+ev.getPointerCount()+" "+isScaling);
-		
-		switch (ev.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_DOWN:
-		case MotionEvent.ACTION_POINTER_DOWN:
-			Log.w("ViewPager", "Top dispatch down " +ev.getPointerCount());
-			if (ev.getPointerCount() == 1){
-				xDown = ev.getRawX();
-				yDown = ev.getRawY();
-			}
-			break;
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_POINTER_UP:
-			Log.w("ViewPager", "Top dispatch up");
-			if (ev.getPointerCount()==1) {
-				/*if (isScaling){
-					if (isTwoPointer) isTwoPointer = false; else
-						isScaling = false;
-				}
-				isScaling = false;
-			}
-			break;
-		case MotionEvent.ACTION_MOVE:
-			Log.w("ViewPager", "Top dispatch move");
-			xMove = ev.getRawX();
-			yMove = ev.getRawY();
-			break;
-		}
-		if (ev.getPointerCount() >= 2) {
-			isScaling = true;
-			//isTwoPointer = true;
-			return true;
-		}
-		if (isScaling) return true;
-		return super.dispatchTouchEvent(ev);
-	}*/
+	 * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
+	 */
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
-		if (granularity == 1) {
-			Intent intent = new Intent(TimelineActivity.this,
-					ShowImageActivity.class);
-			intent.putExtra("image", arg2);
-			startActivity(intent);
-		} else {
-			if (mSet.get(arg2).size() == 1) {
-				Intent intent = new Intent(TimelineActivity.this,
-						ShowImageActivity.class);
-				intent.putExtra("image", mSet.get(arg2).get(0));
-				startActivity(intent);
-				return;
-			}
-			this.downGranularity(arg2);
-		}
+		if (mSet.get(arg2).size() > 1) 
+			this.downGranularity(arg2);	
 	}
+	/*
+	 * 自定义listview 用于事件分发的处理。
+	 */
 	private class MyListView extends ListView{
-		private boolean isScaling = false;
-		//private boolean isTwoPointer = false;
-		private float xDown;// 记录手指按下时的横坐标。  
-	    private float xMove;// 记录手指移动时的横坐标。  
-	    private float yDown;// 记录手指按下时的纵坐标。  
-	    private float yMove;// 记录手指移动时的纵坐标。  
 		public MyListView(Context context) {
 			super(context);
 			this.setDivider(null);
 			// TODO Auto-generated constructor stub
 		}
+
 		/*
 		 * (non-Javadoc)
-		 * @see android.widget.AbsListView#onTouchEvent(android.view.MotionEvent)
+		 * 
+		 * @see
+		 * android.widget.AbsListView#onTouchEvent(android.view.MotionEvent)
 		 * 处理listView的触摸事件
 		 */
 		@Override
-		public boolean onTouchEvent(MotionEvent ev){
-			Log.w("ViewPager", "onTouch event.getPointerCount()"+ev.getPointerCount() + " " +dst+" "+ndst);
+		public boolean onTouchEvent(MotionEvent ev) {
 			switch (ev.getAction() & MotionEvent.ACTION_MASK) {
 			case MotionEvent.ACTION_DOWN:
 			case MotionEvent.ACTION_POINTER_DOWN:
@@ -388,13 +357,13 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				break;
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_POINTER_UP:
-				
+
 				if (ev.getPointerCount() == 2 && ndst < dst) {
 					upGranularity();
 					dst = -1;
 				}
 				break;
-			
+
 			case MotionEvent.ACTION_MOVE:
 				if (ev.getPointerCount() >= 2) {
 					ndst = measureFingers(ev);
@@ -405,48 +374,20 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				return true;
 			return super.onTouchEvent(ev);
 		}
+
 		/*
-		 * 		(non-Javadoc)
-		 * @see android.view.ViewGroup#dispatchTouchEvent(android.view.MotionEvent)
-		 *  * listView事件分发规则：
-		 * 状态：双指操作中isScaling.
-		 * 指头全放 ：isScaling = false;
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.view.ViewGroup#dispatchTouchEvent(android.view.MotionEvent) *
+		 * listView事件分发规则： 状态：双指操作中isScaling. 指头全放 ：isScaling = false;
 		 * 任何状态为true时截断调用onTouch，否则分发给子View
 		 */
 		@Override
-		public boolean dispatchTouchEvent(MotionEvent ev){
-			Log.w("ViewPager", ""+ev.getPointerCount()+" "+isScaling);
-			
-			switch (ev.getAction() & MotionEvent.ACTION_MASK) {
-			case MotionEvent.ACTION_DOWN:
-			case MotionEvent.ACTION_POINTER_DOWN:
-				Log.w("ViewPager", "Top dispatch down " +ev.getPointerCount());
-				if (ev.getPointerCount() == 1){
-					xDown = ev.getRawX();
-					yDown = ev.getRawY();
-				}
-				break;
-			case MotionEvent.ACTION_UP:
-			case MotionEvent.ACTION_POINTER_UP:
-				Log.w("ViewPager", "Top dispatch up");
-				if (ev.getPointerCount()==1) {
-					/*if (isScaling){
-						if (isTwoPointer) isTwoPointer = false; else
-							isScaling = false;
-					}*/
-					isScaling = false;
-				}
-				break;
-			case MotionEvent.ACTION_MOVE:
-				Log.w("ViewPager", "Top dispatch move");
-				xMove = ev.getRawX();
-				yMove = ev.getRawY();
-				break;
+		public boolean dispatchTouchEvent(MotionEvent ev) {
+			if (ev.getPointerCount()>=2) {
+				return onTouchEvent(ev);
 			}
-			if (ev.getPointerCount() >= 2) isScaling = true;
-			if (isScaling) Log.w("ViewPager", "should be dealed"); else
-				Log.w("ViewPager", "should not be dealed");
-			if (isScaling) return true;
 			return super.dispatchTouchEvent(ev);
 		}
 	}

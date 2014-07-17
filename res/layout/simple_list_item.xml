@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_back"
+    android:descendantFocusability="blocksDescendants"
     android:orientation="vertical" >
     <RelativeLayout 
         android:layout_width="match_parent"
@@ -13,17 +14,17 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:textColor="#eeeeee"
-            android:textSize="23sp" />
+            android:textSize="25sp" />
 		<TextView
 		    android:id="@+id/item_more"
 		    android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:textColor="#eeeeee"
-            android:textSize="23sp"
+            android:textSize="25sp"
 		    />
 	</RelativeLayout>
-    <com.example.photomanager1_0.JazzyViewPager
+    <com.example.photomanager1_0.MyViewPager
             android:layout_width="match_parent"
             android:layout_height="100dip"
             android:id="@+id/timeline_view_pager"

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.example.photomanager1_0.JazzyViewPager.TransitionEffect;
 
@@ -490,6 +489,7 @@ public class ShowImageActivity extends Activity {
 	public void finish() {
 		for (int i = 0; i < n; i++)
 			recycle(i);
+		TimelineActivity.lastClickImage.setTimeInMillis(0);
 		super.finish();
 	}
 
