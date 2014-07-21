@@ -2,6 +2,7 @@ package com.example.photomanager1_0;
 
 import java.util.ArrayList;
 
+
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -14,6 +15,7 @@ import com.baidu.mapapi.map.MKEvent;
 import com.baidu.mapapi.map.MKMapViewListener;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationOverlay;
 import com.baidu.mapapi.map.OverlayItem;
 import com.baidu.mapapi.search.MKAddrInfo;
 import com.baidu.mapapi.search.MKBusLineResult;
@@ -27,6 +29,7 @@ import com.baidu.mapapi.search.MKSuggestionInfo;
 import com.baidu.mapapi.search.MKSuggestionResult;
 import com.baidu.mapapi.search.MKTransitRouteResult;
 import com.baidu.mapapi.search.MKWalkingRouteResult;
+import com.baidu.mapapi.utils.CoordinateConvert;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 
 import android.app.Activity;
@@ -44,12 +47,16 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -86,7 +93,9 @@ public class MapActivity extends Activity {
 	private ImageDialog mDialog;
 	private ArrayList<ArrayList<Integer>> mPicSet;
 	private GridView mRel;
-
+	private LinearLayout ll;
+	private boolean llVisible = false;
+	private LocationOverlay myLocationOverlay = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -325,7 +334,7 @@ public class MapActivity extends Activity {
 		});
 		mSet = dg.getSetWithPlace();
 		mOverlay = new MyOverlay(getResources().getDrawable(
-				R.drawable.icon_gcoding), mMapView);
+				R.drawable.icon_myloc), mMapView);
 		mMapView.getOverlays().add(mOverlay);
 	}
 
@@ -335,23 +344,21 @@ public class MapActivity extends Activity {
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		int width = (int) (dm.widthPixels), height = (int) (dm.heightPixels);
+		int length = (int)(Math.min(width, height)*0.20);
+		//Log.i("photo", "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
 		for (int i = 0; i < mSet.size(); i++) {
 			PicInfo info = PicInfoList.get(mSet.get(i));
 			Point screenOn = new Point();
-			mMapView.getProjection().toPixels(
-					new GeoPoint((int) (1e6 * info.lalitude),
-							(int) (1e6 * info.longitude)), screenOn);
+			mMapView.getProjection().toPixels(info.pl, screenOn);
 			if (screenOn.x < 0 || screenOn.y < 0 || screenOn.x > width
 					|| screenOn.y > height)
 				continue;
 			boolean side = false;
 			for (int j = 0; j < mPicSet.size(); j++) {
 				ArrayList<Integer> p = mPicSet.get(j);
-				PicInfo infoP = PicInfoList.get(mSet.get(p.get(0)));
+				PicInfo infoP = PicInfoList.get(p.get(0));
 				Point screenOn1 = new Point();
-				mMapView.getProjection().toPixels(
-						new GeoPoint((int) (1e6 * infoP.lalitude),
-								(int) (1e6 * infoP.longitude)), screenOn1);
+				mMapView.getProjection().toPixels(info.pl , screenOn1);
 				if (Math.abs(screenOn.x - screenOn1.x) < 200
 						&& Math.abs(screenOn.y - screenOn1.y) < 200) {
 					p.add(i);
@@ -361,7 +368,7 @@ public class MapActivity extends Activity {
 			}
 			if (!side) {
 				ArrayList<Integer> p = new ArrayList<Integer>();
-				p.add(i);
+				p.add(mSet.get(i));
 				mPicSet.add(p);
 			}
 		}
@@ -370,7 +377,7 @@ public class MapActivity extends Activity {
 			int m = 3;
 			for (int j = 0; j < 3; j++)
 				if (j < mPicSet.get(i).size()) {
-					info[j] = PicInfoList.get(mSet.get(mPicSet.get(i).get(j)));
+					info[j] = PicInfoList.get(mPicSet.get(i).get(j));
 					if (info[j].bitmap == null) {
 						m = j;
 						break;
@@ -381,17 +388,16 @@ public class MapActivity extends Activity {
 				}
 			if (m == 0)
 				continue;
-			GeoPoint gp = new GeoPoint((int) (info[0].lalitude * 1e6),
-					(int) (info[0].longitude * 1e6));
+			GeoPoint gp =info[0].pl;
 			OverlayItem oi = new OverlayItem(gp, "", "");
-			Bitmap b = Bitmap.createBitmap(180 + m * 20, 230,
+			Bitmap b = Bitmap.createBitmap(length - 20 + m * 20, length - 15 + m * 15,
 					info[0].bitmap.getConfig());
 			Canvas canvas = new Canvas(b);
 			for (int j = m - 1; j >= 0; j--) {
 				canvas.drawBitmap(info[j].bitmap,
 						new Rect(0, 0, info[j].bitmap.getWidth(),
 								info[j].bitmap.getHeight()), new RectF(j * 20,
-								j * 15, 200 + j * 20, 200 + j * 15), null);
+										j * 15, length + j * 20,length + j * 15), null);
 			} // draw at most three picture in one set;
 			oi.setMarker(new BitmapDrawable(null, b));
 			mOverlay.addItem(oi);
@@ -409,7 +415,13 @@ public class MapActivity extends Activity {
 		option.setScanSpan(1000);
 		option.setServiceName("com.baidu.location.service");
 		mLocClient.setLocOption(option);
-	}
+		myLocationOverlay = new LocationOverlay(mMapView);
+		myLocationOverlay.setData(locData);
+		myLocationOverlay.setMarker(getResources().getDrawable(
+				R.drawable.icon_myloc));
+		myLocationOverlay.enableCompass();
+		
+	} 
 
 	// 重置地图中心点
 	public void resetCenterPoint() {
@@ -419,16 +431,66 @@ public class MapActivity extends Activity {
 		Toast.makeText(MapActivity.this, "正在定位……", Toast.LENGTH_SHORT).show();
 	}
 
-	public void resetCenterPoint(View v) {
+	public void resetCenterPoint(View v) {  
 		resetCenterPoint();
 	}
 
 	public void showSearchPanel(View v) {
-		LinearLayout ll = (LinearLayout) findViewById(R.id.mapSearchBlock);
-		if (ll.getVisibility() == View.VISIBLE)
-			ll.setVisibility(View.GONE);
-		else
-			ll.setVisibility(View.VISIBLE);
+		ll = (LinearLayout) findViewById(R.id.mapSearchBlock);
+		if (llVisible){
+			llVisible = false;
+			Animation a = new AlphaAnimation(1.0f, 0.0f);
+			a.setDuration(800);
+			a.setAnimationListener(new AnimationListener(){
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					// TODO Auto-generated method stub
+					ll.setVisibility(View.GONE);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			ll.startAnimation(a);
+		}
+		else{
+			llVisible = true;
+			Animation a = new AlphaAnimation(0.0f, 1.0f);
+			a.setDuration(800);
+			a.setAnimationListener(new AnimationListener(){
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					// TODO Auto-generated method stub
+					ll.setVisibility(View.VISIBLE);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			ll.startAnimation(a);
+		}
 	}
 
 	public void closeSearch(View v) {
@@ -497,24 +559,22 @@ public class MapActivity extends Activity {
 			locData.latitude = location.getLatitude();
 			locData.longitude = location.getLongitude();
 			// 如果不显示定位精度圈，将accuracy赋值为0即可
-			locData.accuracy = location.getRadius();
+			locData.accuracy = 0;//location.getRadius();
 			// 此处可以设置 locData的方向信息, 如果定位 SDK 未返回方向信息，用户可以自己实现罗盘功能添加方向信息。
 			locData.direction = location.getDerect();
-			// 移动地图到定位点
+			// 移动地图到定位点 
+			myLocationOverlay.setData(locData);
 			MKPoiInfo pInfo = new MKPoiInfo();
 			pInfo.pt = new GeoPoint((int) (locData.latitude * 1e6),
 					(int) (locData.longitude * 1e6));
 			// 移动完成
+			/*
 			pInfo.name = "我在这儿";
 			ArrayList<MKPoiInfo> myP = new ArrayList<MKPoiInfo>();
-			myP.add(pInfo);
-
-			MyPoiOverlay poiOverlay = new MyPoiOverlay(MapActivity.this,
-					mMapView, mSearch);
-			poiOverlay.setData(myP);
+			myP.add(pInfo);*/
 			mMapView.getOverlays().clear();
 			mMapView.getOverlays().add(mOverlay);
-			mMapView.getOverlays().add(poiOverlay);
+			mMapView.getOverlays().add(myLocationOverlay);
 			mMapView.getController().setZoom(14);
 			mMapView.getController().animateTo(pInfo.pt);
 			mMapView.refresh();
@@ -531,7 +591,20 @@ public class MapActivity extends Activity {
 			}
 		}
 	}
+	public class LocationOverlay extends MyLocationOverlay{
 
+  		public LocationOverlay(MapView mapView) {
+  			super(mapView);
+  			// TODO Auto-generated constructor stub
+  		}
+  		@Override
+  		protected boolean dispatchTap() {
+  			// TODO Auto-generated method stub
+  			//处理点击事件,弹出泡
+  			return true;
+  		}
+  		
+  	}
 	public class MyOverlay extends ItemizedOverlay {
 
 		public MyOverlay(Drawable defaultMarker, MapView mapView) {
@@ -554,9 +627,7 @@ public class MapActivity extends Activity {
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			PicInfo info = PicInfoList.get(mSet.get(mPicSet.get(index).get(0)));
 			Point screenOn = new Point();
-			mMapView.getProjection().toPixels(
-					new GeoPoint((int) (1e6 * info.lalitude),
-							(int) (1e6 * info.longitude)), screenOn);
+			mMapView.getProjection().toPixels(info.pl, screenOn);
 			mDialog.showDialog(screenOn.x, screenOn.y);
 
 			PictureAdapter pa = new PictureAdapter(MapActivity.this);

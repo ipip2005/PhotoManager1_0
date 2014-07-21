@@ -93,19 +93,20 @@ containing a value of this type.
         public static final int icon_3_n=0x7f02000d;
         public static final int icon_4=0x7f02000e;
         public static final int icon_4_n=0x7f02000f;
-        public static final int icon_gcoding=0x7f020010;
-        public static final int list_back=0x7f020011;
-        public static final int locate=0x7f020012;
-        public static final int locate_press=0x7f020013;
-        public static final int locate_style=0x7f020014;
-        public static final int maintab_toolbar_bg=0x7f020015;
-        public static final int map_search=0x7f020016;
-        public static final int map_search_press=0x7f020017;
-        public static final int map_search_style=0x7f020018;
-        public static final int text_color=0x7f020019;
-        public static final int transparent=0x7f02001c;
-        public static final int trash_button=0x7f02001a;
-        public static final int trash_button_press=0x7f02001b;
+        public static final int icon_gcoding1=0x7f020010;
+        public static final int icon_myloc=0x7f020011;
+        public static final int list_back=0x7f020012;
+        public static final int locate=0x7f020013;
+        public static final int locate_press=0x7f020014;
+        public static final int locate_style=0x7f020015;
+        public static final int maintab_toolbar_bg=0x7f020016;
+        public static final int map_search=0x7f020017;
+        public static final int map_search_press=0x7f020018;
+        public static final int map_search_style=0x7f020019;
+        public static final int text_color=0x7f02001a;
+        public static final int transparent=0x7f02001d;
+        public static final int trash_button=0x7f02001b;
+        public static final int trash_button_press=0x7f02001c;
     }
     public static final class id {
         public static final int accordion=0x7f05000b;

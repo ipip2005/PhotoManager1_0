@@ -3,6 +3,8 @@ package com.example.photomanager1_0;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import com.baidu.mapapi.utils.CoordinateConvert;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -97,6 +99,9 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		};
 		dg = new DataGain(getContentResolver(), TimelineActivity.this, handler);
 		PicInfoList = dg.getPicInfoList();
+		for (int i=0;i<PicInfoList.size();i++){
+			//PicInfoList.get(i).pl = CoordinateConvert.fromWgs84ToBaidu(PicInfoList.get(i).pl);
+		}
 		granularity = 2;
 		mSet = dg.getSet(granularity);
 		// Log.i("photo",""+PicInfoList.size());

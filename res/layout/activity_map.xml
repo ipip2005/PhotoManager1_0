@@ -19,7 +19,7 @@
 		<LinearLayout
 	    	android:id="@+id/mapSearchBlock"
 	   	 	android:orientation="vertical"
-	    	android:visibility="gone"
+	    	android:visibility="invisible"
 	    	android:layout_alignParentTop="true"
 	    	android:alpha="0.8"
 	    	android:background="#000000"

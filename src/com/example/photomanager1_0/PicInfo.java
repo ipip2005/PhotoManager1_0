@@ -2,6 +2,8 @@ package com.example.photomanager1_0;
 
 import java.util.Calendar;
 
+import com.baidu.platform.comapi.basestruct.GeoPoint;
+
 import android.graphics.Bitmap;
 
 public class PicInfo {
@@ -9,7 +11,7 @@ public class PicInfo {
 	String title=null;
 	String text=null;
 	Calendar mdate;
-	double lalitude,longitude;
+	GeoPoint pl=null;
 	Long id;
 	String fileRoute;
 }

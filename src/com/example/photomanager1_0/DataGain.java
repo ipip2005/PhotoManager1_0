@@ -11,6 +11,9 @@ import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.baidu.mapapi.utils.CoordinateConvert;
+import com.baidu.platform.comapi.basestruct.GeoPoint;
+
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -22,6 +25,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Thumbnails;
+import android.util.Log;
 
 /**
  * @author ipip
@@ -41,11 +45,11 @@ public class DataGain {
 	private ArrayList<PicInfo> mPicInfoList;
 	private ArrayList<ArrayList<Integer>> mSet1, mSet2, mSet3, mSet4;
 	private ArrayList<Integer> PSet;
-	private boolean isPSet = false; // if tSet has been calculated
 	private static final String[] STORE_IMAGES = {
 			MediaStore.Images.Media.DATE_TAKEN,
 			MediaStore.Images.Media.LATITUDE,
-			MediaStore.Images.Media.LONGITUDE, MediaStore.Images.Media._ID,
+			MediaStore.Images.Media.LONGITUDE, 
+			MediaStore.Images.Media._ID,
 			MediaStore.Images.Media.DATA, };
 	ExecutorService pool = Executors.newFixedThreadPool(3);
 
@@ -82,10 +86,10 @@ public class DataGain {
 					Calendar.YEAR))
 				info.title = "" + info.mdate.get(Calendar.YEAR) + "Äê"
 						+ info.title;
-			info.lalitude = cursor.getDouble(1);
-			info.longitude = cursor.getDouble(2);
+			if (cursor.getDouble(1)>0)
+				info.pl = new GeoPoint((int) (cursor.getDouble(1) * 1e6),
+						(int) (cursor.getDouble(2) * 1e6));
 			info.id = cursor.getLong(3);
-			info.text = "" + info.lalitude + " : " + info.longitude;
 			info.fileRoute = cursor.getString(4);
 			mPicInfoList.add(info);
 		} while (cursor.moveToNext());
@@ -172,11 +176,9 @@ public class DataGain {
 	}
 
 	public ArrayList<Integer> getSetWithPlace() {
-		if (isPSet)
-			return PSet;
 		PSet = new ArrayList<Integer>();
 		for (int i = 0; i < n; i++)
-			if (mPicInfoList.get(i).lalitude != 0) {
+			if (mPicInfoList.get(i).pl != null) {
 				PSet.add(i);
 			}
 		return PSet;

@@ -401,9 +401,9 @@ public class ShowImageActivity extends Activity {
 			info.add("拍摄日期: "
 					+ et.getAttribute(ExifInterface.TAG_DATETIME)
 							.replaceFirst(":", "/").replaceFirst(":", "/"));
-		if (TimelineActivity.PicInfoList.get(id).lalitude != 0)
-			info.add("经纬度: " + TimelineActivity.PicInfoList.get(id).lalitude
-					+ "," + TimelineActivity.PicInfoList.get(id).longitude);
+		if (TimelineActivity.PicInfoList.get(id).pl != null)
+			info.add("经纬度: " + TimelineActivity.PicInfoList.get(id).pl.getLatitudeE6()/1E6
+					+ "," + TimelineActivity.PicInfoList.get(id).pl.getLongitudeE6()/1E6);
 		if (et.getAttribute(ExifInterface.TAG_APERTURE) != null)
 			info.add("光圈值: " + et.getAttribute(ExifInterface.TAG_APERTURE));
 		if (et.getAttribute(ExifInterface.TAG_MAKE) != null)
