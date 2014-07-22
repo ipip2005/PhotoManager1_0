@@ -5,14 +5,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.baidu.mapapi.utils.CoordinateConvert;
-import com.baidu.platform.comapi.basestruct.GeoPoint;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
+import com.baidu.mapapi.utils.CoordinateConverter.CoordType;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
@@ -41,6 +43,7 @@ public class DataGain {
 	private int p;
 	private int done, doing;
 	private int cacheOrder[];
+	private boolean gotPoi[];
 	// signal for thread security
 	private ArrayList<PicInfo> mPicInfoList;
 	private ArrayList<ArrayList<Integer>> mSet1, mSet2, mSet3, mSet4;
@@ -64,6 +67,7 @@ public class DataGain {
 		n = cursor.getCount();
 		got = new boolean[n];
 		ing = new boolean[n];
+		gotPoi = new boolean[n];
 		p = 0;
 		done = 0;
 		doing = 0;
@@ -87,8 +91,7 @@ public class DataGain {
 				info.title = "" + info.mdate.get(Calendar.YEAR) + "Äê"
 						+ info.title;
 			if (cursor.getDouble(1)>0)
-				info.pl = new GeoPoint((int) (cursor.getDouble(1) * 1e6),
-						(int) (cursor.getDouble(2) * 1e6));
+				info.pl = new LatLng(cursor.getDouble(1),cursor.getDouble(2));
 			info.id = cursor.getLong(3);
 			info.fileRoute = cursor.getString(4);
 			mPicInfoList.add(info);
@@ -156,7 +159,9 @@ public class DataGain {
 			p = ps.searchEndAt();
 			mSet4.add(ps.getArrayList());
 		}
-
+		
+		for (int i=0;i<n;i++) gotPoi[i] = false;
+		checkAllPoiData();
 	}
 
 	public ArrayList<ArrayList<Integer>> getSet(int granularity) {
@@ -178,7 +183,7 @@ public class DataGain {
 	public ArrayList<Integer> getSetWithPlace() {
 		PSet = new ArrayList<Integer>();
 		for (int i = 0; i < n; i++)
-			if (mPicInfoList.get(i).pl != null) {
+			if (gotPoi[i]) {
 				PSet.add(i);
 			}
 		return PSet;
@@ -196,7 +201,44 @@ public class DataGain {
 		doing++;
 		pool.execute(t);
 	}
-
+	public boolean getBDPoiFromFile(int i){
+		return false;
+		/*String filename = "" + mPicInfoList.get(i).id + ".poi";
+		File f = new File(filename);
+		Boolean fileExists = false;
+		try {
+			FileInputStream s = mContext.openFileInput(filename);
+			fileExists = s != null;
+			s.close();
+		} catch (StreamCorruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (fileExists){
+			ObjectInputStream o = new ObjectInputStream(s); 
+			LatLng gp = (LatLng)o.readObject();
+		}*/
+	}
+	public void requirePoiDataAndWrite(int i){
+		LatLng sourceLatLng = mPicInfoList.get(i).pl; 
+		CoordinateConverter converter  = new CoordinateConverter();  
+		converter.from(CoordType.GPS);  
+		// sourceLatLng´ý×ª»»×ø±ê  
+		converter.coord(sourceLatLng);  
+		LatLng desLatLng = converter.convert();
+		mPicInfoList.get(i).pl = desLatLng;
+		gotPoi[i]=true;
+	}
+	public void checkAllPoiData(){
+		for (int i=0;i<n;i++) if (mPicInfoList.get(i).pl!=null && !gotPoi[i]){
+			if (getBDPoiFromFile(i)) continue;
+			requirePoiDataAndWrite(i);
+		}
+	}
+	
 	public void delData(int index) {
 
 	}
@@ -215,7 +257,6 @@ public class DataGain {
 			String filename = "" + mPicInfoList.get(id).id + ".thunb";
 			File f = new File(filename);
 			Boolean fileExists = false;
-			;
 			try {
 				FileInputStream s = mContext.openFileInput(filename);
 				mPicInfoList.get(id).bitmap = BitmapFactory.decodeStream(s);

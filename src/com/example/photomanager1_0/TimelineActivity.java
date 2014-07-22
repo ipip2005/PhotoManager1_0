@@ -3,7 +3,6 @@ package com.example.photomanager1_0;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import com.baidu.mapapi.utils.CoordinateConvert;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

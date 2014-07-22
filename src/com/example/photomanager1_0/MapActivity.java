@@ -3,62 +3,81 @@ package com.example.photomanager1_0;
 import java.util.ArrayList;
 
 
+
+
+
+
+
+
+import java.util.List;
+
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.BMapManager;
-import com.baidu.mapapi.MKGeneralListener;
-import com.baidu.mapapi.map.ItemizedOverlay;
-import com.baidu.mapapi.map.LocationData;
-import com.baidu.mapapi.map.MKEvent;
-import com.baidu.mapapi.map.MKMapViewListener;
+import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MyLocationOverlay;
-import com.baidu.mapapi.map.OverlayItem;
-import com.baidu.mapapi.search.MKAddrInfo;
-import com.baidu.mapapi.search.MKBusLineResult;
-import com.baidu.mapapi.search.MKDrivingRouteResult;
-import com.baidu.mapapi.search.MKPoiInfo;
-import com.baidu.mapapi.search.MKPoiResult;
-import com.baidu.mapapi.search.MKSearch;
-import com.baidu.mapapi.search.MKSearchListener;
-import com.baidu.mapapi.search.MKShareUrlResult;
-import com.baidu.mapapi.search.MKSuggestionInfo;
-import com.baidu.mapapi.search.MKSuggestionResult;
-import com.baidu.mapapi.search.MKTransitRouteResult;
-import com.baidu.mapapi.search.MKWalkingRouteResult;
-import com.baidu.mapapi.utils.CoordinateConvert;
-import com.baidu.platform.comapi.basestruct.GeoPoint;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationConfigeration;
+import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Overlay;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.SupportMapFragment;
+import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener;
+import com.baidu.mapapi.map.MyLocationConfigeration.LocationMode;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.overlayutil.OverlayManager;
+import com.baidu.mapapi.overlayutil.PoiOverlay;
+import com.baidu.mapapi.search.core.CityInfo;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
+import com.baidu.mapapi.search.poi.PoiCitySearchOption;
+import com.baidu.mapapi.search.poi.PoiDetailResult;
+import com.baidu.mapapi.search.poi.PoiResult;
+import com.baidu.mapapi.search.poi.PoiSearch;
+import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
+import com.baidu.mapapi.search.sug.SuggestionResult;
+import com.baidu.mapapi.search.sug.SuggestionResult.SuggestionInfo;
+import com.baidu.mapapi.search.sug.SuggestionSearch;
+import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
@@ -72,157 +91,54 @@ import android.widget.Toast;
 /**
  * @author ipip 2014年7月16日下午2:49:25
  */
-public class MapActivity extends Activity {
+public class MapActivity extends Activity implements OnGetPoiSearchResultListener, OnGetSuggestionResultListener {
 	private MapView mMapView = null;
-	private BMapManager mBMapManager = null;
+	private BaiduMap mBaiduMap = null;
+	private PoiSearch mSearch;
+	private SuggestionSearch mSuggestionSearch = null;
+	private MyLocationData locData;
 	LocationClient mLocClient;
-	LocationData locData = null;
 	public MyLocationListenner myListener = new MyLocationListenner();
-	private MKSearch mSearch = null; // 搜索模块，也可去掉地图模块独立使用
 	/**
 	 * 搜索关键字输入窗口
 	 */
 	private boolean first = true;
 	private AutoCompleteTextView keyWorldsView = null;
 	private ArrayAdapter<String> sugAdapter = null;
-	private int load_Index, index;
+	private int load_index, index;
 	private ArrayList<PicInfo> PicInfoList = TimelineActivity.PicInfoList;
 	private DataGain dg = TimelineActivity.dg;
 	private ArrayList<Integer> mSet;
-	private MyOverlay mOverlay;
+	//private MyOverlay mOverlay;
 	private ImageDialog mDialog;
 	private ArrayList<ArrayList<Integer>> mPicSet;
 	private GridView mRel;
 	private LinearLayout ll;
 	private boolean llVisible = false;
-	private LocationOverlay myLocationOverlay = null;
+	private BitmapDescriptor[] cache;
+	private int cacheCount=0;
+	private MyOverlay pics;
+	private MyPoiOverlay poiOverlay;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
-		/**
-		 * 使用地图sdk前需先初始化BMapManager. BMapManager是全局的，可为多个MapView共用，它需要地图模块创建前创建，
-		 * 并在地图地图模块销毁后销毁，只要还有地图模块在使用，BMapManager就不应该销毁
-		 */
-		if (mBMapManager == null) {
-			mBMapManager = new BMapManager(getApplicationContext());
-			/**
-			 * 如果BMapManager没有初始化则初始化BMapManager
-			 */
-			mBMapManager.init(new MyGeneralListener());
-		}
 		setContentView(R.layout.activity_map);
 		initComponents();
 		mMapView = (MapView) findViewById(R.id.bmapView);
-		initMapView();
 		// 初始化搜索模块，注册搜索事件监听
-		mSearch = new MKSearch();
-		mSearch.init(mBMapManager, new MKSearchListener() {
-			// 在此处理详情页结果
-			@Override
-			public void onGetPoiDetailSearchResult(int type, int error) {
-				if (error != 0) {
-					Toast.makeText(MapActivity.this, "抱歉，未找到结果",
-							Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(MapActivity.this, "成功，查看详情页面",
-							Toast.LENGTH_SHORT).show();
-				}
-			}
-
-			/**
-			 * 在此处理poi搜索结果
-			 */
-			public void onGetPoiResult(MKPoiResult res, int type, int error) {
-				// 错误号可参考MKEvent中的定义
-				if (error != 0 || res == null) {
-					Toast.makeText(MapActivity.this, "抱歉，未找到结果",
-							Toast.LENGTH_LONG).show();
-					return;
-				}
-				// 将地图移动到第一个POI中心点
-				if (res.getCurrentNumPois() > 0) {
-					// 将poi结果显示到地图上
-					MyPoiOverlay poiOverlay = new MyPoiOverlay(
-							MapActivity.this, mMapView, mSearch);
-					poiOverlay.setData(res.getAllPoi());
-					mMapView.getOverlays().clear();
-					mMapView.getOverlays().add(mOverlay);
-					mMapView.getOverlays().add(poiOverlay);
-					Toast.makeText(MapActivity.this, "选择任意箭头查看",
-							Toast.LENGTH_SHORT).show();
-					mMapView.refresh();
-					// 当ePoiType为2（公交线路）或4（地铁线路）时， poi坐标为空
-					for (MKPoiInfo info : res.getAllPoi()) {
-						if (info.pt != null) {
-							mMapView.getController().setZoom(14);
-							mMapView.getController().animateTo(info.pt);
-							break;
-						}
-					}
-				} else if (res.getCityListNum() > 0) {
-					// 当输入关键字在本市没有找到，但在其他城市找到时，返回包含该关键字信息的城市列表
-					String strInfo = "在";
-					for (int i = 0; i < res.getCityListNum(); i++) {
-						strInfo += res.getCityListInfo(i).city;
-						strInfo += ",";
-					}
-					strInfo += "找到结果";
-					Toast.makeText(MapActivity.this, strInfo, Toast.LENGTH_LONG)
-							.show();
-				}
-			}
-
-			public void onGetDrivingRouteResult(MKDrivingRouteResult res,
-					int error) {
-			}
-
-			public void onGetTransitRouteResult(MKTransitRouteResult res,
-					int error) {
-			}
-
-			public void onGetWalkingRouteResult(MKWalkingRouteResult res,
-					int error) {
-			}
-
-			public void onGetAddrResult(MKAddrInfo res, int error) {
-				EditText editCity = (EditText) MapActivity.this
-						.findViewById(R.id.city);
-				editCity.setText(res.addressComponents.city);
-			}
-
-			public void onGetBusDetailResult(MKBusLineResult result, int iError) {
-			}
-
-			/**
-			 * 更新建议列表
-			 */
-			@Override
-			public void onGetSuggestionResult(MKSuggestionResult res, int arg1) {
-				if (res == null || res.getAllSuggestions() == null) {
-					return;
-				}
-				sugAdapter.clear();
-				for (MKSuggestionInfo info : res.getAllSuggestions()) {
-					if (info.key != null)
-						sugAdapter.add(info.key);
-				}
-				sugAdapter.notifyDataSetChanged();
-
-			}
-
-			@Override
-			public void onGetShareUrlResult(MKShareUrlResult result, int type,
-					int error) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
+		mSearch = PoiSearch.newInstance();
+		mSearch.setOnGetPoiSearchResultListener(this);
+		mSuggestionSearch = SuggestionSearch.newInstance();
+		mSuggestionSearch.setOnGetSuggestionResultListener(this);
 		keyWorldsView = (AutoCompleteTextView) findViewById(R.id.searchkey);
 		sugAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_dropdown_item_1line);
 		keyWorldsView.setAdapter(sugAdapter);
-
+		mBaiduMap = mMapView.getMap();
+		MapStatusUpdate u = MapStatusUpdateFactory.zoomTo(14.0f);
+		mBaiduMap.setMapStatus(u);
+		initMapView();
 		/**
 		 * 当输入关键字变化时，动态更新建议列表
 		 */
@@ -250,11 +166,14 @@ public class MapActivity extends Activity {
 				/**
 				 * 使用建议搜索服务获取建议列表，结果在onSuggestionResult()中更新
 				 */
-				mSearch.suggestionSearch(cs.toString(), city);
+
+				mSuggestionSearch
+				.requestSuggestion(new SuggestionSearchOption()
+						.keyword(cs.toString()).city(city));
 			}
 		});
 		setLocationManager();
-		resetCenterPoint();
+		resetCenterPoint(null);
 	}
 
 	private void initComponents() {
@@ -264,82 +183,58 @@ public class MapActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		mMapView.onPause();
 		super.onPause();
+		mMapView.onPause();
 	}
 
 	@Override
 	protected void onResume() {
-		mMapView.onResume();
 		super.onResume();
+		mMapView.onResume();
 	}
 
 	@Override
 	protected void onDestroy() {
-		mMapView.destroy();
-		mSearch.destory();
 		super.onDestroy();
+		mMapView.onDestroy();
 	}
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		mMapView.onSaveInstanceState(outState);
-
-	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		mMapView.onRestoreInstanceState(savedInstanceState);
-	}
 
 	private void initMapView() {
 		mMapView.setLongClickable(true);
-		mMapView.getController().setZoom(14);
-		mMapView.getController().enableClick(true);
-		mMapView.regMapViewListener(mBMapManager, new MKMapViewListener() {
-
+		mBaiduMap.setOnMapStatusChangeListener(new OnMapStatusChangeListener() {
 			@Override
-			public void onClickMapPoi(MapPoi arg0) {
-				// TODO Auto-generated method stub
-
+			public void onMapStatusChange(MapStatus status) {
+				
 			}
 
 			@Override
-			public void onGetCurrentMap(Bitmap arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onMapAnimationFinish() {
-				// TODO Auto-generated method stub
-				addPicOverlays();
-
-			}
-
-			@Override
-			public void onMapLoadFinish() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onMapMoveFinish() {
+			public void onMapStatusChangeFinish(MapStatus arg0) {
 				// TODO Auto-generated method stub
 				addPicOverlays();
 			}
 
+			@Override
+			public void onMapStatusChangeStart(MapStatus arg0) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
+		
 		mSet = dg.getSetWithPlace();
-		mOverlay = new MyOverlay(getResources().getDrawable(
-				R.drawable.icon_myloc), mMapView);
-		mMapView.getOverlays().add(mOverlay);
+		cache = new BitmapDescriptor[dg.getCount()];
+		pics = new MyOverlay(mBaiduMap);
 	}
 
 	private void addPicOverlays() {
-		mOverlay.removeAll();
+		//mBaiduMap.clear();
+		pics.removeFromMap();
+		pics.clear();
+		for (int i=0;i<cacheCount;i++) if (cache[i]!=null){
+			cache[i].recycle();
+			cache[i]=null;
+		}
+		cacheCount=0;
 		mPicSet = new ArrayList<ArrayList<Integer>>();
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -349,7 +244,7 @@ public class MapActivity extends Activity {
 		for (int i = 0; i < mSet.size(); i++) {
 			PicInfo info = PicInfoList.get(mSet.get(i));
 			Point screenOn = new Point();
-			mMapView.getProjection().toPixels(info.pl, screenOn);
+			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			if (screenOn.x < 0 || screenOn.y < 0 || screenOn.x > width
 					|| screenOn.y > height)
 				continue;
@@ -358,7 +253,7 @@ public class MapActivity extends Activity {
 				ArrayList<Integer> p = mPicSet.get(j);
 				PicInfo infoP = PicInfoList.get(p.get(0));
 				Point screenOn1 = new Point();
-				mMapView.getProjection().toPixels(info.pl , screenOn1);
+				screenOn1 = mBaiduMap.getProjection().toScreenLocation(infoP.pl);
 				if (Math.abs(screenOn.x - screenOn1.x) < 200
 						&& Math.abs(screenOn.y - screenOn1.y) < 200) {
 					p.add(i);
@@ -372,6 +267,7 @@ public class MapActivity extends Activity {
 				mPicSet.add(p);
 			}
 		}
+		//Log.i("pic", ""+mPicSet.size());
 		for (int i = 0; i < mPicSet.size(); i++) {
 			PicInfo[] info = new PicInfo[3];
 			int m = 3;
@@ -388,8 +284,7 @@ public class MapActivity extends Activity {
 				}
 			if (m == 0)
 				continue;
-			GeoPoint gp =info[0].pl;
-			OverlayItem oi = new OverlayItem(gp, "", "");
+			
 			Bitmap b = Bitmap.createBitmap(length - 20 + m * 20, length - 15 + m * 15,
 					info[0].bitmap.getConfig());
 			Canvas canvas = new Canvas(b);
@@ -399,40 +294,39 @@ public class MapActivity extends Activity {
 								info[j].bitmap.getHeight()), new RectF(j * 20,
 										j * 15, length + j * 20,length + j * 15), null);
 			} // draw at most three picture in one set;
-			oi.setMarker(new BitmapDrawable(null, b));
-			mOverlay.addItem(oi);
+			cache[cacheCount] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null, b).getBitmap());
+			LatLng gp =info[0].pl;
+			OverlayOptions oo = new MarkerOptions().position(gp).icon(cache[cacheCount])
+					.zIndex(-1);
+			pics.add(oo);
+			cacheCount++;
 		}
-		mMapView.refresh();
+		pics.addToMap();
+		//if (poiOverlay!=null) poiOverlay.addToMap();
 	}
 
 	private void setLocationManager() {
-		mLocClient = new LocationClient(getApplicationContext());
-		locData = new LocationData();
+		mLocClient = new LocationClient(getApplicationContext());	
+		LocationMode mCurrentMode = LocationMode.NORMAL;
+		BitmapDescriptor mMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_myloc);
+		mBaiduMap
+				.setMyLocationConfigeration(new MyLocationConfigeration(
+						mCurrentMode, false, null));
 		mLocClient.registerLocationListener(myListener);
 		LocationClientOption option = new LocationClientOption();
 		option.setOpenGps(true);// 打开gps
 		option.setCoorType("bd09ll"); // 设置坐标类型
-		option.setScanSpan(1000);
-		option.setServiceName("com.baidu.location.service");
+		option.setScanSpan(100000);
 		mLocClient.setLocOption(option);
-		myLocationOverlay = new LocationOverlay(mMapView);
-		myLocationOverlay.setData(locData);
-		myLocationOverlay.setMarker(getResources().getDrawable(
-				R.drawable.icon_myloc));
-		myLocationOverlay.enableCompass();
-		
 	} 
 
 	// 重置地图中心点
-	public void resetCenterPoint() {
+	public void resetCenterPoint(View v) {  
+		mBaiduMap.setMyLocationEnabled(true);
+		first = true;
 		mLocClient.start();
 		mLocClient.requestLocation();
-
 		Toast.makeText(MapActivity.this, "正在定位……", Toast.LENGTH_SHORT).show();
-	}
-
-	public void resetCenterPoint(View v) {  
-		resetCenterPoint();
 	}
 
 	public void showSearchPanel(View v) {
@@ -493,10 +387,6 @@ public class MapActivity extends Activity {
 		}
 	}
 
-	public void closeSearch(View v) {
-		LinearLayout ll = (LinearLayout) findViewById(R.id.mapSearchBlock);
-		ll.setVisibility(View.GONE);
-	}
 
 	/**
 	 * 影响搜索按钮点击事件
@@ -506,47 +396,24 @@ public class MapActivity extends Activity {
 	public void searchButtonProcess(View v) {
 		EditText editCity = (EditText) findViewById(R.id.city);
 		EditText editSearchKey = (EditText) findViewById(R.id.searchkey);
-		mSearch.poiSearchInCity(editCity.getText().toString(), editSearchKey
-				.getText().toString());
+		mSearch.searchInCity(new PoiCitySearchOption().city(editCity.getText().toString()).keyword(editSearchKey
+				.getText().toString()).pageNum(load_index).pageCapacity(9));
+		InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.hideSoftInputFromWindow(MapActivity.this.getCurrentFocus().getWindowToken(),
+				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
-
+	public void goToLastPage(View v){
+		if (load_index == 0 ){
+			Toast.makeText(this, "这是第一组数据", Toast.LENGTH_SHORT);
+		} else{
+			load_index--;
+			searchButtonProcess(null);
+		}
+	}
 	public void goToNextPage(View v) {
 		// 搜索下一组poi
-		int flag = mSearch.goToPoiPage(++load_Index);
-		if (flag != 0) {
-			Toast.makeText(MapActivity.this, "先搜索开始，然后再搜索下一组数据",
-					Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	private class MyGeneralListener implements MKGeneralListener {
-
-		@Override
-		public void onGetNetworkState(int iError) {
-			if (iError == MKEvent.ERROR_NETWORK_CONNECT) {
-				Toast.makeText(MapActivity.this, "您的网络出错啦！", Toast.LENGTH_LONG)
-						.show();
-			} else if (iError == MKEvent.ERROR_NETWORK_DATA) {
-				Toast.makeText(MapActivity.this, "输入正确的检索条件！",
-						Toast.LENGTH_LONG).show();
-			}
-			// ...
-		}
-
-		@Override
-		public void onGetPermissionState(int iError) {
-			// 非零值表示key验证未通过
-			if (iError != 0) {
-				// 授权Key错误：
-				Toast.makeText(
-						MapActivity.this,
-						"AndroidManifest.xml 文件输入正确的授权Key,并检查您的网络连接是否正常！error: "
-								+ iError, Toast.LENGTH_LONG).show();
-			} else {
-				Toast.makeText(MapActivity.this, "key认证成功", Toast.LENGTH_LONG)
-						.show();
-			}
-		}
+		load_index++;
+		searchButtonProcess(null);
 	}
 
 	public class MyLocationListenner implements BDLocationListener {
@@ -555,64 +422,75 @@ public class MapActivity extends Activity {
 		public void onReceiveLocation(BDLocation location) {
 			if (location == null)
 				return;
-
-			locData.latitude = location.getLatitude();
-			locData.longitude = location.getLongitude();
-			// 如果不显示定位精度圈，将accuracy赋值为0即可
-			locData.accuracy = 0;//location.getRadius();
+			locData = new MyLocationData.Builder()
+			.accuracy(location.getRadius())
+			// 此处设置开发者获取到的方向信息，顺时针0-360
+			.latitude(location.getLatitude())
+			.longitude(location.getLongitude()).build();
 			// 此处可以设置 locData的方向信息, 如果定位 SDK 未返回方向信息，用户可以自己实现罗盘功能添加方向信息。
-			locData.direction = location.getDerect();
-			// 移动地图到定位点 
-			myLocationOverlay.setData(locData);
-			MKPoiInfo pInfo = new MKPoiInfo();
-			pInfo.pt = new GeoPoint((int) (locData.latitude * 1e6),
-					(int) (locData.longitude * 1e6));
-			// 移动完成
-			/*
-			pInfo.name = "我在这儿";
-			ArrayList<MKPoiInfo> myP = new ArrayList<MKPoiInfo>();
-			myP.add(pInfo);*/
-			mMapView.getOverlays().clear();
-			mMapView.getOverlays().add(mOverlay);
-			mMapView.getOverlays().add(myLocationOverlay);
-			mMapView.getController().setZoom(14);
-			mMapView.getController().animateTo(pInfo.pt);
-			mMapView.refresh();
-			mLocClient.stop();
+			mBaiduMap.setMyLocationData(locData);
+			//mLocClient.stop();
+			//mBaiduMap.setMyLocationEnabled(false);
 			if (first) {
-				mSearch.reverseGeocode(pInfo.pt);
 				first = false;
+				LatLng ll = new LatLng(location.getLatitude(),
+						location.getLongitude());
+				//Log.i("gps","in "+ll.latitude+" "+ll.longitude);
+				mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
+				new Handler().postDelayed(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						mBaiduMap.animateMapStatus(MapStatusUpdateFactory.zoomTo(14));
+					}
+					
+				}, 400);
+				GeoCoder ss = GeoCoder.newInstance();
+				ss.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener(){
+
+					@Override
+					public void onGetGeoCodeResult(GeoCodeResult arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onGetReverseGeoCodeResult(
+							ReverseGeoCodeResult res) {
+						// TODO Auto-generated method stub
+						EditText et = (EditText)MapActivity.this.findViewById(R.id.city);
+						/////reverse result ,get city, uncompleted
+					}
+					
+				});
+				ss.reverseGeoCode(new ReverseGeoCodeOption().location(ll));
+				/////////////////// reverse uncompleted
 			}
 		}
-
 		public void onReceivePoi(BDLocation poiLocation) {
 			if (poiLocation == null) {
 				return;
 			}
 		}
 	}
-	public class LocationOverlay extends MyLocationOverlay{
-
-  		public LocationOverlay(MapView mapView) {
-  			super(mapView);
-  			// TODO Auto-generated constructor stub
-  		}
-  		@Override
-  		protected boolean dispatchTap() {
-  			// TODO Auto-generated method stub
-  			//处理点击事件,弹出泡
-  			return true;
-  		}
-  		
-  	}
-	public class MyOverlay extends ItemizedOverlay {
-
-		public MyOverlay(Drawable defaultMarker, MapView mapView) {
-			super(defaultMarker, mapView);
+	public class MyOverlay extends OverlayManager {
+		private List<OverlayOptions> loo;
+		public MyOverlay(BaiduMap arg0) {
+			super(arg0);
+			loo = new ArrayList<OverlayOptions>();
+			// TODO Auto-generated constructor stub
 		}
-
+		public void add(OverlayOptions oo){
+			loo.add(oo);
+		}
+		
+		public void clear(){
+			loo.clear();
+		}
+/*
 		@Override
-		public boolean onTap(int tapIndex) {
+		public boolean onClick(int tapIndex) {
 			index = tapIndex;
 			if (index >= mPicSet.size())
 				return false;
@@ -627,7 +505,7 @@ public class MapActivity extends Activity {
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			PicInfo info = PicInfoList.get(mSet.get(mPicSet.get(index).get(0)));
 			Point screenOn = new Point();
-			mMapView.getProjection().toPixels(info.pl, screenOn);
+			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			mDialog.showDialog(screenOn.x, screenOn.y);
 
 			PictureAdapter pa = new PictureAdapter(MapActivity.this);
@@ -647,6 +525,18 @@ public class MapActivity extends Activity {
 
 			});
 			return true;
+		}
+*/
+		@Override
+		public boolean onMarkerClick(Marker arg0) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public List<OverlayOptions> getOverlayOptions() {
+			// TODO Auto-generated method stub
+			return loo;
 		}
 
 	}
@@ -743,5 +633,63 @@ public class MapActivity extends Activity {
 			});
 
 		}
+	}
+
+	@Override
+	public void onGetPoiDetailResult(PoiDetailResult result) {
+		// TODO Auto-generated method stub
+		if (result.error != SearchResult.ERRORNO.NO_ERROR) {
+			Toast.makeText(MapActivity.this, "抱歉，未找到结果", Toast.LENGTH_SHORT)
+					.show();
+		} else {
+			Toast.makeText(MapActivity.this, "成功，查看详情页面", Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+
+	@Override
+	public void onGetPoiResult(PoiResult result) {
+		// TODO Auto-generated method stub
+		if (result == null
+				|| result.error == SearchResult.ERRORNO.RESULT_NOT_FOUND) {
+			return;
+		}
+		if (result.error == SearchResult.ERRORNO.NO_ERROR) {
+			if (poiOverlay!=null)poiOverlay.removeFromMap();
+			poiOverlay = new MyPoiOverlay(mBaiduMap);
+			poiOverlay.setPoiSearch(mSearch);
+			mBaiduMap.setOnMarkerClickListener(poiOverlay);
+			poiOverlay.setData(result);
+			poiOverlay.addToMap();
+			poiOverlay.zoomToSpan();
+			return;
+		}
+		if (result.error == SearchResult.ERRORNO.AMBIGUOUS_KEYWORD) {
+
+			// 当输入关键字在本市没有找到，但在其他城市找到时，返回包含该关键字信息的城市列表
+			String strInfo = "在";
+			for (CityInfo cityInfo : result.getSuggestCityList()) {
+				strInfo += cityInfo.city;
+				strInfo += ",";
+			}
+			strInfo += "找到结果";
+			Toast.makeText(MapActivity.this, strInfo, Toast.LENGTH_LONG)
+					.show();
+		}
+
+	}
+
+	@Override
+	public void onGetSuggestionResult(SuggestionResult res) {
+		// TODO Auto-generated method stub
+		if (res == null || res.getAllSuggestions() == null) {
+			return;
+		}
+		sugAdapter.clear();
+		for (SuggestionResult.SuggestionInfo info : res.getAllSuggestions()) {
+			if (info.key != null)
+				sugAdapter.add(info.key);
+		}
+		sugAdapter.notifyDataSetChanged();
 	}
 }

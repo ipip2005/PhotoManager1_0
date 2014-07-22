@@ -71,8 +71,8 @@
 		    		android:layout_height="wrap_content"
 		    		android:padding="10dip"
 		    		android:background="@drawable/button_style"
-		    		android:onClick="closeSearch"
-		    		android:text="关闭"
+		    		android:onClick="goToLastPage"
+		    		android:text="上一组数据"
 		    		/>
         		<Button
             		android:id="@+id/map_next_data"

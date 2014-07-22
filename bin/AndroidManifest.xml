@@ -21,11 +21,12 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" 
+        android:name="com.example.photomanager1_0.BasicApplication"
         android:logo="@drawable/ic_launcher" 
         android:theme="@style/AppBaseTheme">"
         	<meta-data
        	      android:name="com.baidu.lbsapi.API_KEY"
-       	      android:value="QAaFXdFL9zmSvhisoiQAVgTz"/>
+       	      android:value="Xa1EH3uBLyL47Lth5nZLy7b1"/>
         <service 
             android:name="com.baidu.location.f"
             android:enabled="true"

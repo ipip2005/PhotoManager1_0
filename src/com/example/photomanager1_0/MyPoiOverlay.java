@@ -1,30 +1,30 @@
 package com.example.photomanager1_0;
 
-import android.app.Activity;
 
-import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.PoiOverlay;
-import com.baidu.mapapi.search.MKPoiInfo;
-import com.baidu.mapapi.search.MKSearch;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.overlayutil.PoiOverlay;
+import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.poi.PoiDetailSearchOption;
+import com.baidu.mapapi.search.poi.PoiSearch;
 
 public class MyPoiOverlay extends PoiOverlay {
-    
-    MKSearch mSearch;
-
-    public MyPoiOverlay(Activity activity, MapView mapView, MKSearch search) {
-        super(activity, mapView);
-        mSearch = search;
-    }
-
-    @Override
-    protected boolean onTap(int i) {
-        super.onTap(i);
-        MKPoiInfo info = getPoi(i);
-        if (info.hasCaterDetails) {
-            mSearch.poiDetailSearch(info.uid);
-        }
-        return true;
-    }
+    PoiSearch mPoiSearch;
+	public MyPoiOverlay(BaiduMap baiduMap) {
+		super(baiduMap);
+	}
+	public void setPoiSearch(PoiSearch poiSearch){
+		mPoiSearch = poiSearch;
+	}
+	@Override
+	public boolean onPoiClick(int index) {
+		super.onPoiClick(index);
+		PoiInfo poi = getPoiResult().getAllPoi().get(index);
+		if (poi.hasCaterDetails) {
+			mPoiSearch.searchPoiDetail((new PoiDetailSearchOption())
+					.poiUid(poi.uid));
+		}
+		return true;
+	}
 
     
 }
