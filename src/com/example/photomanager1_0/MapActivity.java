@@ -460,12 +460,11 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 							ReverseGeoCodeResult res) {
 						// TODO Auto-generated method stub
 						EditText et = (EditText)MapActivity.this.findViewById(R.id.city);
-						/////reverse result ,get city, uncompleted
+						et.setText(res.getAddressDetail().city);
 					}
 					
 				});
 				ss.reverseGeoCode(new ReverseGeoCodeOption().location(ll));
-				/////////////////// reverse uncompleted
 			}
 		}
 		public void onReceivePoi(BDLocation poiLocation) {
@@ -650,12 +649,13 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	@Override
 	public void onGetPoiResult(PoiResult result) {
 		// TODO Auto-generated method stub
+		if (poiOverlay!=null)poiOverlay.removeFromMap();
 		if (result == null
 				|| result.error == SearchResult.ERRORNO.RESULT_NOT_FOUND) {
+			Toast.makeText(this, "没有找到结果", Toast.LENGTH_SHORT);
 			return;
 		}
 		if (result.error == SearchResult.ERRORNO.NO_ERROR) {
-			if (poiOverlay!=null)poiOverlay.removeFromMap();
 			poiOverlay = new MyPoiOverlay(mBaiduMap);
 			poiOverlay.setPoiSearch(mSearch);
 			mBaiduMap.setOnMarkerClickListener(poiOverlay);
