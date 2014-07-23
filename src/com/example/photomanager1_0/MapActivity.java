@@ -17,6 +17,8 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BaiduMap.OnMapClickListener;
+import com.baidu.mapapi.map.BaiduMap.OnMarkerClickListener;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
@@ -57,6 +59,7 @@ import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -70,14 +73,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
@@ -224,6 +231,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		mSet = dg.getSetWithPlace();
 		cache = new BitmapDescriptor[dg.getCount()];
 		pics = new MyOverlay(mBaiduMap);
+		mBaiduMap.setOnMarkerClickListener(pics);
 	}
 
 	private void addPicOverlays() {
@@ -297,7 +305,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			cache[cacheCount] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null, b).getBitmap());
 			LatLng gp =info[0].pl;
 			OverlayOptions oo = new MarkerOptions().position(gp).icon(cache[cacheCount])
-					.zIndex(-1);
+					.zIndex(-1).title(String.valueOf(i));
 			pics.add(oo);
 			cacheCount++;
 		}
@@ -308,7 +316,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private void setLocationManager() {
 		mLocClient = new LocationClient(getApplicationContext());	
 		LocationMode mCurrentMode = LocationMode.NORMAL;
-		BitmapDescriptor mMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_myloc);
 		mBaiduMap
 				.setMyLocationConfigeration(new MyLocationConfigeration(
 						mCurrentMode, false, null));
@@ -487,6 +494,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		public void clear(){
 			loo.clear();
 		}
+		
 /*
 		@Override
 		public boolean onClick(int tapIndex) {
@@ -527,9 +535,40 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		}
 */
 		@Override
-		public boolean onMarkerClick(Marker arg0) {
+		public boolean onMarkerClick(Marker m) {
 			// TODO Auto-generated method stub
-			return false;
+			index = Integer.parseInt(m.getTitle());
+			mDialog = new ImageDialog(MapActivity.this);
+			WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+			mDialog.getWindow().setGravity(Gravity.CENTER);
+			DisplayMetrics dm = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(dm);
+			lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+			lp.height = (int) (dm.heightPixels * 0.9);
+			mDialog.getWindow().setAttributes(lp);
+			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			PicInfo info = PicInfoList.get(mSet.get(mPicSet.get(index).get(0)));
+			Point screenOn = new Point();
+			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
+			mDialog.showDialog(screenOn.x, screenOn.y);
+
+			PictureAdapter pa = new PictureAdapter(MapActivity.this);
+			mRel.setAdapter(pa);
+			mRel.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					// TODO Auto-generated method stub
+					Intent intent = new Intent(MapActivity.this,
+							ShowImageActivity.class);
+					intent.putExtra("image",
+							mSet.get(mPicSet.get(index).get(arg2)));
+					startActivity(intent);
+				}
+
+			});
+			return true;
 		}
 
 		@Override
