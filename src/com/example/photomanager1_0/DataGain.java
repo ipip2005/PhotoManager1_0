@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,7 +26,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Thumbnails;
-import android.util.Log;
 
 /**
  * @author ipip
@@ -292,7 +290,6 @@ public class DataGain {
 					f.mkdirs();
 					FileOutputStream s = mContext.openFileOutput(filename,
 							Context.MODE_PRIVATE);
-					// ByteArrayOutputStream bs = new ByteArrayOutputStream(s);
 					mPicInfoList.get(id).bitmap.compress(
 							Bitmap.CompressFormat.PNG, 100, s);
 					s.close();

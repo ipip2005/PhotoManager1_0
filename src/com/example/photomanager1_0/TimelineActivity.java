@@ -98,12 +98,8 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		};
 		dg = new DataGain(getContentResolver(), TimelineActivity.this, handler);
 		PicInfoList = dg.getPicInfoList();
-		for (int i=0;i<PicInfoList.size();i++){
-			//PicInfoList.get(i).pl = CoordinateConvert.fromWgs84ToBaidu(PicInfoList.get(i).pl);
-		}
 		granularity = 2;
 		mSet = dg.getSet(granularity);
-		// Log.i("photo",""+PicInfoList.size());
 	}
 
 	private class PictureAdapter extends BaseAdapter {

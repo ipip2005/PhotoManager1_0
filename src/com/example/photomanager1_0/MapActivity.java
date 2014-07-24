@@ -15,13 +15,9 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BaiduMap.OnMapClickListener;
-import com.baidu.mapapi.map.BaiduMap.OnMarkerClickListener;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
-import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -30,14 +26,11 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfigeration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
-import com.baidu.mapapi.map.SupportMapFragment;
 import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener;
 import com.baidu.mapapi.map.MyLocationConfigeration.LocationMode;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.OverlayManager;
-import com.baidu.mapapi.overlayutil.PoiOverlay;
 import com.baidu.mapapi.search.core.CityInfo;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
@@ -52,7 +45,6 @@ import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
-import com.baidu.mapapi.search.sug.SuggestionResult.SuggestionInfo;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 
@@ -61,7 +53,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -72,7 +63,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +72,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -133,6 +124,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		setContentView(R.layout.activity_map);
 		initComponents();
 		mMapView = (MapView) findViewById(R.id.bmapView);
+		mMapView.removeViewAt(2);
+		mMapView.removeViewAt(1);
 		// 初始化搜索模块，注册搜索事件监听
 		mSearch = PoiSearch.newInstance();
 		mSearch.setOnGetPoiSearchResultListener(this);
@@ -411,7 +404,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	}
 	public void goToLastPage(View v){
 		if (load_index == 0 ){
-			Toast.makeText(this, "这是第一组数据", Toast.LENGTH_SHORT);
+			Toast.makeText(this, "这是第一组数据", Toast.LENGTH_SHORT).show();;
 		} else{
 			load_index--;
 			searchButtonProcess(null);
@@ -603,6 +596,12 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			}
 			holder.setImageBitmap(PicInfoList.get(mSet.get(mPicSet.get(index)
 					.get(position))).bitmap);
+			ScaleAnimation a = new ScaleAnimation(1.5f, 0.95f,
+					1.5f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
+					Animation.RELATIVE_TO_SELF, 0.5f);
+			a.setDuration(400);
+			holder.setAnimation(a);
+			holder.startAnimation(a);
 			return convertView;
 		}
 
@@ -631,13 +630,10 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 
 		public ImageDialog(Context context) {
 			super(context);
-			// TODO Auto-generated constructor stub
-
 		}
 
 		public ImageDialog(Context context, int theme) {
 			super(context, theme);
-			// TODO Auto-generated constructor stub
 		}
 
 		public void showDialog(int x, int y) {
@@ -649,11 +645,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		private void windowDeploy(int x, int y) {
 			window = getWindow();
 			window.setWindowAnimations(R.style.grid_animstyle);
-			/*
-			 * WindowManager.LayoutParams l = window.getAttributes(); l.gravity
-			 * = Gravity.LEFT | Gravity.TOP; l.x = x; l.y = y;
-			 * window.setAttributes(l);
-			 */
 		}
 
 		@Override
