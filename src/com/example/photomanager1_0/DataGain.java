@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Thumbnails;
+import android.util.Log;
 
 /**
  * @author ipip
@@ -180,6 +181,7 @@ public class DataGain {
 
 	public ArrayList<Integer> getSetWithPlace() {
 		PSet = new ArrayList<Integer>();
+		Log.i("photo","n: "+n);
 		for (int i = 0; i < n; i++)
 			if (gotPoi[i]) {
 				PSet.add(i);
@@ -199,27 +201,7 @@ public class DataGain {
 		doing++;
 		pool.execute(t);
 	}
-	public boolean getBDPoiFromFile(int i){
-		return false;
-		/*String filename = "" + mPicInfoList.get(i).id + ".poi";
-		File f = new File(filename);
-		Boolean fileExists = false;
-		try {
-			FileInputStream s = mContext.openFileInput(filename);
-			fileExists = s != null;
-			s.close();
-		} catch (StreamCorruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (fileExists){
-			ObjectInputStream o = new ObjectInputStream(s); 
-			LatLng gp = (LatLng)o.readObject();
-		}*/
-	}
+
 	public void requirePoiDataAndWrite(int i){
 		LatLng sourceLatLng = mPicInfoList.get(i).pl; 
 		CoordinateConverter converter  = new CoordinateConverter();  
@@ -232,7 +214,6 @@ public class DataGain {
 	}
 	public void checkAllPoiData(){
 		for (int i=0;i<n;i++) if (mPicInfoList.get(i).pl!=null && !gotPoi[i]){
-			if (getBDPoiFromFile(i)) continue;
 			requirePoiDataAndWrite(i);
 		}
 	}

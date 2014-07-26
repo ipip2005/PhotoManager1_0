@@ -63,6 +63,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -221,7 +222,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			}
 		});
 		
-		mSet = dg.getSetWithPlace();
+		
 		cache = new BitmapDescriptor[dg.getCount()];
 		pics = new MyOverlay(mBaiduMap);
 		mBaiduMap.setOnMarkerClickListener(pics);
@@ -229,6 +230,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 
 	private void addPicOverlays() {
 		//mBaiduMap.clear();
+		mSet = dg.getSetWithPlace();
 		pics.removeFromMap();
 		pics.clear();
 		for (int i=0;i<cacheCount;i++) if (cache[i]!=null){
@@ -257,7 +259,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				screenOn1 = mBaiduMap.getProjection().toScreenLocation(infoP.pl);
 				if (Math.abs(screenOn.x - screenOn1.x) < 200
 						&& Math.abs(screenOn.y - screenOn1.y) < 200) {
-					p.add(i);
+					p.add(mSet.get(i));
 					side = true;
 					break;
 				}
@@ -540,7 +542,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			lp.height = (int) (dm.heightPixels * 0.9);
 			mDialog.getWindow().setAttributes(lp);
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			PicInfo info = PicInfoList.get(mSet.get(mPicSet.get(index).get(0)));
+			Log.i("",""+index+" "+mPicSet.size()+" ");
+			PicInfo info = PicInfoList.get(mPicSet.get(index).get(0));
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			mDialog.showDialog(screenOn.x, screenOn.y);
@@ -555,8 +558,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 					// TODO Auto-generated method stub
 					Intent intent = new Intent(MapActivity.this,
 							ShowImageActivity.class);
-					intent.putExtra("image",
-							mSet.get(mPicSet.get(index).get(arg2)));
+					intent.putExtra("image",mPicSet.get(index).get(arg2));
 					startActivity(intent);
 				}
 
@@ -594,8 +596,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			} else {
 				holder = (ImageView) convertView.getTag();
 			}
-			holder.setImageBitmap(PicInfoList.get(mSet.get(mPicSet.get(index)
-					.get(position))).bitmap);
+			holder.setImageBitmap(PicInfoList.get(mPicSet.get(index)
+					.get(position)).bitmap);
 			ScaleAnimation a = new ScaleAnimation(1.5f, 0.95f,
 					1.5f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
 					Animation.RELATIVE_TO_SELF, 0.5f);

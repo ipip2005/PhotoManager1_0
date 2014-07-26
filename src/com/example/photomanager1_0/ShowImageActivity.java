@@ -319,7 +319,7 @@ public class ShowImageActivity extends Activity {
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		lp.width = (int) (dm.widthPixels * 0.95);
-		lp.height = (int) (dm.heightPixels * 0.9);
+		lp.height = (int) (dm.heightPixels * 0.8);
 		mDialog.getWindow().setAttributes(lp);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
