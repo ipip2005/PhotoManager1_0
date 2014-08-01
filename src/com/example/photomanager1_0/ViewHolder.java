@@ -7,7 +7,6 @@ public class ViewHolder {
 	}
 	public TextView title;
 	public TextView text;
-	public MyViewPager mViewPager;
 	public MyViewPager viewPager;
 	public int holder_id = -1;
 }

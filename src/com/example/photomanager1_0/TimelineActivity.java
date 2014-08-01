@@ -140,8 +140,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 						.findViewById(R.id.item_title);
 				holder.text = (TextView) convertView
 						.findViewById(R.id.item_more);
-				holder.mViewPager = (MyViewPager) convertView
-						.findViewById(R.id.timeline_view_pager);
 				holder.viewPager = (MyViewPager) convertView
 						.findViewById(R.id.timeline_view_pager);
 				holder.holder_id = position;
@@ -149,12 +147,12 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.mViewPager.setCurrentItem(0);
 			holder.viewPager.removeAllViews();
 			holder.holder_id = position;
 			holder.viewPager
 					.setAdapter(new MyViewPagerAdapter(TimelineActivity.this,
 							mSet.get(position)));
+			holder.viewPager.setCurrentItem(Integer.MAX_VALUE/2);
 			// holder.jViewPager.setFadeEnabled(true);
 			// holder.jViewPager.setTransitionEffect(TransitionEffect.Tablet);
 			holder.viewPager.setPageMargin(30);
@@ -189,6 +187,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
+			if (set.size() > 4) return Integer.MAX_VALUE;
 			return set.size();
 		}
 
@@ -200,11 +199,12 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
+			int id = position % set.size();
 			ImageView iv = new ImageView(mContext);
-			if (PicInfoList.get(set.get(position)).bitmap == null)
-				dg.getData(set.get(position));
-			iv.setImageBitmap(PicInfoList.get(set.get(position)).bitmap);
-			iv.setTag(set.get(position));
+			if (PicInfoList.get(set.get(id)).bitmap == null)
+				dg.getData(set.get(id));
+			iv.setImageBitmap(PicInfoList.get(set.get(id)).bitmap);
+			iv.setTag(set.get(id));
 			iv.setOnClickListener(new OnClickListener() {
 
 				@Override

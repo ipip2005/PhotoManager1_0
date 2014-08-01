@@ -490,45 +490,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			loo.clear();
 		}
 		
-/*
-		@Override
-		public boolean onClick(int tapIndex) {
-			index = tapIndex;
-			if (index >= mPicSet.size())
-				return false;
-			mDialog = new ImageDialog(MapActivity.this);
-			WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
-			mDialog.getWindow().setGravity(Gravity.CENTER);
-			DisplayMetrics dm = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-			lp.height = (int) (dm.heightPixels * 0.9);
-			mDialog.getWindow().setAttributes(lp);
-			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			PicInfo info = PicInfoList.get(mSet.get(mPicSet.get(index).get(0)));
-			Point screenOn = new Point();
-			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
-			mDialog.showDialog(screenOn.x, screenOn.y);
-
-			PictureAdapter pa = new PictureAdapter(MapActivity.this);
-			mRel.setAdapter(pa);
-			mRel.setOnItemClickListener(new OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					// TODO Auto-generated method stub
-					Intent intent = new Intent(MapActivity.this,
-							ShowImageActivity.class);
-					intent.putExtra("image",
-							mSet.get(mPicSet.get(index).get(arg2)));
-					startActivity(intent);
-				}
-
-			});
-			return true;
-		}
-*/
 		@Override
 		public boolean onMarkerClick(Marker m) {
 			// TODO Auto-generated method stub
@@ -542,7 +503,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			lp.height = (int) (dm.heightPixels * 0.9);
 			mDialog.getWindow().setAttributes(lp);
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			Log.i("",""+index+" "+mPicSet.size()+" ");
+			//Log.i("",""+index+" "+mPicSet.size()+" ");
 			PicInfo info = PicInfoList.get(mPicSet.get(index).get(0));
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
