@@ -494,21 +494,21 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		public boolean onMarkerClick(Marker m) {
 			// TODO Auto-generated method stub
 			index = Integer.parseInt(m.getTitle());
-			mDialog = new ImageDialog(MapActivity.this);
-			WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+			mDialog = new ImageDialog(MapActivity.this, R.style.dialog);
+			//WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
 			mDialog.getWindow().setGravity(Gravity.CENTER);
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-			lp.height = (int) (dm.heightPixels * 0.9);
-			mDialog.getWindow().setAttributes(lp);
+			//lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+			//lp.height = (int) (dm.heightPixels * 0.9);
+			//lp.alpha = 0.8f;
+			//mDialog.getWindow().setAttributes(lp);
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			//Log.i("",""+index+" "+mPicSet.size()+" ");
 			PicInfo info = PicInfoList.get(mPicSet.get(index).get(0));
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			mDialog.showDialog(screenOn.x, screenOn.y);
-
 			PictureAdapter pa = new PictureAdapter(MapActivity.this);
 			mRel.setAdapter(pa);
 			mRel.setOnItemClickListener(new OnItemClickListener() {
@@ -548,7 +548,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			ImageView holder;
 			if (convertView == null) {
 				int lid = R.layout.map_ontap_grid;
-				;
 				holder = new ImageView(MapActivity.this);
 				convertView = mInflater.inflate(lid, null);
 				holder = (ImageView) convertView
@@ -577,7 +576,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		@Override
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
-			return PicInfoList.get(mSet.get(mPicSet.get(index).get(position))).bitmap;
+			return PicInfoList.get(mPicSet.get(index).get(position)).bitmap;
 		}
 
 		@Override
