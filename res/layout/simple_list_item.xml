@@ -24,7 +24,7 @@
             android:textSize="25sp"
 		    />
 	</RelativeLayout>
-    <com.example.photomanager1_0.MyViewPager
+    <com.photomanager.main.MyViewPager
             android:layout_width="match_parent"
             android:layout_height="100dip"
             android:id="@+id/timeline_view_pager"

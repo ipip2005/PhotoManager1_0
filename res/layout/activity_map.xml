@@ -118,7 +118,7 @@
         	    android:layout_weight="1"
         	    android:layout_height="wrap_content">
 				<Button
-         			android:id="@+id/locButton"
+         			android:id="@+id/searchButton"
          			android:layout_width="40dp"
          			android:layout_height="40dp"
          			android:layout_centerInParent="true"
@@ -131,6 +131,14 @@
         	    android:layout_width="0dp"
         	    android:layout_weight="1"
         	    android:layout_height="wrap_content">
+				<Button
+         			android:id="@+id/menuButton"
+         			android:layout_width="40dp"
+         			android:layout_height="40dp"
+         			android:layout_centerInParent="true"
+         			android:background="@drawable/map_search_style"
+         			android:alpha="0.8"
+         			android:textColor="#FF000000" />
 			</RelativeLayout>
 		</LinearLayout>
 	</RelativeLayout>
