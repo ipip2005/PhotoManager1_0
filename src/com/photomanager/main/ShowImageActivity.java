@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.photomanager.main.JazzyViewPager.TransitionEffect;
+import com.polites.android.GestureImageView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -35,6 +36,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -55,6 +57,7 @@ public class ShowImageActivity extends Activity {
 	private Animation anim_s;
 	private Button b;
 	private Bitmap[] bitmapCache;
+	private boolean changable = false;
 	private float px = 0, py = 0;
 
 	@Override
@@ -94,7 +97,7 @@ public class ShowImageActivity extends Activity {
 					py = event.getY();
 					break;
 				case MotionEvent.ACTION_UP:
-					if (px - event.getX() < 5 && py - event.getY() < 5) {
+					if (Math.abs(px - event.getX()) < 5 && Math.abs(py - event.getY()) < 5) {
 						if (ll.getVisibility() == View.VISIBLE)
 							ll.setVisibility(View.INVISIBLE);
 						else
@@ -147,7 +150,9 @@ public class ShowImageActivity extends Activity {
 
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
-			ImageView iv = new ImageView(mContext);
+			/*ScalableImageView iv = new ScalableImageView(mContext);
+			iv.setScaleType(ScaleType.MATRIX);*/
+			GestureImageView iv = new GestureImageView(mContext);
 			Bitmap bm = null;
 			if (bitmapCache[position] != null
 					&& bitmapCache[position].isRecycled() == false)

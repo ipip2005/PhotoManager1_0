@@ -5,6 +5,7 @@ import java.util.Calendar;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.Window;
@@ -23,6 +24,7 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 	private RadioGroup mGroup;
 	private Intent iTimeline,iPlace,iMap,iTag;
 	private Calendar lastBack;
+	public static Settings s;
 	@Override 
 	public boolean dispatchKeyEvent(KeyEvent event){
 		if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK){
@@ -63,6 +65,8 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
+		Log.i("Main", "new Settings()");
+		s = new Settings(this);
 		setTabHost();
 	}
 	@Override

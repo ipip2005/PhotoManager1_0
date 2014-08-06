@@ -87,9 +87,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private MyLocationData locData;
 	LocationClient mLocClient;
 	public MyLocationListenner myListener = new MyLocationListenner();
-	/**
-	 * ËÑË÷¹Ø¼ü×ÖÊäÈë´°¿Ú
-	 */
 	private boolean first = true;
 	private AutoCompleteTextView keyWorldsView = null;
 	private ArrayAdapter<String> sugAdapter = null;
@@ -168,6 +165,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 
 	private void initComponents() {
 		EditText et = (EditText) findViewById(R.id.city);
+		if (Main.s.get("city")!=null)
+			et.setText((String)Main.s.get("city"));
 		et.setSelectAllOnFocus(true);
 	}
 
@@ -215,6 +214,16 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		cache = new BitmapDescriptor[dg.getCount()];
 		pics = new MyOverlay(mBaiduMap);
 		mBaiduMap.setOnMarkerClickListener(pics);
+		Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
+		
+		if ((Main.s.get("last-location-x"))!=null){
+			Log.i("MapActivity", "hasLast "+Double.parseDouble(Main.s.get("last-location-x").toString())+" "+
+					Double.parseDouble(Main.s.get("last-location-y").toString()));
+			mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(
+					new LatLng(Double.parseDouble(Main.s.get("last-location-x").toString()),
+							   Double.parseDouble(Main.s.get("last-location-y").toString()))));
+			Log.i("MapActivity", "moveOver");
+		}
 	}
 
 	private void addPicOverlays() {
@@ -435,7 +444,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				LatLng ll = new LatLng(location.getLatitude(),
 						location.getLongitude());
 				//Log.i("gps","in "+ll.latitude+" "+ll.longitude);
-				mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
+				mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll),400);
 				new Handler().postDelayed(new Runnable(){
 
 					@Override
@@ -460,6 +469,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 						// TODO Auto-generated method stub
 						EditText et = (EditText)MapActivity.this.findViewById(R.id.city);
 						et.setText(res.getAddressDetail().city);
+						Main.s.put("city", res.getAddressDetail().city);
 					}
 					
 				});
@@ -467,6 +477,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				createMyOverlay();
 				mBaiduMap.setMyLocationEnabled(false);
 				mLocClient.stop();
+				Main.s.put("last-location-x", ll.latitude);
+				Main.s.put("last-location-y", ll.longitude);
 			}
 		}
 		public void onReceivePoi(BDLocation poiLocation) {

@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -29,6 +30,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -62,8 +64,8 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		setContentView(R.layout.activity_timeline);
 		preData();
 		listView = new MyListView(this);
-		LinearLayout ll = (LinearLayout) findViewById(R.id.timeline_ll);
-		ll.addView(listView);
+		RelativeLayout rl = (RelativeLayout) findViewById(R.id.timeline_rl);
+		rl.addView(listView);
 		mAdapter = new PictureAdapter(this);
 		listView.setAdapter(mAdapter);
 		listView.setOnItemClickListener(this);
@@ -205,38 +207,50 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				dg.getData(set.get(id));
 			iv.setImageBitmap(PicInfoList.get(set.get(id)).bitmap);
 			iv.setTag(set.get(id));
-			iv.setOnClickListener(new OnClickListener() {
+			iv.setOnTouchListener(new OnTouchListener(){
 
 				@Override
-				public void onClick(View v) {
+				public boolean onTouch(View v, MotionEvent ev) {
 					// TODO Auto-generated method stub
-					if (Calendar.getInstance().getTimeInMillis()
-							- lastClickImage.getTimeInMillis() < 10000)
-						return;
-					lastClickImage = Calendar.getInstance();
-					Animation cAnimation = new ScaleAnimation(1.0f, 0.95f,
-							1.0f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
-							Animation.RELATIVE_TO_SELF, 0.5f);
-					cAnimation.setDuration(200);
-					v.setAnimation(cAnimation);
-
-					Animation dAnimation = new ScaleAnimation(0.95f, 1.0f,
-							0.95f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f,
-							Animation.RELATIVE_TO_SELF, 0.5f);
-					dAnimation.setDuration(200);
-					dAnimation.setStartTime(200);
-					v.setAnimation(dAnimation);
-
-					v.startAnimation(cAnimation);
-					v.startAnimation(dAnimation);
-					Intent intent = new Intent(TimelineActivity.this,
-							ShowImageActivity.class);
-					intent.putExtra("image", (Integer) v.getTag());
-					startActivity(intent);
-					/*
-					*/
+					Log.i("TimelineActivity",""+ev.getAction()+" "+ev.getRawX()+" "+ev.getRawY());
+					
+					
+					switch (ev.getAction() & MotionEvent.ACTION_MASK){
+					case MotionEvent.ACTION_DOWN:
+					case MotionEvent.ACTION_POINTER_DOWN:
+						Log.i("TimelineActivity", "Down");	
+						Animation cAnimation = new ScaleAnimation(1.0f, 0.9f,
+								1.0f, 0.9f, Animation.RELATIVE_TO_SELF, 0.5f,
+								Animation.RELATIVE_TO_SELF, 0.5f);
+						cAnimation.setDuration(300);
+						cAnimation.setFillAfter(true);
+						v.setAnimation(cAnimation);
+						v.startAnimation(cAnimation);
+						break;	
+					case MotionEvent.ACTION_CANCEL:
+						Animation dAnimation = new ScaleAnimation(0.95f, 1.0f,
+								0.95f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f,
+								Animation.RELATIVE_TO_SELF, 0.5f);
+						dAnimation.setDuration(300);
+						v.setAnimation(dAnimation);
+						v.startAnimation(dAnimation);
+						break;
+					case MotionEvent.ACTION_UP:
+						Animation eAnimation = new ScaleAnimation(0.95f, 1.0f,
+								0.95f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f,
+								Animation.RELATIVE_TO_SELF, 0.5f);
+						eAnimation.setDuration(300);
+						v.setAnimation(eAnimation);
+						v.startAnimation(eAnimation);
+						Intent intent = new Intent(TimelineActivity.this,
+								ShowImageActivity.class);
+						intent.putExtra("image", (Integer) v.getTag());
+						startActivity(intent);
+						break;
+					}
+					return true;
 				}
-
+				
 			});
 			((ViewPager) container).addView(iv, 0);
 			return iv;

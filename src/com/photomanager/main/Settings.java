@@ -12,32 +12,38 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import android.content.Context;
+import com.baidu.mapapi.model.LatLng;
 
-public class Settsings {
-	private Map<String, Object> settings;
+import android.content.Context;
+import android.util.Log;
+
+public class Settings {
+	private SettingsMap settings;
 	private Context context;
 	private static final String filename = "settings.s";
-	public Settsings(Context context){
+	public Settings(Context context){
 		this.context = context;
-		settings = new HashMap<String, Object>();
+		settings = new SettingsMap();
 		if (!load()){
+			Log.i("Settings", "failed loading");
 			settings.put("first-create", generateTimeStick());
 		}
+		Log.i("Settings", ""+(String)settings.get("first-create"));
+	}
+	private void clear(){
+		context.deleteFile(filename);
 	}
 	private boolean load(){
 		try {
 			FileInputStream s = context.openFileInput(filename);
 			if (s == null) return false;
 			ObjectInputStream o = new ObjectInputStream(s);
-			String key;
-			while ((key = (String)o.readObject())!=null){
-				settings.put(key, o.readObject());
-			}
+			settings = (SettingsMap)o.readObject();
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (StreamCorruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,12 +60,7 @@ public class Settsings {
 		try {
 			FileOutputStream s = context.openFileOutput(filename, Context.MODE_PRIVATE);
 			ObjectOutputStream o = new ObjectOutputStream(s);
-			Iterator<Map.Entry<String, Object>> i = settings.entrySet().iterator();
-			while (i.hasNext()){
-				Map.Entry<String, Object> so = (Map.Entry<String, Object>) i.next();
-				o.writeObject(so.getKey());
-				o.writeObject(so.getValue());
-			}
+			o.writeObject(settings);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,17 +68,17 @@ public class Settsings {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	public void put(String key, Object item){
+		Log.i("Settings", "put: "+key+" "+item);
 		settings.put(key, item);
+		save();
 	}
 	public Object get(String key){
 		return settings.get(key);
 	}
 	private String generateTimeStick(){
 		Calendar c = Calendar.getInstance();
-		c.getTimeInMillis();
-		return c.toString();
+		return String.valueOf(c.getTimeInMillis());
 	}
 }

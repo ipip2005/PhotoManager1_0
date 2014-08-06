@@ -3,6 +3,7 @@ package com.photomanager.main;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class MyViewPager extends ViewPager {
@@ -15,7 +16,6 @@ public class MyViewPager extends ViewPager {
 	public MyViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-
 	private float xDown;// 记录手指按下时的横坐标。
 	private float xMove;// 记录手指移动时的横坐标。
 	private float yDown;// 记录手指按下时的纵坐标。
@@ -52,11 +52,11 @@ public class MyViewPager extends ViewPager {
 			if (viewPagerScrolling) {
 				return super.dispatchTouchEvent(ev);
 			}
-
-			if (Math.abs(yMove - yDown) < 20 && Math.abs(xMove - xDown) > 3) {
+			float dx = Math.abs(xMove - xDown), dy = Math.abs(yMove - yDown);
+			if (dx > 3 && dx > dy && this.getChildCount() >= 4) {
 				this.getParent().requestDisallowInterceptTouchEvent(true);
 				viewPagerScrolling = true;
-			} else if (Math.abs(yMove - yDown) >= 20) {
+			} else if (dy > 3 && dy > dx) {
 				fatherScrolling = true;
 				return false;
 			} else

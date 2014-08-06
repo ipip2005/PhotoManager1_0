@@ -188,7 +188,6 @@ public class DataGain {
 
 	public ArrayList<Integer> getSetWithPlace() {
 		PSet = new ArrayList<Integer>();
-		Log.i("photo","n: "+n);
 		for (int i = 0; i < n; i++)
 			if (gotPoi[i]) {
 				PSet.add(i);
