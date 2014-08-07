@@ -27,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -36,6 +37,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -47,7 +49,7 @@ public class ShowImageActivity extends Activity {
 	private LinearLayout ll;
 	private InfoDialog mDialog;
 	private String fileRoute;
-	private JazzyViewPager mViewPager;
+	private ImageViewPager mViewPager;
 	private MyViewPagerAdapter mAdapter;
 	// the number of the bitmap in PicInfoList, which is not the source ID
 	private int id;
@@ -67,9 +69,10 @@ public class ShowImageActivity extends Activity {
 		setContentView(R.layout.image_show);
 		id = getIntent().getIntExtra("image", -1);
 		n = TimelineActivity.PicInfoList.size();
-		mViewPager = (JazzyViewPager) findViewById(R.id.image_show_view_pager);
+		
 		InitViewPager();
-
+		ll = (LinearLayout) findViewById(R.id.ivImageCover);
+		ll.bringToFront();
 		b = (Button) findViewById(R.id.ivBackButton);
 		b.setText(" < ПаІб(" + (id + 1) + "/"
 				+ TimelineActivity.PicInfoList.size() + ")");
@@ -86,39 +89,9 @@ public class ShowImageActivity extends Activity {
 	}
 
 	private void InitViewPager() {
-		ll = (LinearLayout) findViewById(R.id.ivImageCover);
-		mViewPager.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					px = event.getX();
-					py = event.getY();
-					break;
-				case MotionEvent.ACTION_UP:
-					if (Math.abs(px - event.getX()) < 5 && Math.abs(py - event.getY()) < 5) {
-						if (ll.getVisibility() == View.VISIBLE)
-							ll.setVisibility(View.INVISIBLE);
-						else
-							ll.setVisibility(View.VISIBLE);
-					}
-					break;
-				}
-				return false;
-			}
-
-		});
-		/*
-		 * mViewPager.setOnClickListener(new OnClickListener(){
-		 * 
-		 * @Override public void onClick(View arg0) { // TODO Auto-generated
-		 * method stub Log.w("photo", "onClick"); if (ll.getVisibility() ==
-		 * View.VISIBLE) ll.setVisibility(View.INVISIBLE); else
-		 * ll.setVisibility(View.VISIBLE); }
-		 * 
-		 * });
-		 */
+		mViewPager = new ImageViewPager(this);
+		RelativeLayout rl = (RelativeLayout) findViewById(R.id.ivImageFrame);
+		rl.addView(mViewPager);
 		bitmapCache = new Bitmap[n];
 		mAdapter = new MyViewPagerAdapter(this);
 		mViewPager.setAdapter(mAdapter);
@@ -127,6 +100,11 @@ public class ShowImageActivity extends Activity {
 		mViewPager.setTransitionEffect(TransitionEffect.Tablet);
 		mViewPager.setPageMargin(30);
 		mViewPager.setOnPageChangeListener(new MyOnPageChangeListener());
+		LayoutParams l = mViewPager.getLayoutParams();
+		l.height = LayoutParams.WRAP_CONTENT;
+		l.width = LayoutParams.WRAP_CONTENT;
+		mViewPager.setLayoutParams(l);
+		
 	}
 
 	private class MyViewPagerAdapter extends PagerAdapter {
@@ -515,6 +493,32 @@ public class ShowImageActivity extends Activity {
 			ArrayList<String> info = getPicInfo();
 			lv.setAdapter(new ArrayAdapter<String>(ShowImageActivity.this,
 					R.layout.small_font, R.id.info_tv, info));
+		}
+	}
+	private class ImageViewPager extends JazzyViewPager{
+
+		public ImageViewPager(Context context) {
+			super(context);
+			// TODO Auto-generated constructor stub
+		}
+		@Override
+		public boolean dispatchTouchEvent(MotionEvent ev){
+			switch (ev.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				px = ev.getX();
+				py = ev.getY();
+				break;
+			case MotionEvent.ACTION_UP:
+				if (Math.abs(px - ev.getX()) < 5 && Math.abs(py - ev.getY()) < 5) {
+					if (ll.getVisibility() == View.VISIBLE)
+						ll.setVisibility(View.INVISIBLE);
+					else
+						ll.setVisibility(View.VISIBLE);
+				}
+				break;
+			}
+			return super.dispatchTouchEvent(ev);
+			
 		}
 	}
 }

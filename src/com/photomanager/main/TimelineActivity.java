@@ -189,7 +189,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
-			if (set.size() > 4) return Integer.MAX_VALUE;
+			if (set.size() > 3) return Integer.MAX_VALUE;
 			return set.size();
 		}
 
@@ -212,13 +212,13 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				@Override
 				public boolean onTouch(View v, MotionEvent ev) {
 					// TODO Auto-generated method stub
-					Log.i("TimelineActivity",""+ev.getAction()+" "+ev.getRawX()+" "+ev.getRawY());
+					//Log.i("TimelineActivity",""+ev.getAction()+" "+ev.getRawX()+" "+ev.getRawY());
 					
 					
 					switch (ev.getAction() & MotionEvent.ACTION_MASK){
 					case MotionEvent.ACTION_DOWN:
 					case MotionEvent.ACTION_POINTER_DOWN:
-						Log.i("TimelineActivity", "Down");	
+						//Log.i("TimelineActivity", "Down");	
 						Animation cAnimation = new ScaleAnimation(1.0f, 0.9f,
 								1.0f, 0.9f, Animation.RELATIVE_TO_SELF, 0.5f,
 								Animation.RELATIVE_TO_SELF, 0.5f);

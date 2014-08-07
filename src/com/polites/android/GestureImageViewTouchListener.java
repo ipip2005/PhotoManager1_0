@@ -17,6 +17,7 @@ package com.polites.android;
 
 import android.content.res.Configuration;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -66,7 +67,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 	private boolean canDragY = false;
 	
 	private boolean multiTouch = false;
-	
+	private boolean zoomed;
 	private int displayWidth;
 	private int displayHeight;
 	
@@ -80,7 +81,6 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 	private GestureDetector tapDetector;
 	private GestureDetector flingDetector;
 	private GestureImageViewListener imageListener;
-
 	public GestureImageViewTouchListener(final GestureImageView image, int displayWidth, int displayHeight) {
 		super();
 		
@@ -151,12 +151,14 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		tapDetector = new GestureDetector(image.getContext(), new SimpleOnGestureListener() {
 			@Override
 			public boolean onDoubleTap(MotionEvent e) {
+				Log.i("GestureImageView","doubleClick");
 				startZoom(e);
 				return true;
 			}
 
 			@Override
 			public boolean onSingleTapConfirmed(MotionEvent e) {
+				Log.i("GestureImageView","singleClick");
 				if(!inZoom) {
 					if(onClickListener != null) {
 						onClickListener.onClick(image);
@@ -266,10 +268,17 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 	private void stopAnimations() {
 		image.animationStop();
 	}
-	
+	public boolean isZoomed(){
+		return zoomed;
+	}
+	public void setZoomed(boolean zoomed){
+		this.zoomed = zoomed;
+	}
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-
+		//Log.i("GestureImageView", "isZoomed: "+zoomed+ " "+lastScale+" "+startingScale);
+		if (isZoomed())
+			image.getParent().requestDisallowInterceptTouchEvent(true);
 		if(!inZoom) {
 			
 			if(!tapDetector.onTouchEvent(event)) {
@@ -361,7 +370,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		
 		initialDistance = 0;
 		lastScale = currentScale;
-		
+		zoomed = !(Math.abs(lastScale - startingScale) < 0.01);
 		if(!canDragX) {
 			next.x = centerX;
 		}
@@ -421,6 +430,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		}
 		
 		image.redraw();
+		
 	}
 	
 	protected boolean handleDrag(float x, float y) {

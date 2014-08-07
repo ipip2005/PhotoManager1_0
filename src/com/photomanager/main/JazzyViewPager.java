@@ -139,7 +139,7 @@ public class JazzyViewPager extends ViewPager {
 	public void addView(View child, int index, LayoutParams params) {
 		super.addView(wrapChild(child), index, params);
 	}
-
+	
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent arg0) {
 		return mEnabled ? super.onInterceptTouchEvent(arg0) : false;
