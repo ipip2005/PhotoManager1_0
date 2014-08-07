@@ -128,8 +128,6 @@ public class ShowImageActivity extends Activity {
 
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
-			/*ScalableImageView iv = new ScalableImageView(mContext);
-			iv.setScaleType(ScaleType.MATRIX);*/
 			GestureImageView iv = new GestureImageView(mContext);
 			Bitmap bm = null;
 			if (bitmapCache[position] != null
