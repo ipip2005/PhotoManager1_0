@@ -96,17 +96,20 @@ containing a value of this type.
         public static final int icon_gcoding1=0x7f020010;
         public static final int icon_myloc=0x7f020011;
         public static final int list_back=0x7f020012;
-        public static final int locate=0x7f020013;
-        public static final int locate_press=0x7f020014;
+        public static final int loc0=0x7f020013;
+        public static final int loc1=0x7f020014;
         public static final int locate_style=0x7f020015;
         public static final int maintab_toolbar_bg=0x7f020016;
-        public static final int map_search=0x7f020017;
-        public static final int map_search_press=0x7f020018;
-        public static final int map_search_style=0x7f020019;
-        public static final int text_color=0x7f02001a;
-        public static final int transparent=0x7f02001d;
-        public static final int trash_button=0x7f02001b;
-        public static final int trash_button_press=0x7f02001c;
+        public static final int map_search_style=0x7f020017;
+        public static final int search0=0x7f020018;
+        public static final int search1=0x7f020019;
+        public static final int span0=0x7f02001a;
+        public static final int span1=0x7f02001b;
+        public static final int span_style=0x7f02001c;
+        public static final int text_color=0x7f02001d;
+        public static final int transparent=0x7f020020;
+        public static final int trash_button=0x7f02001e;
+        public static final int trash_button_press=0x7f02001f;
     }
     public static final class id {
         public static final int accordion=0x7f05000b;
@@ -139,12 +142,12 @@ containing a value of this type.
         public static final int mapgridimage=0x7f050024;
         public static final int maptapimageshowgridview=0x7f050025;
         public static final int maptapimageshowokbutton=0x7f050026;
-        public static final int menuButton=0x7f05001a;
         public static final int rotatedown=0x7f05000a;
         public static final int rotateup=0x7f050009;
         public static final int search=0x7f050017;
         public static final int searchButton=0x7f050019;
         public static final int searchkey=0x7f050014;
+        public static final int spanButton=0x7f05001a;
         public static final int stack=0x7f050006;
         public static final int standard=0x7f050000;
         public static final int tablet=0x7f050001;

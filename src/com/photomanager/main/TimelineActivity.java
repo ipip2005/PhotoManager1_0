@@ -84,7 +84,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
 				0.5f);
 		myAnimationB.setDuration(400);
-		listView.setAnimation(myAnimation);
 	}
 
 	/*
@@ -155,13 +154,8 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 					.setAdapter(new MyViewPagerAdapter(TimelineActivity.this,
 							mSet.get(position)));
 			holder.viewPager.setCurrentItem(Integer.MAX_VALUE/2);
-			// holder.jViewPager.setFadeEnabled(true);
-			// holder.jViewPager.setTransitionEffect(TransitionEffect.Tablet);
 			holder.viewPager.setPageMargin(30);
 			holder.viewPager.setOffscreenPageLimit(5);
-			// Log.w("ViewPager",
-			// ""+mSet.get(position).size()+" "+holder.holder_id + " "+
-			// position);
 			holder.viewPager.setCurrentItem(0);
 			String openFlag = "";
 			if (mSet.get(position).size() > 1)
@@ -266,17 +260,21 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	private String dealTitle(ArrayList<Integer> list) {
 		String st = PicInfoList.get(list.get(0)).title;
 		String ed = PicInfoList.get(list.get(list.size() - 1)).title;
-
+		String ret = st;
+		Calendar c = PicInfoList.get(list.get(0)).mdate;
 		if (list.size() == 1) {
-			Calendar c = PicInfoList.get(list.get(0)).mdate;
-			return st + " " + c.get(Calendar.HOUR_OF_DAY) + ":"
+			ret += " " + c.get(Calendar.HOUR_OF_DAY) + ":"
 					+ c.get(Calendar.MINUTE);
+			return ret;
 		}
-
-		if (st.equals(ed))
-			return st;
-		else
-			return ed + "-" + st;
+		if (!st.equals(ed)) ret = ed + "-" + st;
+		if (granularity == 4){
+			if (c.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)){
+				ret = "½ñÄê " + ret;
+			} else
+				ret = c.get(Calendar.YEAR) + "Äê " + ret;
+		}
+		return ret;
 	}
 
 	private double measureFingers(MotionEvent event) {

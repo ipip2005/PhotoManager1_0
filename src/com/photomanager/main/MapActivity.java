@@ -21,6 +21,7 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener;
 import com.baidu.mapapi.map.MyLocationConfigeration.LocationMode;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.overlayutil.OverlayManager;
 import com.baidu.mapapi.search.core.CityInfo;
 import com.baidu.mapapi.search.core.SearchResult;
@@ -104,6 +105,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private int cacheCount=0;
 	private MyOverlay pics, myLocOverlay;
 	private MyPoiOverlay poiOverlay;
+	private LatLngBounds llb;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		
@@ -242,8 +244,10 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		int width = (int) (dm.widthPixels), height = (int) (dm.heightPixels);
 		int length = (int)(Math.min(width, height)*0.20);
 		//Log.i("photo", "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
+		LatLngBounds.Builder builder = new LatLngBounds.Builder();
 		for (int i = 0; i < mSet.size(); i++) {
-			PicInfo info = PicInfoList.get(mSet.get(i));
+			PicInfo info = PicInfoList.get(mSet.get(i)); 
+			builder.include(info.pl);		//用所有图片构建一个最小闭矩形用于span。
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			if (screenOn.x < 0 || screenOn.y < 0 || screenOn.x > width
@@ -267,7 +271,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				p.add(mSet.get(i));
 				mPicSet.add(p);
 			}
+			
 		}
+		llb = builder.build();
 		//Log.i("pic", ""+mPicSet.size());
 		for (int i = 0; i < mPicSet.size(); i++) {
 			PicInfo[] info = new PicInfo[3];
@@ -305,6 +311,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		pics.addToMap();
 		//if (poiOverlay!=null) poiOverlay.addToMap();
 	}
+	/**
+	 * establish a Location Overlay
+	 */
 	private void createMyOverlay(){
 		myLocOverlay.removeFromMap();
 		myLocOverlay.clear();
@@ -395,7 +404,17 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			ll.startAnimation(a);
 		}
 	}
-
+	public void spanMapToSeePics(View v){
+		if (mSet.size() > 0){
+			pics.zoomToSpan();
+			MapStatusUpdate m = MapStatusUpdateFactory.newLatLngBounds(llb);
+			//mBaiduMap.setMapStatus(m);
+			mBaiduMap.animateMapStatus(m);
+			Toast.makeText(this, "可见所有图片", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(this, "没有可显示的图片，拍照时没有禁用定位？", Toast.LENGTH_SHORT).show();
+		}
+	}
 
 	/**
 	 * 影响搜索按钮点击事件
@@ -505,7 +524,10 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		@Override
 		public boolean onMarkerClick(Marker m) {
 			// TODO Auto-generated method stub
-			if (m.getTitle().equals("here")) return true;
+			if (m.getTitle().equals("here")) {
+				Toast.makeText(MapActivity.this, "我在这儿", Toast.LENGTH_SHORT).show();
+				return true;
+			}
 			index = Integer.parseInt(m.getTitle());
 			mDialog = new ImageDialog(MapActivity.this, R.style.dialog);
 			DisplayMetrics dm = new DisplayMetrics();

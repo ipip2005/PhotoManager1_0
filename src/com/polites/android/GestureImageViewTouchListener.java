@@ -17,7 +17,6 @@ package com.polites.android;
 
 import android.content.res.Configuration;
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -155,14 +154,12 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 				new SimpleOnGestureListener() {
 					@Override
 					public boolean onDoubleTap(MotionEvent e) {
-						Log.i("GestureImageView", "doubleClick");
 						startZoom(e);
 						return true;
 					}
 
 					@Override
 					public boolean onSingleTapConfirmed(MotionEvent e) {
-						Log.i("GestureImageView", "singleClick");
 						if (!inZoom) {
 							if (onClickListener != null) {
 								onClickListener.onClick(image);

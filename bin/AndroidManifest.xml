@@ -6,7 +6,7 @@
 	
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="100" />
+        android:targetSdkVersion="19" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />  
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -26,7 +26,7 @@
         android:theme="@style/AppBaseTheme">"
         	<meta-data
        	      android:name="com.baidu.lbsapi.API_KEY"
-       	      android:value="QAaFXdFL9zmSvhisoiQAVgTz"/>
+       	      android:value="WkCgNIE0qaT6du7j72Doe7n2"/>
         <service 
             android:name="com.baidu.location.f"
             android:enabled="true"
