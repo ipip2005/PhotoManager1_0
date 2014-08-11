@@ -399,8 +399,11 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			//mBaiduMap.setMapStatus(m);
 			mBaiduMap.animateMapStatus(m);
 			Toast.makeText(this, "所有图片可见", Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(this, "无图片可显示 确认拍照时没有禁用定位", Toast.LENGTH_SHORT).show();
+		} else 
+		if (mSet != null && mSet.size() == 0){
+			Toast.makeText(this, "无带坐标图片，请确认拍照时开启定位。", Toast.LENGTH_SHORT).show();
+		} else{
+			Toast.makeText(this, "未载入...请重试", Toast.LENGTH_SHORT).show();
 		}
 	}
 

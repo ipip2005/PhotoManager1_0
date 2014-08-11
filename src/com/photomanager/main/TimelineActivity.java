@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LayoutAnimationController;
@@ -28,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -92,11 +94,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	 */
 	private void preData() {
 		lastClickImage.setTimeInMillis(0);
-		handler = new Handler() {
-			public void handleMessage(Message msg) {
-				mAdapter.notifyDataSetChanged();
-			}
-		};
 		dg = new DataGain(getContentResolver(), TimelineActivity.this, handler);
 		PicInfoList = dg.getPicInfoList();
 		granularity = 2;
@@ -149,13 +146,12 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				holder = (ViewHolder) convertView.getTag();
 			}
 			holder.viewPager.removeAllViews();
-			holder.holder_id = position;
 			holder.viewPager
 					.setAdapter(new MyViewPagerAdapter(TimelineActivity.this,
 							mSet.get(position)));
-			holder.viewPager.setCurrentItem(Integer.MAX_VALUE/2);
 			holder.viewPager.setPageMargin(30);
-			holder.viewPager.setOffscreenPageLimit(5);
+			holder.viewPager.setCurrentItem(Integer.MAX_VALUE/2);
+			holder.viewPager.setOffscreenPageLimit(1);
 			holder.viewPager.setCurrentItem(0);
 			String openFlag = "";
 			if (mSet.get(position).size() > 1)
@@ -194,13 +190,13 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		}
 
 		@Override
-		public Object instantiateItem(ViewGroup container, int position) {
-			int id = position % set.size();
+		public Object instantiateItem(ViewGroup container, final int position) {
+			final int id = position % set.size();
 			ImageView iv = new ImageView(mContext);
-			if (PicInfoList.get(set.get(id)).bitmap == null)
-				dg.getData(set.get(id));
-			iv.setImageBitmap(PicInfoList.get(set.get(id)).bitmap);
-			iv.setTag(set.get(id));
+			dg.getData(set.get(id), iv);
+			LayoutParams lp = new LayoutParams(250, 250);
+			iv.setLayoutParams(lp);
+			iv.setScaleType(ScaleType.CENTER_CROP);
 			iv.setOnTouchListener(new OnTouchListener(){
 
 				@Override
@@ -238,7 +234,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 						v.startAnimation(eAnimation);
 						Intent intent = new Intent(TimelineActivity.this,
 								ShowImageActivity.class);
-						intent.putExtra("image", (Integer) v.getTag());
+						intent.putExtra("image", (Integer) set.get(id));
 						startActivity(intent);
 						break;
 					}
@@ -256,15 +252,19 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		}
 
 	}
-
+	private String addZero(int i){
+		
+		if (i < 10) return "0" + i;
+		return "" + i;
+	}
 	private String dealTitle(ArrayList<Integer> list) {
 		String st = PicInfoList.get(list.get(0)).title;
 		String ed = PicInfoList.get(list.get(list.size() - 1)).title;
 		String ret = st;
 		Calendar c = PicInfoList.get(list.get(0)).mdate;
 		if (list.size() == 1) {
-			ret += " " + c.get(Calendar.HOUR_OF_DAY) + ":"
-					+ c.get(Calendar.MINUTE);
+			ret += " " + addZero(c.get(Calendar.HOUR_OF_DAY)) + ":"
+					+ addZero(c.get(Calendar.MINUTE));
 			return ret;
 		}
 		if (!st.equals(ed)) ret = ed + "-" + st;

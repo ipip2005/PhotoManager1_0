@@ -26,7 +26,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Thumbnails;
+import android.support.v4.util.LruCache;
 import android.util.Log;
+import android.widget.ImageView;
 
 /**
  * @author ipip
@@ -35,25 +37,22 @@ import android.util.Log;
 public class DataGain {
 	private Cursor cursor;
 	private int n;
-	private boolean[] got, ing;
 	private ContentResolver cr;
 	private TimelineActivity mContext;
 	private Handler mHandler;
-	private int p;
-	private int done, doing;
-	private int cacheOrder[];
 	private boolean gotPoi[];
+	private static LruCache<String, Bitmap> cache;
 	// signal for thread security
 	private ArrayList<PicInfo> mPicInfoList;
 	private ArrayList<ArrayList<Integer>> mSet1, mSet2, mSet3, mSet4;
-	private ArrayList<Integer> PSet;
+	private ArrayList<Integer> mSetWithPlace;
 	private static final String[] STORE_IMAGES = {
 			MediaStore.Images.Media.DATE_TAKEN,
 			MediaStore.Images.Media.LATITUDE,
 			MediaStore.Images.Media.LONGITUDE, 
 			MediaStore.Images.Media._ID,
 			MediaStore.Images.Media.DATA, };
-	ExecutorService pool = Executors.newFixedThreadPool(3);
+	ExecutorService pool = Executors.newFixedThreadPool(4);
 	/**
 	 * @param contentResolver
 	 * @param context
@@ -68,15 +67,19 @@ public class DataGain {
 						+ MediaStore.Images.Media.DATE_TAKEN + " DESC");
 		mContext = context;
 		n = cursor.getCount();
-		got = new boolean[n];
-		ing = new boolean[n];
 		gotPoi = new boolean[n];
-		p = 0;
-		done = 0;
-		doing = 0;
 		mHandler = handler;
-		cacheOrder = new int[n];
 		preData();
+		int maxMemory = (int)(Runtime.getRuntime().maxMemory());
+		int cacheSize = maxMemory/4;
+		Log.i("DataGain", "Cache Size: "+cacheSize);
+		cache = new LruCache<String, Bitmap>(cacheSize){
+			@Override
+			protected int sizeOf(String key, Bitmap value)
+			{
+				return value.getRowBytes() * value.getHeight();
+			};
+		};;
 	}
 	@SuppressLint("SimpleDateFormat")
 	/**
@@ -127,13 +130,11 @@ public class DataGain {
 		int st = 0;
 		boolean temp[] = new boolean[n];
 		for (int i = 0; i < mSet2.size(); i++) {
-			cacheOrder[st] = mSet2.get(i).get(0);
 			temp[mSet2.get(i).get(0)] = true;
 			st++;
 		}
 		for (int i = 0; i < n; i++)
 			if (!temp[i]) {
-				cacheOrder[st] = i;
 				st++;
 			}
 
@@ -165,7 +166,6 @@ public class DataGain {
 			p = ps.searchEndAt();
 			mSet4.add(ps.getArrayList());
 		}
-		
 		for (int i=0;i<n;i++) gotPoi[i] = false;
 		checkAllPoiData();
 	}
@@ -181,33 +181,124 @@ public class DataGain {
 			return mSet4;
 		return null;
 	}
-
+	private void addBitmapToLruCache(String key, Bitmap bitmap)
+	{
+		if (cache.get(key) == null)
+		{
+			if (bitmap != null)
+				cache.put(key, bitmap);
+		}
+	}
 	public ArrayList<PicInfo> getPicInfoList() {
 		return this.mPicInfoList;
 	}
 
 	public ArrayList<Integer> getSetWithPlace() {
-		PSet = new ArrayList<Integer>();
-		for (int i = 0; i < n; i++)
-			if (gotPoi[i]) {
-				PSet.add(i);
-			}
-		return PSet;
+		return mSetWithPlace;
 	}
 
 	public int getCount() {
 		return n;
 	}
-
-	public void getData(int index) {
-		if (got[index] || ing[index])
-			return;
-		MyThread t = new MyThread(index);
-		ing[index] = true;
-		doing++;
+	
+	/*public Bitmap getData(int index) {
+		if (cache.get(String.valueOf(index)) != null) {
+			Log.i("DataGain","hasData: "+index);
+			return cache.get(String.valueOf(index));
+		}
+		MyThread t = new MyThread(index, null);
 		pool.execute(t);
-	}
+		return null;
+	}*/
+	public void getData(final int index, final ImageView iv){
+		Log.i("DataGain", "count: " + cache.size());
+		iv.setTag(String.valueOf(index));
+		if (mHandler == null){
+			mHandler = new Handler(){
+				public void handleMessage(Message msg) {
+					Holder h = (Holder)msg.obj;
+					if (h.iv != null && h.iv.getTag().toString().equals(h.tag)){
+						h.iv.setImageBitmap(h.bm);
+					}
+				}
+			};
+		}
+		Bitmap bm = cache.get(String.valueOf(index));
+		if (bm != null) {
+			Message m = Message.obtain();
+			m.obj = new Holder(iv, bm, String.valueOf(index));
+			mHandler.sendMessage(m);
+			return;
+		} else
+		pool.execute(new Runnable(){
 
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				int id = index;
+				String filename = "" + mPicInfoList.get(id).id + ".thumb";
+				Boolean fileExists = false;
+				try {
+					FileInputStream s = mContext.openFileInput(filename);
+					fileExists = s != null;
+					if (fileExists){
+						Bitmap bm = BitmapFactory.decodeStream(s);
+						synchronized (cache){
+							addBitmapToLruCache(String.valueOf(id), bm);
+						}
+						Message m = Message.obtain();
+						m.obj = new Holder(iv, bm, String.valueOf(id));
+						mHandler.sendMessage(m);
+						return;
+					}
+					s.close();
+				} catch (StreamCorruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if (!fileExists) {
+					BitmapFactory.Options op = new BitmapFactory.Options();
+					op.inJustDecodeBounds = true;
+					BitmapFactory.decodeFile(mPicInfoList.get(id).fileRoute, op);
+					if (op.outWidth > op.outHeight){
+						op.inSampleSize = op.outWidth/200;
+						op.outWidth = 200;
+						op.outHeight = op.outHeight * 200 / op.outWidth;
+					} else {
+						op.inSampleSize = op.outHeight/200;
+						op.outHeight = 200;
+						op.outWidth = op.outWidth * 200 / op.outHeight;
+					}
+					op.inPurgeable = true;
+					op.inInputShareable = true;
+					op.inPreferredConfig = Bitmap.Config.RGB_565;
+					op.inJustDecodeBounds = false;
+					Bitmap bitmap = BitmapFactory.decodeFile(mPicInfoList.get(id).fileRoute, op);
+					addBitmapToLruCache(String.valueOf(id), bitmap);
+					Message m = Message.obtain();
+					m.obj = new Holder(iv, bitmap, String.valueOf(id));
+					mHandler.sendMessage(m);
+					try {
+						FileOutputStream s = mContext.openFileOutput(filename,
+								Context.MODE_PRIVATE);
+						bitmap.compress(Bitmap.CompressFormat.PNG, 100, s);
+						s.close();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			}	
+		});
+	}
 	public void requirePoiDataAndWrite(int i){
 		LatLng sourceLatLng = mPicInfoList.get(i).pl; 
 		CoordinateConverter converter  = new CoordinateConverter();  
@@ -216,98 +307,29 @@ public class DataGain {
 		converter.coord(sourceLatLng);  
 		LatLng desLatLng = converter.convert();
 		mPicInfoList.get(i).pl = desLatLng;
-		gotPoi[i]=true;
 	}
 	public void checkAllPoiData(){
-		for (int i=0;i<n;i++) if (mPicInfoList.get(i).pl!=null && !gotPoi[i]){
+		mSetWithPlace = new ArrayList<Integer>();
+		for (int i=0;i<n;i++) if (mPicInfoList.get(i).pl!=null){
 			requirePoiDataAndWrite(i);
+			mSetWithPlace.add(i);
 		}
 	}
 	
 	public void delData(int index) {
-
+		
 	}
 
-	private class MyThread implements Runnable {
-		private int id;
-
-		public MyThread(int index) {
-			id = index;
-		}
-
-		@SuppressLint("SimpleDateFormat")
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			String filename = "" + mPicInfoList.get(id).id + ".thunb";
-			File f = new File(filename);
-			Boolean fileExists = false;
-			try {
-				FileInputStream s = mContext.openFileInput(filename);
-				mPicInfoList.get(id).bitmap = BitmapFactory.decodeStream(s);
-				fileExists = s != null;
-				s.close();
-			} catch (StreamCorruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (!fileExists) {
-				BitmapFactory.Options op = new BitmapFactory.Options();
-				op.inJustDecodeBounds = true;
-				op.inSampleSize = 1;
-				mPicInfoList.get(id).bitmap = MediaStore.Images.Thumbnails
-						.getThumbnail(cr, mPicInfoList.get(id).id,
-								Thumbnails.MINI_KIND, op);
-				if (op.outWidth < op.outHeight){
-					op.inSampleSize = op.outWidth/250;
-					op.outWidth = 250;
-					op.outHeight = op.outHeight * 250 / op.outWidth;
-				} else {
-					op.inSampleSize = op.outHeight/250;
-					op.outHeight = 250;
-					op.outWidth = op.outWidth * 250 / op.outHeight;
-				}
-				mPicInfoList.get(id).bitmap = ThumbnailUtils.extractThumbnail(MediaStore.Images.Thumbnails
-						.getThumbnail(cr, mPicInfoList.get(id).id,
-								Thumbnails.MINI_KIND, op), 250, 250);
-				try {
-					f.mkdirs();
-					FileOutputStream s = mContext.openFileOutput(filename,
-							Context.MODE_PRIVATE);
-					mPicInfoList.get(id).bitmap.compress(
-							Bitmap.CompressFormat.PNG, 100, s);
-					s.close();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-			Message msg = new Message();
-			msg.what = id;
-			mHandler.sendMessage(msg);
-			// mContext.doneWork(id, info);
-			got[id] = true;
-			done++;
-			/*if (doing - done <= 1) {
-				while (p < n - 1 && (ing[cacheOrder[p]] || got[cacheOrder[p]]))
-					p++;
-				if (!ing[cacheOrder[p]] && !got[cacheOrder[p]]) {
-					ing[cacheOrder[p]] = true;
-					doing++;
-					MyThread t = new MyThread(cacheOrder[p]);
-					pool.execute(t);
-				}
-			}*/
+	private class Holder{
+		public ImageView iv;
+		public Bitmap bm;
+		public String tag;
+		public Holder(ImageView iv, Bitmap bm, String tag){
+			this.iv = iv;
+			this.bm = bm;
+			this.tag = tag;
 		}
 	}
-
 	private class PicSet {
 		ArrayList<Integer> ids;
 		int p;
