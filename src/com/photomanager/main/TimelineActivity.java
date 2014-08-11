@@ -34,7 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
- * @author ipip 2014Äê7ÔÂ16ÈÕÏÂÎç2:50:04
+ * @author ipip 2014å¹´7æœˆ16æ—¥ä¸‹åˆ2:50:04
  */
 public class TimelineActivity extends Activity implements OnItemClickListener {
 	static public ArrayList<PicInfo> PicInfoList;
@@ -270,9 +270,9 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		if (!st.equals(ed)) ret = ed + "-" + st;
 		if (granularity == 4){
 			if (c.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)){
-				ret = "½ñÄê " + ret;
+				ret = "ä»Šå¹´ " + ret;
 			} else
-				ret = c.get(Calendar.YEAR) + "Äê " + ret;
+				ret = c.get(Calendar.YEAR) + "å¹´ " + ret;
 		}
 		return ret;
 	}
@@ -331,9 +331,9 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	}
 
 	/**
-	 * ×Ô¶¨Òålistview ÓÃÓÚÊÂ¼ş·Ö·¢µÄ´¦Àí¡£
+	 * è‡ªå®šä¹‰listview ç”¨äºäº‹ä»¶åˆ†å‘çš„å¤„ç†ã€‚
 	 * @author ipip
-	 *  2014Äê8ÔÂ4ÈÕÉÏÎç10:46:53
+	 *  2014å¹´8æœˆ4æ—¥ä¸Šåˆ10:46:53
 	 */
 	private class MyListView extends ListView {
 		public MyListView(Context context) {
@@ -343,7 +343,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		}
 
 		/**
-		 * ´¦ÀílistViewµÄ´¥ÃşÊÂ¼ş
+		 * å¤„ç†listViewçš„è§¦æ‘¸äº‹ä»¶
 		 */
 		@Override
 		public boolean onTouchEvent(MotionEvent ev) {

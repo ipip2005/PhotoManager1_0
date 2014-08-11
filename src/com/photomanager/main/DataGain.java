@@ -30,7 +30,7 @@ import android.util.Log;
 
 /**
  * @author ipip
- *  2014Äê7ÔÂ16ÈÕÏÂÎç2:50:27
+ *  2014å¹´7æœˆ16æ—¥ä¸‹åˆ2:50:27
  */
 public class DataGain {
 	private Cursor cursor;
@@ -81,7 +81,7 @@ public class DataGain {
 	@SuppressLint("SimpleDateFormat")
 	/**
 	 * preData()
-	 * ×¼±¸ĞèÒªµÄÊı¾İ
+	 * å‡†å¤‡éœ€è¦çš„æ•°æ®
 	 */
 	private void preData() {
 		mPicInfoList = new ArrayList<PicInfo>();
@@ -90,11 +90,11 @@ public class DataGain {
 			PicInfo info = new PicInfo();
 			info.mdate = Calendar.getInstance();
 			info.mdate.setTimeInMillis(cursor.getLong(0));
-			info.title = "" + (info.mdate.get(Calendar.MONTH) + 1) + "ÔÂ"
-					+ info.mdate.get(Calendar.DATE) + "ÈÕ";
+			info.title = "" + (info.mdate.get(Calendar.MONTH) + 1) + "æœˆ"
+					+ info.mdate.get(Calendar.DATE) + "æ—¥";
 			if (info.mdate.get(Calendar.YEAR) != Calendar.getInstance().get(
 					Calendar.YEAR))
-				info.title = "" + info.mdate.get(Calendar.YEAR) + "Äê"
+				info.title = "" + info.mdate.get(Calendar.YEAR) + "å¹´"
 						+ info.title;
 			if (cursor.getDouble(1)>0)
 				info.pl = new LatLng(cursor.getDouble(1),cursor.getDouble(2));
@@ -212,7 +212,7 @@ public class DataGain {
 		LatLng sourceLatLng = mPicInfoList.get(i).pl; 
 		CoordinateConverter converter  = new CoordinateConverter();  
 		converter.from(CoordType.GPS);  
-		// sourceLatLng´ı×ª»»×ø±ê  
+		// sourceLatLngå¾…è½¬æ¢åæ ‡  
 		converter.coord(sourceLatLng);  
 		LatLng desLatLng = converter.convert();
 		mPicInfoList.get(i).pl = desLatLng;
@@ -295,7 +295,7 @@ public class DataGain {
 			// mContext.doneWork(id, info);
 			got[id] = true;
 			done++;
-			if (doing - done <= 1) {
+			/*if (doing - done <= 1) {
 				while (p < n - 1 && (ing[cacheOrder[p]] || got[cacheOrder[p]]))
 					p++;
 				if (!ing[cacheOrder[p]] && !got[cacheOrder[p]]) {
@@ -304,7 +304,7 @@ public class DataGain {
 					MyThread t = new MyThread(cacheOrder[p]);
 					pool.execute(t);
 				}
-			}
+			}*/
 		}
 	}
 

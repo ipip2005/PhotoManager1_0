@@ -16,10 +16,10 @@ public class MyViewPager extends ViewPager {
 	public MyViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-	private float xDown;// 记录手指按下时的横坐标。
-	private float xMove;// 记录手指移动时的横坐标。
-	private float yDown;// 记录手指按下时的纵坐标。
-	private float yMove;// 记录手指移动时的纵坐标。
+	private float xDown;
+	private float xMove;
+	private float yDown;
+	private float yMove;
 	private boolean viewPagerScrolling = false;
 	private boolean fatherScrolling = false;
 

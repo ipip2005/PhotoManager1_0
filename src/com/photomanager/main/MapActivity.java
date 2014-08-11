@@ -78,7 +78,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 /**
- * @author ipip 2014Äê7ÔÂ16ÈÕÏÂÎç2:49:25
+ * 
+ * @author ipip 2014/8/11 13:59
+ *
  */
 public class MapActivity extends Activity implements OnGetPoiSearchResultListener, OnGetSuggestionResultListener {
 	private MapView mMapView = null;
@@ -88,7 +90,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private MyLocationData locData;
 	LocationClient mLocClient;
 	public MyLocationListenner myListener = new MyLocationListenner();
-	private boolean first = true;
 	private AutoCompleteTextView keyWorldsView = null;
 	private ArrayAdapter<String> sugAdapter = null;
 	private int load_index, index;
@@ -115,7 +116,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		mMapView = (MapView) findViewById(R.id.bmapView);
 		mMapView.removeViewAt(2);
 		mMapView.removeViewAt(1);
-		// ³õÊ¼»¯ËÑË÷Ä£¿é£¬×¢²áËÑË÷ÊÂ¼ş¼àÌı
 		mSearch = PoiSearch.newInstance();
 		mSearch.setOnGetPoiSearchResultListener(this);
 		mSuggestionSearch = SuggestionSearch.newInstance();
@@ -125,12 +125,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				android.R.layout.simple_dropdown_item_1line);
 		keyWorldsView.setAdapter(sugAdapter);
 		mBaiduMap = mMapView.getMap();
-		MapStatusUpdate u = MapStatusUpdateFactory.zoomTo(14.0f);
+		MapStatusUpdate u = MapStatusUpdateFactory.zoomTo(13.0f);
 		mBaiduMap.setMapStatus(u);
 		initMapView();
-		/**
-		 * µ±ÊäÈë¹Ø¼ü×Ö±ä»¯Ê±£¬¶¯Ì¬¸üĞÂ½¨ÒéÁĞ±í
-		 */
 		keyWorldsView.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -152,9 +149,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				}
 				String city = ((EditText) findViewById(R.id.city)).getText()
 						.toString();
-				/**
-				 * Ê¹ÓÃ½¨ÒéËÑË÷·şÎñ»ñÈ¡½¨ÒéÁĞ±í£¬½á¹ûÔÚonSuggestionResult()ÖĞ¸üĞÂ
-				 */
 
 				mSuggestionSearch
 				.requestSuggestion(new SuggestionSearchOption()
@@ -216,15 +210,12 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		cache = new BitmapDescriptor[dg.getCount()];
 		pics = new MyOverlay(mBaiduMap);
 		mBaiduMap.setOnMarkerClickListener(pics);
-		Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
+		//Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
 		
 		if ((Main.s.get("last-location-x"))!=null){
-			Log.i("MapActivity", "hasLast "+Double.parseDouble(Main.s.get("last-location-x").toString())+" "+
-					Double.parseDouble(Main.s.get("last-location-y").toString()));
 			mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(
 					new LatLng(Double.parseDouble(Main.s.get("last-location-x").toString()),
 							   Double.parseDouble(Main.s.get("last-location-y").toString()))));
-			Log.i("MapActivity", "moveOver");
 		}
 	}
 
@@ -247,7 +238,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		LatLngBounds.Builder builder = new LatLngBounds.Builder();
 		for (int i = 0; i < mSet.size(); i++) {
 			PicInfo info = PicInfoList.get(mSet.get(i)); 
-			builder.include(info.pl);		//ÓÃËùÓĞÍ¼Æ¬¹¹½¨Ò»¸ö×îĞ¡±Õ¾ØĞÎÓÃÓÚspan¡£
+			builder.include(info.pl);		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½spanï¿½ï¿½
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			if (screenOn.x < 0 || screenOn.y < 0 || screenOn.x > width
@@ -309,7 +300,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			cacheCount++;
 		}
 		pics.addToMap();
-		//if (poiOverlay!=null) poiOverlay.addToMap();
 	}
 	/**
 	 * establish a Location Overlay
@@ -331,20 +321,18 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 						mCurrentMode, false, null));
 		mLocClient.registerLocationListener(myListener);
 		LocationClientOption option = new LocationClientOption();
-		option.setOpenGps(true);// ´ò¿ªgps
-		option.setCoorType("bd09ll"); // ÉèÖÃ×ø±êÀàĞÍ
+		option.setOpenGps(true);
+		option.setCoorType("bd09ll");
 		option.setScanSpan(100000);
 		mLocClient.setLocOption(option);
 		myLocOverlay = new MyOverlay(mBaiduMap);
 	} 
 
-	// ÖØÖÃµØÍ¼ÖĞĞÄµã
 	public void resetCenterPoint(View v) {  
 		mBaiduMap.setMyLocationEnabled(true);
-		first = true;
 		mLocClient.start();
 		mLocClient.requestLocation();
-		Toast.makeText(MapActivity.this, "ÕıÔÚ¶¨Î»¡­¡­", Toast.LENGTH_SHORT).show();
+		Toast.makeText(MapActivity.this, "å®šä½ä¸­...", Toast.LENGTH_SHORT).show();
 	}
 
 	public void showSearchPanel(View v) {
@@ -405,22 +393,17 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		}
 	}
 	public void spanMapToSeePics(View v){
-		if (mSet.size() > 0){
+		if (mSet != null && mSet.size() > 0 && pics != null){
 			pics.zoomToSpan();
 			MapStatusUpdate m = MapStatusUpdateFactory.newLatLngBounds(llb);
 			//mBaiduMap.setMapStatus(m);
 			mBaiduMap.animateMapStatus(m);
-			Toast.makeText(this, "¿É¼ûËùÓĞÍ¼Æ¬", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "æ‰€æœ‰å›¾ç‰‡å¯è§", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, "Ã»ÓĞ¿ÉÏÔÊ¾µÄÍ¼Æ¬£¬ÅÄÕÕÊ±Ã»ÓĞ½ûÓÃ¶¨Î»£¿", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "æ— å›¾ç‰‡å¯æ˜¾ç¤º ç¡®è®¤æ‹ç…§æ—¶æ²¡æœ‰ç¦ç”¨å®šä½", Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	/**
-	 * Ó°ÏìËÑË÷°´Å¥µã»÷ÊÂ¼ş
-	 * 
-	 * @param v
-	 */
 	public void searchButtonProcess(View v) {
 		EditText editCity = (EditText) findViewById(R.id.city);
 		EditText editSearchKey = (EditText) findViewById(R.id.searchkey);
@@ -432,14 +415,13 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	}
 	public void goToLastPage(View v){
 		if (load_index == 0 ){
-			Toast.makeText(this, "ÕâÊÇµÚÒ»×éÊı¾İ", Toast.LENGTH_SHORT).show();;
+			Toast.makeText(this, "è¿™å·²æ˜¯æœ€å‰é¡µç´¢å¼•", Toast.LENGTH_SHORT).show();;
 		} else{
 			load_index--;
 			searchButtonProcess(null);
 		}
 	}
 	public void goToNextPage(View v) {
-		// ËÑË÷ÏÂÒ»×époi
 		load_index++;
 		searchButtonProcess(null);
 	}
@@ -451,54 +433,46 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				return;
 			locData = new MyLocationData.Builder()
 			.accuracy(location.getRadius())
-			// ´Ë´¦ÉèÖÃ¿ª·¢Õß»ñÈ¡µ½µÄ·½ÏòĞÅÏ¢£¬Ë³Ê±Õë0-360
 			.latitude(location.getLatitude())
 			.longitude(location.getLongitude()).build();
-			// ´Ë´¦¿ÉÒÔÉèÖÃ locDataµÄ·½ÏòĞÅÏ¢, Èç¹û¶¨Î» SDK Î´·µ»Ø·½ÏòĞÅÏ¢£¬ÓÃ»§¿ÉÒÔ×Ô¼ºÊµÏÖÂŞÅÌ¹¦ÄÜÌí¼Ó·½ÏòĞÅÏ¢¡£
 			mBaiduMap.setMyLocationData(locData);
-			//mLocClient.stop();
-			//mBaiduMap.setMyLocationEnabled(false);
-			if (first) {
-				first = false;
-				LatLng ll = new LatLng(location.getLatitude(),
-						location.getLongitude());
-				//Log.i("gps","in "+ll.latitude+" "+ll.longitude);
-				mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll),400);
-				new Handler().postDelayed(new Runnable(){
+			LatLng ll = new LatLng(location.getLatitude(),
+					location.getLongitude());
+			mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll),400);
+			new Handler().postDelayed(new Runnable(){
 
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						mBaiduMap.animateMapStatus(MapStatusUpdateFactory.zoomTo(14));
-					}
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					mBaiduMap.animateMapStatus(MapStatusUpdateFactory.zoomTo(14));
+				}
+				
+			}, 500);
+			GeoCoder ss = GeoCoder.newInstance();
+			ss.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener(){
+
+				@Override
+				public void onGetGeoCodeResult(GeoCodeResult arg0) {
+					// TODO Auto-generated method stub
 					
-				}, 500);
-				GeoCoder ss = GeoCoder.newInstance();
-				ss.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener(){
+				}
 
-					@Override
-					public void onGetGeoCodeResult(GeoCodeResult arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void onGetReverseGeoCodeResult(
-							ReverseGeoCodeResult res) {
-						// TODO Auto-generated method stub
-						EditText et = (EditText)MapActivity.this.findViewById(R.id.city);
-						et.setText(res.getAddressDetail().city);
-						Main.s.put("city", res.getAddressDetail().city);
-					}
-					
-				});
-				ss.reverseGeoCode(new ReverseGeoCodeOption().location(ll));
-				createMyOverlay();
-				mBaiduMap.setMyLocationEnabled(false);
-				mLocClient.stop();
-				Main.s.put("last-location-x", ll.latitude);
-				Main.s.put("last-location-y", ll.longitude);
-			}
+				@Override
+				public void onGetReverseGeoCodeResult(
+						ReverseGeoCodeResult res) {
+					// TODO Auto-generated method stub
+					EditText et = (EditText)MapActivity.this.findViewById(R.id.city);
+					et.setText(res.getAddressDetail().city);
+					Main.s.put("city", res.getAddressDetail().city);
+				}
+				
+			});
+			ss.reverseGeoCode(new ReverseGeoCodeOption().location(ll));
+			createMyOverlay();
+			mBaiduMap.setMyLocationEnabled(false);
+			mLocClient.stop();
+			Main.s.put("last-location-x", ll.latitude);
+			Main.s.put("last-location-y", ll.longitude);
 		}
 		public void onReceivePoi(BDLocation poiLocation) {
 			if (poiLocation == null) {
@@ -525,7 +499,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		public boolean onMarkerClick(Marker m) {
 			// TODO Auto-generated method stub
 			if (m.getTitle().equals("here")) {
-				Toast.makeText(MapActivity.this, "ÎÒÔÚÕâ¶ù", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MapActivity.this, "æˆ‘åœ¨è¿™é‡Œ", Toast.LENGTH_SHORT).show();
 				return true;
 			}
 			index = Integer.parseInt(m.getTitle());
@@ -573,21 +547,21 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			// TODO Auto-generated method stub
-			ImageView holder;
+			SquareLayout holder;
 			if (convertView == null) {
-				int lid = R.layout.map_ontap_grid;
-				holder = new ImageView(MapActivity.this);
+				int lid = R.layout.map_tap_image_show_image;
+				holder = new SquareLayout(MapActivity.this);
 				convertView = mInflater.inflate(lid, null);
-				holder = (ImageView) convertView
-						.findViewById(R.id.mapgridimage);
+				holder = (SquareLayout) convertView
+						.findViewById(R.id.square);
 				convertView.setTag(holder);
 			} else {
-				holder = (ImageView) convertView.getTag();
+				holder = (SquareLayout) convertView.getTag();
 			}
-			holder.setImageBitmap(PicInfoList.get(mPicSet.get(index)
+			((ImageView)holder.findViewById(R.id.image)).setImageBitmap(PicInfoList.get(mPicSet.get(index)
 					.get(position)).bitmap);
-			ScaleAnimation a = new ScaleAnimation(1.5f, 0.95f,
-					1.5f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
+			ScaleAnimation a = new ScaleAnimation(0.7f, 0.95f,
+					0.7f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
 					Animation.RELATIVE_TO_SELF, 0.5f);
 			a.setDuration(400);
 			holder.setAnimation(a);
@@ -658,10 +632,10 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	public void onGetPoiDetailResult(PoiDetailResult result) {
 		// TODO Auto-generated method stub
 		if (result.error != SearchResult.ERRORNO.NO_ERROR) {
-			Toast.makeText(MapActivity.this, "±§Ç¸£¬Î´ÕÒµ½½á¹û", Toast.LENGTH_SHORT)
+			Toast.makeText(MapActivity.this, "åŠ è½½å®Œæˆ", Toast.LENGTH_SHORT)
 					.show();
 		} else {
-			Toast.makeText(MapActivity.this, "³É¹¦£¬²é¿´ÏêÇéÒ³Ãæ", Toast.LENGTH_SHORT)
+			Toast.makeText(MapActivity.this, "ç½‘ç»œé”™è¯¯", Toast.LENGTH_SHORT)
 					.show();
 		}
 	}
@@ -672,7 +646,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		if (poiOverlay!=null)poiOverlay.removeFromMap();
 		if (result == null
 				|| result.error == SearchResult.ERRORNO.RESULT_NOT_FOUND) {
-			Toast.makeText(this, "Ã»ÓĞÕÒµ½½á¹û", Toast.LENGTH_SHORT);
+			Toast.makeText(this, "æ²¡æœ‰æ‰¾åˆ°å†…å®¹", Toast.LENGTH_SHORT);
 			return;
 		}
 		if (result.error == SearchResult.ERRORNO.NO_ERROR) {
@@ -685,14 +659,12 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			return;
 		}
 		if (result.error == SearchResult.ERRORNO.AMBIGUOUS_KEYWORD) {
-
-			// µ±ÊäÈë¹Ø¼ü×ÖÔÚ±¾ÊĞÃ»ÓĞÕÒµ½£¬µ«ÔÚÆäËû³ÇÊĞÕÒµ½Ê±£¬·µ»Ø°üº¬¸Ã¹Ø¼ü×ÖĞÅÏ¢µÄ³ÇÊĞÁĞ±í
-			String strInfo = "ÔÚ";
+			String strInfo = "åœ¨";
 			for (CityInfo cityInfo : result.getSuggestCityList()) {
 				strInfo += cityInfo.city;
 				strInfo += ",";
 			}
-			strInfo += "ÕÒµ½½á¹û";
+			strInfo += "æ‰¾åˆ°ç›¸å…³å†…å®¹";
 			Toast.makeText(MapActivity.this, strInfo, Toast.LENGTH_LONG)
 					.show();
 		}
@@ -713,17 +685,4 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		sugAdapter.notifyDataSetChanged();
 	}
 	
-	/**
-	 * ¹¹Ôì¹ã²¥¼àÌıÀà£¬¼àÌı SDK key ÑéÖ¤ÒÔ¼°ÍøÂçÒì³£¹ã²¥
-	public class SDKReceiver extends BroadcastReceiver {
-		public void onReceive(Context context, Intent intent) {
-			String s = intent.getAction();
-			if (s.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR)) {
-				Toast.makeText(MapActivity.this, "key ÑéÖ¤³ö´í! ÇëÔÚ AndroidManifest.xml ÎÄ¼şÖĞ¼ì²é key ÉèÖÃ", Toast.LENGTH_SHORT);
-			} else if (s
-					.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR)) {
-				Toast.makeText(MapActivity.this, "ÍøÂç³ö´í", Toast.LENGTH_SHORT);
-			}
-		}
-	}*/
 }

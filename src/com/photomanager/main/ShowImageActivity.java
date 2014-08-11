@@ -43,7 +43,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 /**
- * @author ipip 2014Äê7ÔÂ16ÈÕÏÂÎç2:50:37
+ * 
+ * @author ipip
+ *
  */
 public class ShowImageActivity extends Activity {
 	private LinearLayout ll;
@@ -74,7 +76,7 @@ public class ShowImageActivity extends Activity {
 		ll = (LinearLayout) findViewById(R.id.ivImageCover);
 		ll.bringToFront();
 		b = (Button) findViewById(R.id.ivBackButton);
-		b.setText(" < Ïà²á(" + (id + 1) + "/"
+		b.setText(" < ç›¸å†Œ(" + (id + 1) + "/"
 				+ TimelineActivity.PicInfoList.size() + ")");
 		b.setOnClickListener(new OnClickListener() {
 
@@ -143,7 +145,8 @@ public class ShowImageActivity extends Activity {
 
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
-			container.removeView((View) object);
+			View view = (View) object;  
+            container.removeView(view);  
 		}
 	}
 
@@ -164,10 +167,10 @@ public class ShowImageActivity extends Activity {
 		public void onPageSelected(int arg0) {
 			// TODO Auto-generated method stub
 			id = arg0;
-			b.setText(" < Ïà²á(" + (id + 1) + "/"
+			b.setText(" < ç›¸å†Œ(" + (id + 1) + "/"
 					+ TimelineActivity.PicInfoList.size() + ")");
 			int idl = last_id(last_id(last_id(id)));
-			int idn = (id + 3) % n;
+			int idn = (id + 2) % n;
 			recycle(idl);
 			recycle(idn);
 		}
@@ -224,14 +227,10 @@ public class ShowImageActivity extends Activity {
 			createScaledBitmap(op);
 			op.inJustDecodeBounds = false;
 			op.inSampleSize = o_w / op.outWidth;
-			// Log.w("photo",
-			// "id:"+id+"   "+op.inSampleSize+" "+o_w+" "+op.outWidth);
 			op.inPurgeable = true;
 			op.inInputShareable = true;
 			op.inPreferredConfig = Bitmap.Config.RGB_565;
 			bitmapCache[id] = BitmapFactory.decodeFile(fileRoute, op);
-			// bm = MediaStore.Images.Media.getBitmap(getContentResolver(),
-			// uri);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -350,13 +349,13 @@ public class ShowImageActivity extends Activity {
 			e.printStackTrace();
 		}
 		if (et == null) {
-			info.add("ÐÅÏ¢»ñÈ¡Ê§°Ü...");
+			info.add("ä¿¡æ¯èŽ·å–å¤±è´¥...");
 			return info;
 		}
 
 		int fileSplitPlace = fileRoute.lastIndexOf('/');
-		info.add("Ãû³Æ:" + fileRoute.substring(fileSplitPlace + 1));
-		info.add("Â·¾¶:" + fileRoute.substring(0, fileSplitPlace - 1));
+		info.add("åç§°:" + fileRoute.substring(fileSplitPlace + 1));
+		info.add("è·¯å¾„:" + fileRoute.substring(0, fileSplitPlace - 1));
 		int fileSize = 0;
 		File f = new File(fileRoute);
 		if (f.exists()) {
@@ -376,70 +375,70 @@ public class ShowImageActivity extends Activity {
 		} else
 			strSize = "" + 1.0 * (int) (1.0 * fileSize / 1048576 * 100) / 100
 					+ "MB";
-		info.add("ÎÄ¼þ´óÐ¡: " + strSize + "(" + fileSize + "Byte)");
-		info.add("¿í¸ß: " + o_width + "*" + o_height);
+		info.add("æ–‡ä»¶å¤§å°: " + strSize + "(" + fileSize + "Byte)");
+		info.add("å®½é«˜: " + o_width + "*" + o_height);
 		if (et.getAttribute(ExifInterface.TAG_DATETIME) != null)
-			info.add("ÅÄÉãÈÕÆÚ: "
+			info.add("æ‹æ‘„æ—¥æœŸ: "
 					+ et.getAttribute(ExifInterface.TAG_DATETIME)
 							.replaceFirst(":", "/").replaceFirst(":", "/"));
 		if (TimelineActivity.PicInfoList.get(id).pl != null)
-			info.add("¾­Î³¶È: " + TimelineActivity.PicInfoList.get(id).pl.latitude
+			info.add("ç»çº¬åº¦: " + TimelineActivity.PicInfoList.get(id).pl.latitude
 					+ "," + TimelineActivity.PicInfoList.get(id).pl.longitude);
 		if (et.getAttribute(ExifInterface.TAG_APERTURE) != null)
-			info.add("¹âÈ¦Öµ: " + et.getAttribute(ExifInterface.TAG_APERTURE));
+			info.add("å…‰åœˆå€¼: " + et.getAttribute(ExifInterface.TAG_APERTURE));
 		if (et.getAttribute(ExifInterface.TAG_MAKE) != null)
-			info.add("ÖÆÔìÕß: " + et.getAttribute(ExifInterface.TAG_MAKE));
+			info.add("åˆ¶é€ è€…: " + et.getAttribute(ExifInterface.TAG_MAKE));
 		if (et.getAttribute(ExifInterface.TAG_MODEL) != null)
-			info.add("Éè±¸ÐÍºÅ: " + et.getAttribute(ExifInterface.TAG_MODEL));
+			info.add("è®¾å¤‡åž‹å·: " + et.getAttribute(ExifInterface.TAG_MODEL));
 		if (et.getAttribute(ExifInterface.TAG_FLASH) != null)
-			info.add("ÉÁ¹âµÆ: " + et.getAttribute(ExifInterface.TAG_FLASH));
-		info.add("½¹¾à: "
+			info.add("é—ªå…‰ç¯: " + et.getAttribute(ExifInterface.TAG_FLASH));
+		info.add("ç„¦è·: "
 				+ et.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, -1)
 				+ "mm");
 		if (et.getAttribute(ExifInterface.TAG_EXPOSURE_TIME) != null)
-			info.add("ÆØ¹âÊ±¼ä: "
+			info.add("æ›å…‰æ—¶é—´: "
 					+ et.getAttribute(ExifInterface.TAG_EXPOSURE_TIME) + "ms");
 		if (et.getAttribute(ExifInterface.TAG_WHITE_BALANCE) != null)
-			info.add("°×Æ½ºâ: "
+			info.add("ç™½å¹³è¡¡: "
 					+ ((et.getAttribute(ExifInterface.TAG_WHITE_BALANCE)
 							.equals(String
-									.valueOf(ExifInterface.WHITEBALANCE_AUTO))) ? "×Ô¶¯"
-							: "ÊÖ¶¯"));
+									.valueOf(ExifInterface.WHITEBALANCE_AUTO))) ? "è‡ªåŠ¨"
+							: "æ‰‹åŠ¨"));
 		if (et.getAttribute(ExifInterface.TAG_ISO) != null)
-			info.add("¸Ð¹â¶È: " + et.getAttribute(ExifInterface.TAG_ISO));
+			info.add("æ„Ÿå…‰åº¦: " + et.getAttribute(ExifInterface.TAG_ISO));
 		if (et.getAttribute(ExifInterface.TAG_ORIENTATION) != null) {
 			String ori = "";
 			switch (Integer.valueOf(et
 					.getAttribute(ExifInterface.TAG_ORIENTATION))) {
 			case (ExifInterface.ORIENTATION_NORMAL):
-				ori = "Õý³£";
+				ori = "æ­£å¸¸";
 				break;
 			case (ExifInterface.ORIENTATION_UNDEFINED):
-				ori = "Î´¶¨ÒåµÄ·½Ïò";
+				ori = "æœªå®šä¹‰çš„æ–¹å‘";
 				break;
 			case (ExifInterface.ORIENTATION_FLIP_VERTICAL):
-				ori = "´¹Ö±·­×ª";
+				ori = "åž‚ç›´ç¿»è½¬";
 				break;
 			case (ExifInterface.ORIENTATION_FLIP_HORIZONTAL):
-				ori = "Ë®Æ½·­×ª";
+				ori = "æ°´å¹³ç¿»è½¬";
 				break;
 			case (ExifInterface.ORIENTATION_ROTATE_90):
-				ori = "Ðý×ª90¶È";
+				ori = "æ—‹è½¬90åº¦";
 				break;
 			case (ExifInterface.ORIENTATION_ROTATE_180):
-				ori = "Ðý×ª180¶È";
+				ori = "æ—‹è½¬180åº¦";
 				break;
 			case (ExifInterface.ORIENTATION_ROTATE_270):
-				ori = "Ðý×ª270¶È";
+				ori = "æ—‹è½¬270åº¦";
 				break;
 			case (ExifInterface.ORIENTATION_TRANSPOSE):
-				ori = "·­×ª";
+				ori = "ç¿»è½¬";
 				break;
 			case (ExifInterface.ORIENTATION_TRANSVERSE):
-				ori = "ºáÏò";
+				ori = "æ¨ªå‘";
 				break;
 			}
-			info.add("ÅÄÉã·½Ïò: " + ori);
+			info.add("æ‹æ‘„æ–¹å‘: " + ori);
 		}
 		return info;
 	}

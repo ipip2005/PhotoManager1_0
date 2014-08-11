@@ -123,11 +123,12 @@ containing a value of this type.
         public static final int hostbutton_map=0x7f05000f;
         public static final int hostbutton_tag=0x7f050010;
         public static final int hostbutton_timeline=0x7f05000e;
+        public static final int image=0x7f050028;
         public static final int image_show_center_image=0x7f050020;
         public static final int image_show_view_pager=0x7f05001d;
-        public static final int info_tv=0x7f05002a;
-        public static final int item_more=0x7f050028;
-        public static final int item_title=0x7f050027;
+        public static final int info_tv=0x7f05002c;
+        public static final int item_more=0x7f05002a;
+        public static final int item_title=0x7f050029;
         public static final int ivBackButton=0x7f05001f;
         public static final int ivImageCover=0x7f05001e;
         public static final int ivImageFrame=0x7f05001c;
@@ -148,11 +149,12 @@ containing a value of this type.
         public static final int searchButton=0x7f050019;
         public static final int searchkey=0x7f050014;
         public static final int spanButton=0x7f05001a;
+        public static final int square=0x7f050027;
         public static final int stack=0x7f050006;
         public static final int standard=0x7f050000;
         public static final int tablet=0x7f050001;
         public static final int timeline_rl=0x7f05001b;
-        public static final int timeline_view_pager=0x7f050029;
+        public static final int timeline_view_pager=0x7f05002b;
         public static final int zoomin=0x7f050007;
         public static final int zoomout=0x7f050008;
     }
@@ -166,9 +168,10 @@ containing a value of this type.
         public static final int image_show_info=0x7f030006;
         public static final int map_ontap_grid=0x7f030007;
         public static final int map_tap_image_show=0x7f030008;
-        public static final int simple_image_view=0x7f030009;
-        public static final int simple_list_item=0x7f03000a;
-        public static final int small_font=0x7f03000b;
+        public static final int map_tap_image_show_image=0x7f030009;
+        public static final int simple_image_view=0x7f03000a;
+        public static final int simple_list_item=0x7f03000b;
+        public static final int small_font=0x7f03000c;
     }
     public static final class menu {
         public static final int main=0x7f0b0000;

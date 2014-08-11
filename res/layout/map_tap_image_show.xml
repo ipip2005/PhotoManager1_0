@@ -7,9 +7,9 @@
     <GridView 
         android:background="@null"
         android:numColumns="3"
-        android:verticalSpacing="10dip"
-        android:horizontalSpacing="10dip"
-        android:padding="10dip"
+        android:verticalSpacing="2dip"
+        android:horizontalSpacing="3dip"
+        android:padding="0dip"
       	android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="1"

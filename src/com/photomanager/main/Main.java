@@ -15,14 +15,15 @@ import android.widget.TabHost;
 import android.widget.Toast;
 
 /**
+ * 
  * @author ipip
- *  2014ƒÍ7‘¬16»’œ¬ŒÁ2:49:12
+ *
  */
 @SuppressWarnings("deprecation")
 public class Main extends TabActivity implements OnCheckedChangeListener{
 	private TabHost tHost;
 	private RadioGroup mGroup;
-	private Intent iTimeline,iPlace,iMap,iTag;
+	private Intent iTimeline,iMap,iTag;
 	private Calendar lastBack;
 	public static Settings s;
 	@Override 
@@ -35,7 +36,7 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 					return true;
 				} else lastBack = nowBack;
 			}
-			Toast.makeText(getApplication(), "‘Ÿ∞¥“ª¥ŒÕÀ≥ˆœ‡≤·", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplication(), "ÂÜçÊåâ‰∏ÄÊ¨°ÈÄÄÂá∫", Toast.LENGTH_SHORT).show();
 			return false;
 		} else 
 		return super.dispatchKeyEvent(event);
@@ -81,19 +82,15 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 		mGroup = (RadioGroup) findViewById(R.id.main_tab);
 		mGroup.setOnCheckedChangeListener(this);
 		iTimeline = new Intent(Main.this, TimelineActivity.class);
-		tHost.addTab(tHost.newTabSpec("iTimeline").setIndicator(" ±º‰÷·", getResources().getDrawable(R.drawable.icon_1_n))
+		tHost.addTab(tHost.newTabSpec("iTimeline").setIndicator("Êó∂Èó¥ËΩ¥", getResources().getDrawable(R.drawable.icon_1_n))
 				.setContent(iTimeline));
 		
-		iPlace = new Intent(Main.this, PlaceActivity.class);
-		tHost.addTab(tHost.newTabSpec("iPlace").setIndicator("µÿµ„", getResources().getDrawable(R.drawable.icon_2_n))
-				.setContent(iPlace));
-		
 		iMap = new Intent(Main.this, MapActivity.class);
-		tHost.addTab(tHost.newTabSpec("iMap").setIndicator("µÿÕº", getResources().getDrawable(R.drawable.icon_3_n))
+		tHost.addTab(tHost.newTabSpec("iMap").setIndicator("Ë∂≥Ëøπ", getResources().getDrawable(R.drawable.icon_3_n))
 				.setContent(iMap));
 		
 		iTag = new Intent(Main.this, TagActivity.class);
-		tHost.addTab(tHost.newTabSpec("iTag").setIndicator("±Í«©", getResources().getDrawable(R.drawable.icon_4_n))
+		tHost.addTab(tHost.newTabSpec("iTag").setIndicator("Ê†áÁ≠æ", getResources().getDrawable(R.drawable.icon_4_n))
 				.setContent(iTag));
 		
 	}
