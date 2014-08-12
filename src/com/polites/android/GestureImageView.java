@@ -279,6 +279,8 @@ public class GestureImageView extends ImageView  {
 				}
 
 				break;
+			default:
+				break;
 		}
 	}
 

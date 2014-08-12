@@ -10,11 +10,13 @@ public class MyViewPager extends ViewPager {
 
 	public MyViewPager(Context context) {
 		super(context);
+		init();
 		// TODO Auto-generated constructor stub
 	}
 
 	public MyViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 	private float xDown;
 	private float xMove;
@@ -22,7 +24,9 @@ public class MyViewPager extends ViewPager {
 	private float yMove;
 	private boolean viewPagerScrolling = false;
 	private boolean fatherScrolling = false;
-
+	private void init(){
+		
+	}
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		if (this.getChildCount() < 4)

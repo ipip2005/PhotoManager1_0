@@ -10,14 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -30,7 +28,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -145,7 +142,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.viewPager.removeAllViews();
 			holder.viewPager
 					.setAdapter(new MyViewPagerAdapter(TimelineActivity.this,
 							mSet.get(position)));
@@ -193,7 +189,9 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		public Object instantiateItem(ViewGroup container, final int position) {
 			final int id = position % set.size();
 			ImageView iv = new ImageView(mContext);
-			dg.getData(set.get(id), iv);
+			iv.setImageBitmap(null);
+			String key = DataGainUtil.getInstance().generateKey(set.get(id), DataGainUtil.SMALL);
+			dg.getData(set.get(id), iv, key);
 			LayoutParams lp = new LayoutParams(250, 250);
 			iv.setLayoutParams(lp);
 			iv.setScaleType(ScaleType.CENTER_CROP);
@@ -383,5 +381,11 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			return super.dispatchTouchEvent(ev);
 		}
 	}
-
+	@Override
+	public void onResume(){
+		if (dg != null)
+			mSet = dg.getSet(granularity);
+		super.onResume();
+		//PicInfoList = dg.getPicInfoList();
+	}
 }

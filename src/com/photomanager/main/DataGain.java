@@ -21,18 +21,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.provider.MediaStore.Images.Thumbnails;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.widget.ImageView;
 
 /**
- * @author ipip
- *  2014年7月16日下午2:50:27
+ * @author ipip 2014年7月16日下午2:50:27
  */
 public class DataGain {
 	private Cursor cursor;
@@ -51,8 +49,10 @@ public class DataGain {
 			MediaStore.Images.Media.LATITUDE,
 			MediaStore.Images.Media.LONGITUDE, 
 			MediaStore.Images.Media._ID,
-			MediaStore.Images.Media.DATA, };
+			MediaStore.Images.Media.DATA};
+	private Uri MediaUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 	ExecutorService pool = Executors.newFixedThreadPool(4);
+
 	/**
 	 * @param contentResolver
 	 * @param context
@@ -62,25 +62,25 @@ public class DataGain {
 			Handler handler) {
 		// TODO Auto-generated constructor stub
 		cr = contentResolver;
-		cursor = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				STORE_IMAGES, null, null, ""
+		cursor = cr.query(MediaUri,STORE_IMAGES, null, null, ""
 						+ MediaStore.Images.Media.DATE_TAKEN + " DESC");
 		mContext = context;
 		n = cursor.getCount();
 		gotPoi = new boolean[n];
 		mHandler = handler;
 		preData();
-		int maxMemory = (int)(Runtime.getRuntime().maxMemory());
-		int cacheSize = maxMemory/4;
-		Log.i("DataGain", "Cache Size: "+cacheSize);
-		cache = new LruCache<String, Bitmap>(cacheSize){
+		int maxMemory = (int) (Runtime.getRuntime().maxMemory());
+		int cacheSize = maxMemory / 4;
+		Log.i("DataGain", "Cache Size: " + cacheSize);
+		cache = new LruCache<String, Bitmap>(cacheSize) {
 			@Override
-			protected int sizeOf(String key, Bitmap value)
-			{
+			protected int sizeOf(String key, Bitmap value) {
 				return value.getRowBytes() * value.getHeight();
 			};
-		};;
+		};
+		;
 	}
+
 	@SuppressLint("SimpleDateFormat")
 	/**
 	 * preData()
@@ -99,12 +99,15 @@ public class DataGain {
 					Calendar.YEAR))
 				info.title = "" + info.mdate.get(Calendar.YEAR) + "年"
 						+ info.title;
-			if (cursor.getDouble(1)>0)
-				info.pl = new LatLng(cursor.getDouble(1),cursor.getDouble(2));
+			if (cursor.getDouble(1) > 0)
+				info.pl = new LatLng(cursor.getDouble(1), cursor.getDouble(2));
 			info.id = cursor.getLong(3);
 			info.fileRoute = cursor.getString(4);
 			mPicInfoList.add(info);
 		} while (cursor.moveToNext());
+		makeSets();
+	}
+	private void makeSets(){
 		mSet1 = new ArrayList<ArrayList<Integer>>();
 		mSet2 = new ArrayList<ArrayList<Integer>>();
 		mSet3 = new ArrayList<ArrayList<Integer>>();
@@ -166,7 +169,8 @@ public class DataGain {
 			p = ps.searchEndAt();
 			mSet4.add(ps.getArrayList());
 		}
-		for (int i=0;i<n;i++) gotPoi[i] = false;
+		for (int i = 0; i < n; i++)
+			gotPoi[i] = false;
 		checkAllPoiData();
 	}
 
@@ -181,14 +185,14 @@ public class DataGain {
 			return mSet4;
 		return null;
 	}
-	private void addBitmapToLruCache(String key, Bitmap bitmap)
-	{
-		if (cache.get(key) == null)
-		{
+
+	private void addBitmapToLruCache(String key, Bitmap bitmap) {
+		if (cache.get(key) == null) {
 			if (bitmap != null)
 				cache.put(key, bitmap);
 		}
 	}
+
 	public ArrayList<PicInfo> getPicInfoList() {
 		return this.mPicInfoList;
 	}
@@ -200,94 +204,52 @@ public class DataGain {
 	public int getCount() {
 		return n;
 	}
-	
-	/*public Bitmap getData(int index) {
-		if (cache.get(String.valueOf(index)) != null) {
-			Log.i("DataGain","hasData: "+index);
-			return cache.get(String.valueOf(index));
-		}
-		MyThread t = new MyThread(index, null);
-		pool.execute(t);
-		return null;
-	}*/
-	public void getData(final int index, final ImageView iv){
+	public Bitmap getDataNow(final String key){
+		if (key == null) return null;
+		return cache.get(key);
+	}
+	public void getData(final int index, final ImageView iv, final String key) {
 		Log.i("DataGain", "count: " + cache.size());
-		iv.setTag(String.valueOf(index));
-		if (mHandler == null){
-			mHandler = new Handler(){
+		if (key == null) return;
+		iv.setTag(key);
+		if (mHandler == null) {
+			mHandler = new Handler() {
 				public void handleMessage(Message msg) {
-					Holder h = (Holder)msg.obj;
-					if (h.iv != null && h.iv.getTag().toString().equals(h.tag)){
+					Holder h = (Holder) msg.obj;
+					if (h.iv != null && h.iv.getTag().toString().equals(h.tag)) {
 						h.iv.setImageBitmap(h.bm);
 					}
 				}
 			};
 		}
-		Bitmap bm = cache.get(String.valueOf(index));
+		Bitmap bm = cache.get(key);
 		if (bm != null) {
 			Message m = Message.obtain();
-			m.obj = new Holder(iv, bm, String.valueOf(index));
+			m.obj = new Holder(iv, bm, key);
 			mHandler.sendMessage(m);
 			return;
 		} else
-		pool.execute(new Runnable(){
+			pool.execute(new Runnable() {
 
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				int id = index;
-				String filename = "" + mPicInfoList.get(id).id + ".thumb";
-				Boolean fileExists = false;
-				try {
-					FileInputStream s = mContext.openFileInput(filename);
-					fileExists = s != null;
-					if (fileExists){
-						Bitmap bm = BitmapFactory.decodeStream(s);
-						synchronized (cache){
-							addBitmapToLruCache(String.valueOf(id), bm);
-						}
-						Message m = Message.obtain();
-						m.obj = new Holder(iv, bm, String.valueOf(id));
-						mHandler.sendMessage(m);
-						return;
-					}
-					s.close();
-				} catch (StreamCorruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				if (!fileExists) {
-					BitmapFactory.Options op = new BitmapFactory.Options();
-					op.inJustDecodeBounds = true;
-					BitmapFactory.decodeFile(mPicInfoList.get(id).fileRoute, op);
-					if (op.outWidth > op.outHeight){
-						op.inSampleSize = op.outWidth/200;
-						op.outWidth = 200;
-						op.outHeight = op.outHeight * 200 / op.outWidth;
-					} else {
-						op.inSampleSize = op.outHeight/200;
-						op.outHeight = 200;
-						op.outWidth = op.outWidth * 200 / op.outHeight;
-					}
-					op.inPurgeable = true;
-					op.inInputShareable = true;
-					op.inPreferredConfig = Bitmap.Config.RGB_565;
-					op.inJustDecodeBounds = false;
-					Bitmap bitmap = BitmapFactory.decodeFile(mPicInfoList.get(id).fileRoute, op);
-					addBitmapToLruCache(String.valueOf(id), bitmap);
-					Message m = Message.obtain();
-					m.obj = new Holder(iv, bitmap, String.valueOf(id));
-					mHandler.sendMessage(m);
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					int id = index;
+					String filename = key + mPicInfoList.get(id).id + ".thumb";
+					Boolean fileExists = false;
 					try {
-						FileOutputStream s = mContext.openFileOutput(filename,
-								Context.MODE_PRIVATE);
-						bitmap.compress(Bitmap.CompressFormat.PNG, 100, s);
+						FileInputStream s = mContext.openFileInput(filename);
+						fileExists = s != null;
+						if (fileExists) {
+							Bitmap bm = BitmapFactory.decodeStream(s);
+							addBitmapToLruCache(key, bm);
+							Message m = Message.obtain();
+							m.obj = new Holder(iv, bm, key);
+							mHandler.sendMessage(m);
+							return;
+						}
 						s.close();
-					} catch (FileNotFoundException e) {
+					} catch (StreamCorruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -295,41 +257,167 @@ public class DataGain {
 						e.printStackTrace();
 					}
 
+					if (!fileExists) {
+						BitmapFactory.Options op = new BitmapFactory.Options();
+						op.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(
+								mPicInfoList.get(id).fileRoute, op);
+						if (op.outWidth < op.outHeight) {
+							op.inSampleSize = op.outWidth / 200;
+							op.outWidth = 200;
+							op.outHeight = op.outHeight * 200 / op.outWidth;
+						} else {
+							op.inSampleSize = op.outHeight / 200;
+							op.outHeight = 200;
+							op.outWidth = op.outWidth * 200 / op.outHeight;
+						}
+						op.inPurgeable = true;
+						op.inInputShareable = true;
+						op.inPreferredConfig = Bitmap.Config.RGB_565;
+						op.inJustDecodeBounds = false;
+						Bitmap bitmap = BitmapFactory.decodeFile(
+								mPicInfoList.get(id).fileRoute, op);
+						addBitmapToLruCache(key, bitmap);
+						Message m = Message.obtain();
+						m.obj = new Holder(iv, bitmap, key);
+						mHandler.sendMessage(m);
+						if (!key.endsWith("t")) return;
+						try {
+							FileOutputStream s = mContext.openFileOutput(
+									filename, Context.MODE_PRIVATE);
+							bitmap.compress(Bitmap.CompressFormat.PNG, 100, s);
+							s.close();
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
 				}
-			}	
-		});
+			});
 	}
-	public void requirePoiDataAndWrite(int i){
-		LatLng sourceLatLng = mPicInfoList.get(i).pl; 
-		CoordinateConverter converter  = new CoordinateConverter();  
-		converter.from(CoordType.GPS);  
-		// sourceLatLng待转换坐标  
-		converter.coord(sourceLatLng);  
+
+	public void getData(final int index, final Object info, final String key, final Handler handler){
+		if (key == null) return;
+		Bitmap bm = cache.get(key);
+		if (bm != null) {
+			Message m = Message.obtain();
+			m.obj = info;
+			handler.sendMessage(m);
+			return;
+		} else 
+			pool.execute(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					int id = index;
+					String filename = key + mPicInfoList.get(id).id + ".thumb";
+					Boolean fileExists = false;
+					try {
+						FileInputStream s = mContext.openFileInput(filename);
+						fileExists = s != null;
+						if (fileExists) {
+							Bitmap bm = BitmapFactory.decodeStream(s);
+							addBitmapToLruCache(key, bm);
+							Message m = Message.obtain();
+							m.obj = info;
+							handler.sendMessage(m);
+							return;
+						}
+						s.close();
+					} catch (StreamCorruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					if (!fileExists) {
+						BitmapFactory.Options op = new BitmapFactory.Options();
+						op.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(
+								mPicInfoList.get(id).fileRoute, op);
+						if (op.outWidth < op.outHeight) {
+							op.inSampleSize = op.outWidth / 200;
+							op.outWidth = 200;
+							op.outHeight = op.outHeight * 200 / op.outWidth;
+						} else {
+							op.inSampleSize = op.outHeight / 200;
+							op.outHeight = 200;
+							op.outWidth = op.outWidth * 200 / op.outHeight;
+						}
+						op.inPurgeable = true;
+						op.inInputShareable = true;
+						op.inPreferredConfig = Bitmap.Config.RGB_565;
+						op.inJustDecodeBounds = false;
+						Bitmap bitmap = BitmapFactory.decodeFile(
+								mPicInfoList.get(id).fileRoute, op);
+						addBitmapToLruCache(key, bitmap);
+						Message m = Message.obtain();
+						m.obj = info;
+						handler.sendMessage(m);
+						try {
+							FileOutputStream s = mContext.openFileOutput(
+									filename, Context.MODE_PRIVATE);
+							bitmap.compress(Bitmap.CompressFormat.PNG, 100, s);
+							s.close();
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+				}
+			});
+	}
+	public void requirePoiDataAndWrite(int i) {
+		LatLng sourceLatLng = mPicInfoList.get(i).pl;
+		CoordinateConverter converter = new CoordinateConverter();
+		converter.from(CoordType.GPS);
+		// sourceLatLng待转换坐标
+		converter.coord(sourceLatLng);
 		LatLng desLatLng = converter.convert();
 		mPicInfoList.get(i).pl = desLatLng;
 	}
-	public void checkAllPoiData(){
+
+	public void checkAllPoiData() {
 		mSetWithPlace = new ArrayList<Integer>();
-		for (int i=0;i<n;i++) if (mPicInfoList.get(i).pl!=null){
-			requirePoiDataAndWrite(i);
-			mSetWithPlace.add(i);
-		}
-	}
-	
-	public void delData(int index) {
-		
+		for (int i = 0; i < n; i++)
+			if (mPicInfoList.get(i).pl != null) {
+				requirePoiDataAndWrite(i);
+				mSetWithPlace.add(i);
+			}
 	}
 
-	private class Holder{
+	public void delData(int index) {
+		this.mContext.getContentResolver().delete(MediaUri, 
+				MediaStore.Images.Media._ID + "=" + mPicInfoList.get(index).id, null);
+		mPicInfoList.remove(index);
+		n--;
+		makeSets();
+		checkAllPoiData();
+	}
+
+	private class Holder {
 		public ImageView iv;
 		public Bitmap bm;
 		public String tag;
-		public Holder(ImageView iv, Bitmap bm, String tag){
+
+		public Holder(ImageView iv, Bitmap bm, String tag) {
 			this.iv = iv;
 			this.bm = bm;
 			this.tag = tag;
 		}
 	}
+
 	private class PicSet {
 		ArrayList<Integer> ids;
 		int p;

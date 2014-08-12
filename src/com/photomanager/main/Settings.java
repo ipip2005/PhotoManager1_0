@@ -8,11 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-import com.baidu.mapapi.model.LatLng;
 
 import android.content.Context;
 import android.util.Log;
