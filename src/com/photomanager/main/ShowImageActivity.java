@@ -414,7 +414,7 @@ public class ShowImageActivity extends Activity {
 		ImageView iv = (ImageView)(mAdapter.getCurrentView());
 		iv.clearAnimation();
 		Animation a = new AlphaAnimation(1.0f, 0f);
-		final int anim_time = 2000;
+		final int anim_time = 1500;
 		a.setDuration(anim_time);
 		iv.startAnimation(a);
 		
@@ -430,7 +430,7 @@ public class ShowImageActivity extends Activity {
 						+ TimelineActivity.PicInfoList.size() + ")");
 				mAdapter.notifyDataSetChanged();
 				Animation b = new AlphaAnimation(0f, 1f);
-				b.setDuration(1500);
+				b.setDuration(1000);
 				mViewPager.clearAnimation();
 				mViewPager.startAnimation(b);
 			}
@@ -440,7 +440,7 @@ public class ShowImageActivity extends Activity {
 	}
 	public void delImage(View v){
 		Dialog dialog = new AlertDialog.Builder(this).setTitle("删除图片")
-				.setMessage("确定要删除这张照片吗").setIcon(R.drawable.search0)
+				.setMessage("确定要删除这张照片吗").setIcon(R.drawable.discard2)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					
 					@Override

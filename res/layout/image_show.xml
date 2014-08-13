@@ -50,10 +50,11 @@
     	   			android:background="@null"
     	   		    />
     	   		<Button
-    	   		    android:layout_width="wrap_content"
-    	   		    android:layout_height="wrap_content"
+    	   		    android:layout_width="50dip"
+    	   		    android:layout_height="50dip"
     	   		    android:onClick="delImage"
-    	   		    android:background="@drawable/map_search_style"
+    	   		    android:padding="0dip"
+    	   		    android:background="@drawable/discard_style"
     	   		    />
     	    </LinearLayout>
     	    <ImageView

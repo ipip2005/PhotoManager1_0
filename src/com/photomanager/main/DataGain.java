@@ -71,7 +71,6 @@ public class DataGain {
 		preData();
 		int maxMemory = (int) (Runtime.getRuntime().maxMemory());
 		int cacheSize = maxMemory / 4;
-		Log.i("DataGain", "Cache Size: " + cacheSize);
 		cache = new LruCache<String, Bitmap>(cacheSize) {
 			@Override
 			protected int sizeOf(String key, Bitmap value) {
@@ -234,6 +233,7 @@ public class DataGain {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
+					if (!iv.getTag().toString().equals(key))return;
 					int id = index;
 					String filename = key + mPicInfoList.get(id).id + ".thumb";
 					Boolean fileExists = false;
@@ -262,7 +262,8 @@ public class DataGain {
 						op.inJustDecodeBounds = true;
 						BitmapFactory.decodeFile(
 								mPicInfoList.get(id).fileRoute, op);
-						if (op.outWidth < op.outHeight) {
+						boolean smaller = key.endsWith(String.valueOf(DataGainUtil.SMALL));
+						if ((smaller && op.outWidth > op.outHeight)||(!smaller && op.outWidth < op.outHeight)) {
 							op.inSampleSize = op.outWidth / 200;
 							op.outWidth = 200;
 							op.outHeight = op.outHeight * 200 / op.outWidth;
@@ -281,7 +282,7 @@ public class DataGain {
 						Message m = Message.obtain();
 						m.obj = new Holder(iv, bitmap, key);
 						mHandler.sendMessage(m);
-						if (!key.endsWith("t")) return;
+						if (!key.endsWith(String.valueOf(DataGainUtil.SMALL))) return;
 						try {
 							FileOutputStream s = mContext.openFileOutput(
 									filename, Context.MODE_PRIVATE);

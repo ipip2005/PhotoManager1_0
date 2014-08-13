@@ -296,9 +296,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	}
 	private void refreshOverlayMarker(int set_id){
 		int i = set_id;
-		Bitmap[] bitmaps = new Bitmap[3];
+		Bitmap[] bitmaps = new Bitmap[4];
 		int m = 3;
-		for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 4; j++)
 			if (j < mPicSet.get(i).size()) {
 				String key = DataGainUtil.getInstance().generateKey(mPicSet.get(i).get(j), DataGainUtil.SMALL);
 				bitmaps[j] = TimelineActivity.dg.getDataNow(key);
@@ -307,20 +307,21 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				break;
 			}
 		if (bitmaps[0] == null) return;
-		Bitmap b = Bitmap.createBitmap(markerLength - 20 + m * 20, markerLength - 15 + m * 15,
+		Bitmap b = Bitmap.createBitmap(markerLength - 20 + m * 20, markerLength - 10 + m * 10,
 				bitmaps[0].getConfig());
 		Canvas canvas = new Canvas(b);
 		for (int j = m - 1; j >= 0; j--) {
-			if (bitmaps[j] != null)
-			canvas.drawBitmap(bitmaps[j],
-					new Rect(0, 0, 200, 200), new RectF(j * 20,
-									j * 15, markerLength + j * 20,markerLength + j * 15), null);
+			if (bitmaps[j] != null){
+				int bitmap_length = Math.min(bitmaps[j].getWidth(), bitmaps[j].getHeight());
+				canvas.drawBitmap(bitmaps[j], new Rect(0, 0, bitmap_length, bitmap_length), new RectF(j * 20,
+						j * 10, markerLength + j * 20, markerLength + j * 10), null);
+			}
 			else {
 				Paint p = new Paint();
 				p.setColor(Color.argb(255, 200, 200, 200));
 				canvas.drawRect(new RectF(j * 20,
-						j * 15, markerLength + j * 20,markerLength + j * 15), p);
-			}
+						j * 10, markerLength + j * 20, markerLength + j * 10), p);
+			} 
 				
 		}
 		if (cache[i] != null){
@@ -331,6 +332,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		LatLng gp = TimelineActivity.PicInfoList.get(mPicSet.get(i).get(0)).pl;
 		pics.setOverlayOption(i, new MarkerOptions().position(gp).icon(cache[i])
 				.zIndex(-1).title(String.valueOf(i)));
+		pics.addToMap();
 	}
 	/**
 	 * establish a Location Overlay
@@ -602,9 +604,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			}
 			ImageView iv = (ImageView)holder.findViewById(R.id.image);
 			iv.setImageBitmap(null);
-			String key = DataGainUtil.getInstance().generateKey(position, DataGainUtil.SMALL);
-			TimelineActivity.dg.getData(mPicSet.get(index)
-					.get(position), iv, key);
+			int id = mPicSet.get(index).get(position);
+			String key = DataGainUtil.getInstance().generateKey(id, DataGainUtil.SMALL);
+			TimelineActivity.dg.getData(id, iv, key);
 			ScaleAnimation a = new ScaleAnimation(0.7f, 0.95f,
 					0.7f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
 					Animation.RELATIVE_TO_SELF, 0.5f);
