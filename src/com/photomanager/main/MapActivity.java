@@ -285,7 +285,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		for (int i = 0; i < mPicSet.size(); i++){
 			for (int j = 0; j < 3; j++) if (j < mPicSet.get(i).size()){
 				int id = mPicSet.get(i).get(j);
-				String key = DataGainUtil.getInstance().generateKey(id, DataGainUtil.SMALL);
+				String key = DataGainUtil.generateKey(id, DataGainUtil.SMALL);
 				if (DataGainUtil.getDataGain().getDataNow(key) == null)
 					DataGainUtil.getDataGain().getDataForOther(id, new Pair<Integer, Integer>(addCount, i), 
 							key, mHandler);
@@ -294,12 +294,13 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		pics.addToMap();
 	}
 	private void refreshOverlayMarker(int set_id){
+		Log.i("MapActivty", "refresh");
 		int i = set_id;
-		Bitmap[] bitmaps = new Bitmap[4];
+		Bitmap[] bitmaps = new Bitmap[3];
 		int m = 3;
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < 3; j++)
 			if (j < mPicSet.get(i).size()) {
-				String key = DataGainUtil.getInstance().generateKey(mPicSet.get(i).get(j), DataGainUtil.SMALL);
+				String key = DataGainUtil.generateKey(mPicSet.get(i).get(j), DataGainUtil.SMALL);
 				bitmaps[j] = DataGainUtil.getDataGain().getDataNow(key);
 			} else {
 				m = j;
@@ -327,10 +328,12 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			cache[i].recycle();
 			cache[i] = null;
 		}
+		Log.i("MapActivity","i "+(b==null)+" "+pics.getOverlayOptions().size());
 		cache[i] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null, b).getBitmap());
 		LatLng gp = TimelineActivity.PicInfoList.get(mPicSet.get(i).get(0)).pl;
 		pics.setOverlayOption(i, new MarkerOptions().position(gp).icon(cache[i])
 				.zIndex(-1).title(String.valueOf(i)));
+		Log.i("MapActivity","i -----"+(b==null)+" "+pics.getOverlayOptions().size());
 		pics.addToMap();
 	}
 	/**
@@ -575,7 +578,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		}
 		
 		public void setOverlayOption(int index, OverlayOptions oo){
-			if (index <= loo.size()) loo.add(oo); else
+			if (index >= loo.size()) loo.add(oo); else
 				loo.set(index, oo);
 		}
 	}
@@ -604,7 +607,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			ImageView iv = (ImageView)holder.findViewById(R.id.image);
 			iv.setImageBitmap(null);
 			int id = mPicSet.get(index).get(position);
-			String key = DataGainUtil.getInstance().generateKey(id, DataGainUtil.SMALL);
+			String key = DataGainUtil.generateKey(id, DataGainUtil.SMALL);
 			DataGainUtil.getDataGain().getDataForImageView(id, iv, key);
 			ScaleAnimation a = new ScaleAnimation(0.9f, 1f,
 					0.9f, 1f, Animation.RELATIVE_TO_SELF, 0.5f,

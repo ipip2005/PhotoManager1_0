@@ -14,6 +14,9 @@ public class MyRecyclerView extends RecyclerView{
 		super(context, attr);
 		// TODO Auto-generated constructor stub
 	}
+	public void limitLineHeight(){
+		
+	}
 	private float xDown;
 	private float xMove;
 	private float yDown;
@@ -62,8 +65,6 @@ public class MyRecyclerView extends RecyclerView{
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_POINTER_UP:
 			viewPagerScrolling = false;
-			if (ev.getPointerCount() == 1)
-				this.getParent().requestDisallowInterceptTouchEvent(false);
 			break;
 		}
 		return super.dispatchTouchEvent(ev);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,11 +20,12 @@ public class MyRecyclerViewAdapter extends
 
 	private Context mContext;
 	private ArrayList<Integer> mSet;
-
+	private int itemLength;
 	public MyRecyclerViewAdapter(Context context, ArrayList<Integer> set) {
 		super();
 		mContext = context;
 		mSet = set;
+		itemLength = DataGainUtil.getStandarLength();
 	}
 
 	@Override
@@ -40,12 +40,11 @@ public class MyRecyclerViewAdapter extends
 		ImageView iv = new ImageView(mContext);
 		vh.layout.removeAllViews();
 		iv.setImageBitmap(null);
+		iv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		final int index = mSet.get(position);
-		String key = DataGainUtil.getInstance().generateKey(index,
+		String key = DataGainUtil.generateKey(index,
 				DataGainUtil.SMALL);
 		DataGainUtil.getDataGain().getDataForImageView(index, iv, key);
-		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-		iv.setLayoutParams(lp);
 		iv.setScaleType(ScaleType.CENTER_CROP);
 		iv.setOnTouchListener(new OnTouchListener() {
 
@@ -92,7 +91,8 @@ public class MyRecyclerViewAdapter extends
 
 		});
 		vh.layout.addView(iv);
-		vh.layout.setBackgroundColor(Color.BLUE);
+		vh.layout.setLayoutParams(new LayoutParams(itemLength, itemLength));
+		vh.layout.setPadding(5, 5, 5, 5);
 	}
 
 	@Override

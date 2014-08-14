@@ -182,7 +182,7 @@ public class ShowImageActivity extends Activity {
 			case Configuration.ORIENTATION_PORTRAIT:
 				type = DataGainUtil.LARGE1;
 			}
-			String key = DataGainUtil.getInstance().generateKey(position, type);
+			String key = DataGainUtil.generateKey(position, type);
 			DataGainUtil.getDataGain().getDataForImageView(position, iv, key);
 			((ViewPager) container).addView(iv, 0);
 			mViewPager.setObjectForPosition(iv, position);

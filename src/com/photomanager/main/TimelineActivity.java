@@ -90,7 +90,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	}
 
 	/*
-	 * preprocessing initialize DataGain.class and set callback for loading
+	 * pre-processing initialize DataGain.class and set callback for loading
 	 * bitmaps.
 	 */
 	private void preData() {
@@ -129,6 +129,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			// TODO Auto-generated method stub
+			Log.i("getView", ""+position);
 			ViewHolder holder;
 			if (convertView == null) {
 				int lid;

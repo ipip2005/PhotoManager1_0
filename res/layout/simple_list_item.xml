@@ -26,7 +26,7 @@
 	</RelativeLayout>
     <com.photomanager.main.MyRecyclerView
             android:layout_width="match_parent"
-            android:layout_height="200dip"
+            android:layout_height="100dip"
             android:id="@+id/timeline_recycler_view"
             android:scrollbars="horizontal"
             android:padding="5dip"

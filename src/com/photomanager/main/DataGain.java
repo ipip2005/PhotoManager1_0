@@ -205,7 +205,9 @@ public class DataGain {
 	}
 	public Bitmap getDataNow(final String key){
 		if (key == null) return null;
-		return cache.get(key);
+		Bitmap ret = cache.get(key);
+		if (ret == null || ret.isRecycled()) return null;
+		return ret;
 	}
 	public void getDataForImageView(final int index, final ImageView iv, final String key) {
 		//Log.i("DataGain", "count: " + cache.size());
@@ -243,7 +245,7 @@ public class DataGain {
 						FileInputStream s = mContext.openFileInput(filename);
 						fileExists = s != null;
 						if (fileExists) {
-							Log.i("DataGain", "read from file");
+							//Log.i("DataGain", "read from file");
 							Bitmap bm = BitmapFactory.decodeStream(s);
 							addBitmapToLruCache(key, bm);
 							Message m = Message.obtain();
@@ -263,7 +265,8 @@ public class DataGain {
 					if (!fileExists) {
 						BitmapFactory.Options op = new BitmapFactory.Options();
 						op.inJustDecodeBounds = true;
-						int sWidth = 200, sHeight = 200;
+						int length = DataGainUtil.getStandarLength();
+						int sWidth = length, sHeight = length;
 						BitmapFactory.decodeFile(
 								mPicInfoList.get(id).fileRoute, op);
 						if (!isSmall){
@@ -361,15 +364,16 @@ public class DataGain {
 						op.inJustDecodeBounds = true;
 						BitmapFactory.decodeFile(
 								mPicInfoList.get(id).fileRoute, op);
+						int length = DataGainUtil.getStandarLength();
 						if (op.outWidth < op.outHeight) {
-							op.inSampleSize = op.outWidth / 200;
-							op.outHeight = (int)(1.0 * op.outHeight * 200 / op.outWidth);
-							op.outWidth = 200;
+							op.inSampleSize = op.outWidth / length;
+							op.outHeight = (int)(1.0 * op.outHeight * length / op.outWidth);
+							op.outWidth = length;
 							
 						} else {
-							op.inSampleSize = op.outHeight / 200;
-							op.outWidth = (int)(1.0 * op.outWidth * 200 / op.outHeight);
-							op.outHeight = 200;
+							op.inSampleSize = op.outHeight / length;
+							op.outWidth = (int)(1.0 * op.outWidth * length / op.outHeight);
+							op.outHeight = length;
 							
 						}
 						op.inPurgeable = true;
