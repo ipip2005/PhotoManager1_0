@@ -98,7 +98,6 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private ArrayAdapter<String> sugAdapter = null;
 	private int load_index, index;
 	private ArrayList<PicInfo> PicInfoList = TimelineActivity.PicInfoList;
-	private DataGain dg = TimelineActivity.dg;
 	private ArrayList<Integer> mSet;
 	//private MyOverlay mOverlay;
 	private ImageDialog mDialog;
@@ -219,7 +218,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		});
 		
 		
-		cache = new BitmapDescriptor[dg.getCount()];
+		cache = new BitmapDescriptor[DataGainUtil.getDataGain().getCount()];
 		pics = new MyOverlay(mBaiduMap);
 		mBaiduMap.setOnMarkerClickListener(pics);
 		//Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
@@ -234,7 +233,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private void addPicOverlays() {
 		//mBaiduMap.clear();
 		addCount++;
-		mSet = dg.getSetWithPlace();
+		mSet = DataGainUtil.getDataGain().getSetWithPlace();
 		pics.removeFromMap();
 		pics.clear();
 		for (int i=0;i<cacheCount;i++) if (cache[i]!=null){
@@ -245,7 +244,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		mPicSet = new ArrayList<ArrayList<Integer>>();
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
-		int width = (int) (dm.widthPixels), height = (int) (dm.heightPixels);
+		int width = dm.widthPixels, height = dm.heightPixels;
 		markerLength = (int)(Math.min(width, height)*0.20);
 		//Log.i("photo", "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
 		LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -287,8 +286,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			for (int j = 0; j < 3; j++) if (j < mPicSet.get(i).size()){
 				int id = mPicSet.get(i).get(j);
 				String key = DataGainUtil.getInstance().generateKey(id, DataGainUtil.SMALL);
-				if (TimelineActivity.dg.getDataNow(key) == null)
-					TimelineActivity.dg.getData(id, new Pair<Integer, Integer>(addCount, i), 
+				if (DataGainUtil.getDataGain().getDataNow(key) == null)
+					DataGainUtil.getDataGain().getDataForOther(id, new Pair<Integer, Integer>(addCount, i), 
 							key, mHandler);
 			}
 		}
@@ -301,7 +300,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		for (int j = 0; j < 4; j++)
 			if (j < mPicSet.get(i).size()) {
 				String key = DataGainUtil.getInstance().generateKey(mPicSet.get(i).get(j), DataGainUtil.SMALL);
-				bitmaps[j] = TimelineActivity.dg.getDataNow(key);
+				bitmaps[j] = DataGainUtil.getDataGain().getDataNow(key);
 			} else {
 				m = j;
 				break;
@@ -606,9 +605,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			iv.setImageBitmap(null);
 			int id = mPicSet.get(index).get(position);
 			String key = DataGainUtil.getInstance().generateKey(id, DataGainUtil.SMALL);
-			TimelineActivity.dg.getData(id, iv, key);
-			ScaleAnimation a = new ScaleAnimation(0.7f, 0.95f,
-					0.7f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f,
+			DataGainUtil.getDataGain().getDataForImageView(id, iv, key);
+			ScaleAnimation a = new ScaleAnimation(0.9f, 1f,
+					0.9f, 1f, Animation.RELATIVE_TO_SELF, 0.5f,
 					Animation.RELATIVE_TO_SELF, 0.5f);
 			a.setDuration(400);
 			holder.setAnimation(a);

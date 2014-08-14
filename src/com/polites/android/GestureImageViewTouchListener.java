@@ -17,6 +17,7 @@ package com.polites.android;
 
 import android.content.res.Configuration;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -188,7 +189,8 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		zoomAnimation.reset();
 
 		float zoomTo;
-
+		Log.i("getsture", ""+image.getDeviceOrientation()+" "+image.getScaledWidth()+" "+image.getScaledHeight()
+				+" "+canvasWidth+" "+canvasHeight+" "+image.isLandscape());
 		if (image.isLandscape()) {
 			if (image.getDeviceOrientation() == Configuration.ORIENTATION_PORTRAIT) {
 				int scaledHeight = image.getScaledHeight();
@@ -362,7 +364,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		/**
 		 * recalculate zoomed after lastScale changed.
 		 */
-		zoomed = !(Math.abs(lastScale - startingScale) < 0.01);
+		
 		if (!canDragX) {
 			next.x = centerX;
 		}
@@ -374,16 +376,19 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		boundCoordinates();
 
 		if (!canDragX && !canDragY) {
-
-			if (image.isLandscape()) {
+			currentScale = lastScale = startingScale;
+			/**
+			 * I need the initial image is center inside;
+			 */
+			/*if (image.isLandscape()) {
 				currentScale = fitScaleHorizontal;
 				lastScale = fitScaleHorizontal;
 			} else {
 				currentScale = fitScaleVertical;
 				lastScale = fitScaleVertical;
-			}
+			}*/
 		}
-
+		zoomed = !(Math.abs(lastScale - startingScale) < 0.01);
 		image.setScale(currentScale);
 		image.setPosition(next.x, next.y);
 

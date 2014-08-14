@@ -24,12 +24,11 @@
             android:textSize="25sp"
 		    />
 	</RelativeLayout>
-    <com.photomanager.main.MyViewPager
+    <com.photomanager.main.MyRecyclerView
             android:layout_width="match_parent"
-            android:layout_height="100dip"
-            android:id="@+id/timeline_view_pager"
-            android:flipInterval="30"
-            android:persistentDrawingCache="animation"
+            android:layout_height="200dip"
+            android:id="@+id/timeline_recycler_view"
+            android:scrollbars="horizontal"
             android:padding="5dip"
             />
 

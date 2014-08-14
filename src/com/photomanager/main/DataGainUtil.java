@@ -1,7 +1,11 @@
 package com.photomanager.main;
 
+import android.content.Context;
+import android.os.Handler;
+
 public class DataGainUtil {
 	private static DataGainUtil mData= null;
+	private static DataGain dataGain = null;
 	public final static int
 		SMALL = 2,
 		LARGE0 = 0,
@@ -14,6 +18,15 @@ public class DataGainUtil {
 			mData = new DataGainUtil();
 		}
 		return mData;
+	}
+	public static DataGain getDataGain(){
+		return dataGain;
+	}
+	public static DataGain getDataGainInstance(Context context, Handler handler){
+		if (dataGain == null){
+			dataGain = new DataGain(context, handler);
+		}
+		return dataGain;
 	}
 	/**
 	 * 由图片列表的编号和需要图片的类型生成一个唯一key，用户申请dataGain获取图片

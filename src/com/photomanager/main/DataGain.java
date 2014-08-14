@@ -16,6 +16,7 @@ import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.mapapi.utils.CoordinateConverter.CoordType;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -26,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.util.LruCache;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -36,7 +38,7 @@ public class DataGain {
 	private Cursor cursor;
 	private int n;
 	private ContentResolver cr;
-	private TimelineActivity mContext;
+	private Context mContext;
 	private Handler mHandler;
 	private boolean gotPoi[];
 	private static LruCache<String, Bitmap> cache;
@@ -58,16 +60,15 @@ public class DataGain {
 	 * @param context
 	 * @param handler
 	 */
-	public DataGain(ContentResolver contentResolver, TimelineActivity context,
-			Handler handler) {
+	public DataGain(Context context, Handler handler) {
 		// TODO Auto-generated constructor stub
-		cr = contentResolver;
+		cr = context.getContentResolver();
 		cursor = cr.query(MediaUri,STORE_IMAGES, null, null, ""
 						+ MediaStore.Images.Media.DATE_TAKEN + " DESC");
 		mContext = context;
+		mHandler = handler;
 		n = cursor.getCount();
 		gotPoi = new boolean[n];
-		mHandler = handler;
 		preData();
 		int maxMemory = (int) (Runtime.getRuntime().maxMemory());
 		int cacheSize = maxMemory / 4;
@@ -77,7 +78,6 @@ public class DataGain {
 				return value.getRowBytes() * value.getHeight();
 			};
 		};
-		;
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -207,10 +207,11 @@ public class DataGain {
 		if (key == null) return null;
 		return cache.get(key);
 	}
-	public void getData(final int index, final ImageView iv, final String key) {
-		Log.i("DataGain", "count: " + cache.size());
+	public void getDataForImageView(final int index, final ImageView iv, final String key) {
+		//Log.i("DataGain", "count: " + cache.size());
 		if (key == null) return;
 		iv.setTag(key);
+		final boolean isSmall = key.endsWith(String.valueOf(DataGainUtil.SMALL));
 		if (mHandler == null) {
 			mHandler = new Handler() {
 				public void handleMessage(Message msg) {
@@ -234,6 +235,7 @@ public class DataGain {
 				public void run() {
 					// TODO Auto-generated method stub
 					if (!iv.getTag().toString().equals(key))return;
+					Log.i("DataGain","obtain: "+index);
 					int id = index;
 					String filename = key + mPicInfoList.get(id).id + ".thumb";
 					Boolean fileExists = false;
@@ -241,6 +243,7 @@ public class DataGain {
 						FileInputStream s = mContext.openFileInput(filename);
 						fileExists = s != null;
 						if (fileExists) {
+							Log.i("DataGain", "read from file");
 							Bitmap bm = BitmapFactory.decodeStream(s);
 							addBitmapToLruCache(key, bm);
 							Message m = Message.obtain();
@@ -260,18 +263,33 @@ public class DataGain {
 					if (!fileExists) {
 						BitmapFactory.Options op = new BitmapFactory.Options();
 						op.inJustDecodeBounds = true;
+						int sWidth = 200, sHeight = 200;
 						BitmapFactory.decodeFile(
 								mPicInfoList.get(id).fileRoute, op);
-						boolean smaller = key.endsWith(String.valueOf(DataGainUtil.SMALL));
-						if ((smaller && op.outWidth > op.outHeight)||(!smaller && op.outWidth < op.outHeight)) {
-							op.inSampleSize = op.outWidth / 200;
-							op.outWidth = 200;
-							op.outHeight = op.outHeight * 200 / op.outWidth;
-						} else {
-							op.inSampleSize = op.outHeight / 200;
-							op.outHeight = 200;
-							op.outWidth = op.outWidth * 200 / op.outHeight;
+						if (!isSmall){
+							DisplayMetrics dm = new DisplayMetrics();
+							((Activity)mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
+							sWidth = dm.widthPixels;
+							sHeight = dm.heightPixels;
+							//Log.i("DataGain", ""+op.outWidth+" " + op.outHeight+" "+sWidth+" "+sHeight);
 						}
+						
+						if (op.outWidth < sWidth && op.outHeight < sHeight){
+							op.inSampleSize = 1;
+						} else{
+							boolean s = op.outWidth * sHeight < op.outHeight *sWidth;
+							Log.i("DataGain",""+s+" "+isSmall);
+							if (!s^isSmall){
+								op.inSampleSize = op.outWidth / sWidth;
+								op.outHeight = (int)(1.0 * op.outHeight * sWidth / op.outWidth);
+								op.outWidth = sWidth;
+							} else {
+								op.inSampleSize = op.outHeight / sHeight;
+								op.outWidth = (int)(1.0 * op.outWidth * sHeight / op.outHeight);
+								op.outHeight = sHeight;
+							}
+						}
+						//Log.i("DataGain", ""+op.inSampleSize + " "+op.outWidth+" "+op.outHeight);
 						op.inPurgeable = true;
 						op.inInputShareable = true;
 						op.inPreferredConfig = Bitmap.Config.RGB_565;
@@ -282,7 +300,7 @@ public class DataGain {
 						Message m = Message.obtain();
 						m.obj = new Holder(iv, bitmap, key);
 						mHandler.sendMessage(m);
-						if (!key.endsWith(String.valueOf(DataGainUtil.SMALL))) return;
+						if (!isSmall) return;
 						try {
 							FileOutputStream s = mContext.openFileOutput(
 									filename, Context.MODE_PRIVATE);
@@ -301,7 +319,7 @@ public class DataGain {
 			});
 	}
 
-	public void getData(final int index, final Object info, final String key, final Handler handler){
+	public void getDataForOther(final int index, final Object info, final String key, final Handler handler){
 		if (key == null) return;
 		Bitmap bm = cache.get(key);
 		if (bm != null) {
@@ -345,12 +363,14 @@ public class DataGain {
 								mPicInfoList.get(id).fileRoute, op);
 						if (op.outWidth < op.outHeight) {
 							op.inSampleSize = op.outWidth / 200;
+							op.outHeight = (int)(1.0 * op.outHeight * 200 / op.outWidth);
 							op.outWidth = 200;
-							op.outHeight = op.outHeight * 200 / op.outWidth;
+							
 						} else {
 							op.inSampleSize = op.outHeight / 200;
+							op.outWidth = (int)(1.0 * op.outWidth * 200 / op.outHeight);
 							op.outHeight = 200;
-							op.outWidth = op.outWidth * 200 / op.outHeight;
+							
 						}
 						op.inPurgeable = true;
 						op.inInputShareable = true;

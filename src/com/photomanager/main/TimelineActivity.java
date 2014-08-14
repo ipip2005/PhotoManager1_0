@@ -8,10 +8,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -37,7 +41,7 @@ import android.widget.TextView;
  */
 public class TimelineActivity extends Activity implements OnItemClickListener {
 	static public ArrayList<PicInfo> PicInfoList;
-	static public DataGain dg;
+	private DataGain dg;
 	private PictureAdapter mAdapter;
 	private MyListView listView = null;
 	// The zoom level of the listView
@@ -91,7 +95,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	 */
 	private void preData() {
 		lastClickImage.setTimeInMillis(0);
-		dg = new DataGain(getContentResolver(), TimelineActivity.this, handler);
+		dg = DataGainUtil.getDataGainInstance(this, handler);
 		PicInfoList = dg.getPicInfoList();
 		granularity = 2;
 		mSet = dg.getSet(granularity);
@@ -135,20 +139,17 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 						.findViewById(R.id.item_title);
 				holder.text = (TextView) convertView
 						.findViewById(R.id.item_more);
-				holder.viewPager = (MyViewPager) convertView
-						.findViewById(R.id.timeline_view_pager);
+				holder.view = (MyRecyclerView) convertView
+						.findViewById(R.id.timeline_recycler_view);
 				holder.holder_id = position;
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.viewPager
-					.setAdapter(new MyViewPagerAdapter(TimelineActivity.this,
-							mSet.get(position)));
-			holder.viewPager.setPageMargin(30);
-			holder.viewPager.setCurrentItem(Integer.MAX_VALUE/2);
-			holder.viewPager.setOffscreenPageLimit(1);
-			holder.viewPager.setCurrentItem(0);
+			holder.view.setAdapter(new MyRecyclerViewAdapter(TimelineActivity.this, mSet.get(position)));
+			LinearLayoutManager llm = new LinearLayoutManager(TimelineActivity.this);
+			llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+			holder.view.setLayoutManager(llm);
 			String openFlag = "";
 			if (mSet.get(position).size() > 1)
 				openFlag = ">>>";
@@ -156,99 +157,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			holder.text.setText(openFlag);
 			return convertView;
 		}
-	}
-
-	private class MyViewPagerAdapter extends PagerAdapter {
-		private Context mContext;
-		private ArrayList<Integer> set;
-
-		public MyViewPagerAdapter(Context context, ArrayList<Integer> set) {
-			mContext = context;
-			this.set = set;
-		}
-
-		@Override
-		public float getPageWidth(int position) {
-			return 0.25f;
-		}
-
-		@Override
-		public int getCount() {
-			// TODO Auto-generated method stub
-			if (set.size() > 3) return Integer.MAX_VALUE;
-			return set.size();
-		}
-
-		@Override
-		public boolean isViewFromObject(View arg0, Object arg1) {
-			// TODO Auto-generated method stub
-			return arg0 == (View) arg1;
-		}
-
-		@Override
-		public Object instantiateItem(ViewGroup container, final int position) {
-			final int id = position % set.size();
-			ImageView iv = new ImageView(mContext);
-			iv.setImageBitmap(null);
-			String key = DataGainUtil.getInstance().generateKey(set.get(id), DataGainUtil.SMALL);
-			dg.getData(set.get(id), iv, key);
-			LayoutParams lp = new LayoutParams(250, 250);
-			iv.setLayoutParams(lp);
-			iv.setScaleType(ScaleType.CENTER_CROP);
-			iv.setOnTouchListener(new OnTouchListener(){
-
-				@Override
-				public boolean onTouch(View v, MotionEvent ev) {
-					// TODO Auto-generated method stub
-					//Log.i("TimelineActivity",""+ev.getAction()+" "+ev.getRawX()+" "+ev.getRawY());
-					
-					
-					switch (ev.getAction() & MotionEvent.ACTION_MASK){
-					case MotionEvent.ACTION_DOWN:
-					case MotionEvent.ACTION_POINTER_DOWN:
-						//Log.i("TimelineActivity", "Down");	
-						Animation cAnimation = new ScaleAnimation(1.0f, 0.9f,
-								1.0f, 0.9f, Animation.RELATIVE_TO_SELF, 0.5f,
-								Animation.RELATIVE_TO_SELF, 0.5f);
-						cAnimation.setDuration(300);
-						cAnimation.setFillAfter(true);
-						v.setAnimation(cAnimation);
-						v.startAnimation(cAnimation);
-						break;	
-					case MotionEvent.ACTION_CANCEL:
-						Animation dAnimation = new ScaleAnimation(0.95f, 1.0f,
-								0.95f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f,
-								Animation.RELATIVE_TO_SELF, 0.5f);
-						dAnimation.setDuration(300);
-						v.setAnimation(dAnimation);
-						v.startAnimation(dAnimation);
-						break;
-					case MotionEvent.ACTION_UP:
-						Animation eAnimation = new ScaleAnimation(0.95f, 1.0f,
-								0.95f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f,
-								Animation.RELATIVE_TO_SELF, 0.5f);
-						eAnimation.setDuration(300);
-						v.setAnimation(eAnimation);
-						v.startAnimation(eAnimation);
-						Intent intent = new Intent(TimelineActivity.this,
-								ShowImageActivity.class);
-						intent.putExtra("image", (Integer) set.get(id));
-						startActivity(intent);
-						break;
-					}
-					return true;
-				}
-				
-			});
-			((ViewPager) container).addView(iv, 0);
-			return iv;
-		}
-
-		@Override
-		public void destroyItem(ViewGroup container, int position, Object object) {
-			container.removeView((View) object);
-		}
-
 	}
 	private String addZero(int i){
 		
@@ -339,7 +247,12 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			this.setDivider(null);
 			// TODO Auto-generated constructor stub
 		}
-
+		@Override  
+		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {  
+		    int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,  
+		            MeasureSpec.AT_MOST);  
+		    super.onMeasure(widthMeasureSpec, expandSpec);  
+		} 
 		/**
 		 * 处理listView的触摸事件
 		 */

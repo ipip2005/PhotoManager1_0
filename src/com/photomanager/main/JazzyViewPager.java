@@ -194,7 +194,7 @@ public class JazzyViewPager extends ViewPager {
 	// }
 
 	private void logState(View v, String title) {
-		Log.v(TAG,
+		/*Log.v(TAG,
 				title + ": ROT (" + ViewHelper.getRotation(v) + ", "
 						+ ViewHelper.getRotationX(v) + ", "
 						+ ViewHelper.getRotationY(v) + "), TRANS ("
@@ -202,7 +202,7 @@ public class JazzyViewPager extends ViewPager {
 						+ ViewHelper.getTranslationY(v) + "), SCALE ("
 						+ ViewHelper.getScaleX(v) + ", "
 						+ ViewHelper.getScaleY(v) + "), ALPHA "
-						+ ViewHelper.getAlpha(v));
+						+ ViewHelper.getAlpha(v));*/
 	}
 
 	protected void animateScroll(int position, float positionOffset) {

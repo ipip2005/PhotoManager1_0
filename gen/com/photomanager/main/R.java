@@ -157,8 +157,8 @@ containing a value of this type.
         public static final int stack=0x7f050006;
         public static final int standard=0x7f050000;
         public static final int tablet=0x7f050001;
+        public static final int timeline_recycler_view=0x7f05002b;
         public static final int timeline_rl=0x7f05001b;
-        public static final int timeline_view_pager=0x7f05002b;
         public static final int zoomin=0x7f050007;
         public static final int zoomout=0x7f050008;
     }

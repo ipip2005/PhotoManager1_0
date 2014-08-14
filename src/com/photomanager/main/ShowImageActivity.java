@@ -40,6 +40,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -62,7 +63,7 @@ public class ShowImageActivity extends Activity {
 	private Animation anim_s;
 	private Button b;
 	private float px = 0, py = 0;
-
+	private Handler mHandler;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -171,8 +172,8 @@ public class ShowImageActivity extends Activity {
 
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
-			Log.i("instantiateItem",""+position);
 			GestureImageView iv = new GestureImageView(mContext);
+			iv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			int type = DataGainUtil.SMALL;
 			switch (ShowImageActivity.this.getResources().getConfiguration().orientation){
 			case Configuration.ORIENTATION_LANDSCAPE:
@@ -182,7 +183,7 @@ public class ShowImageActivity extends Activity {
 				type = DataGainUtil.LARGE1;
 			}
 			String key = DataGainUtil.getInstance().generateKey(position, type);
-			TimelineActivity.dg.getData(position, iv, key);
+			DataGainUtil.getDataGain().getDataForImageView(position, iv, key);
 			((ViewPager) container).addView(iv, 0);
 			mViewPager.setObjectForPosition(iv, position);
 			return iv;
@@ -423,7 +424,7 @@ public class ShowImageActivity extends Activity {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				TimelineActivity.dg.delData(id);
+				DataGainUtil.getDataGain().delData(id);
 				if (TimelineActivity.PicInfoList.size() == 0) ShowImageActivity.this.finish();
 				mViewPager.setCurrentItem(id);
 				b.setText(" < 相册(" + (id + 1) + "/"

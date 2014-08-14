@@ -7,6 +7,6 @@ public class ViewHolder {
 	}
 	public TextView title;
 	public TextView text;
-	public MyViewPager viewPager;
+	public MyRecyclerView view;
 	public int holder_id = -1;
 }
