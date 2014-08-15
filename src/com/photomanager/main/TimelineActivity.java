@@ -3,6 +3,14 @@ package com.photomanager.main;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import utils.DataGain;
+import utils.DataGainUtil;
+import utils.PicInfo;
+import utils.ViewHolder;
+
+import com.photomagner.widgets.MyRecyclerGallery;
+import com.photomanager.adapters.MyRecyclerGalleryAdapter;
+
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,6 +23,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ItemAnimator;
 import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,6 +80,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		rl.addView(listView);
 		mAdapter = new PictureAdapter(this);
 		listView.setAdapter(mAdapter);
+		listView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		listView.setOnItemClickListener(this);
 		myLayoutAnimation = new AlphaAnimation(0.8f, 1.0f);
 		myLayoutAnimation.setDuration(500);
@@ -140,14 +150,14 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 						.findViewById(R.id.item_title);
 				holder.text = (TextView) convertView
 						.findViewById(R.id.item_more);
-				holder.view = (MyRecyclerView) convertView
+				holder.view = (MyRecyclerGallery) convertView
 						.findViewById(R.id.timeline_recycler_view);
 				holder.holder_id = position;
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.view.setAdapter(new MyRecyclerViewAdapter(TimelineActivity.this, mSet.get(position)));
+			holder.view.setAdapter(new MyRecyclerGalleryAdapter(TimelineActivity.this, mSet.get(position)));
 			LinearLayoutManager llm = new LinearLayoutManager(TimelineActivity.this);
 			llm.setOrientation(LinearLayoutManager.HORIZONTAL);
 			holder.view.setLayoutManager(llm);
@@ -248,12 +258,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			this.setDivider(null);
 			// TODO Auto-generated constructor stub
 		}
-		@Override  
-		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {  
-		    int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,  
-		            MeasureSpec.AT_MOST);  
-		    super.onMeasure(widthMeasureSpec, expandSpec);  
-		} 
 		/**
 		 * 处理listView的触摸事件
 		 */

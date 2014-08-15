@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.photomanager.main.JazzyViewPager.TransitionEffect;
+import utils.DataGainUtil;
+
+import com.photomagner.widgets.JazzyViewPager;
+import com.photomagner.widgets.JazzyViewPager.TransitionEffect;
 import com.polites.android.GestureImageView;
 
 import android.annotation.SuppressLint;

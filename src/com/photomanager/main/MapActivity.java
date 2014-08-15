@@ -2,6 +2,10 @@ package com.photomanager.main;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import utils.DataGainUtil;
+import utils.PicInfo;
+
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -39,6 +43,8 @@ import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.photomagner.widgets.MyPoiOverlay;
+import com.photomagner.widgets.SquareLayout;
 
 import android.app.Activity;
 import android.app.Dialog;

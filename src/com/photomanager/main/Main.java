@@ -2,6 +2,8 @@ package com.photomanager.main;
 
 import java.util.Calendar;
 
+import utils.Settings;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
