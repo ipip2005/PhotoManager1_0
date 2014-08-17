@@ -90,9 +90,10 @@ import android.widget.Toast;
 /**
  * 
  * @author ipip 2014/8/11 13:59
- *
+ * 
  */
-public class MapActivity extends Activity implements OnGetPoiSearchResultListener, OnGetSuggestionResultListener {
+public class MapActivity extends Activity implements
+		OnGetPoiSearchResultListener, OnGetSuggestionResultListener {
 	private MapView mMapView = null;
 	private BaiduMap mBaiduMap = null;
 	private PoiSearch mSearch;
@@ -105,28 +106,29 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	private int load_index, index;
 	private ArrayList<PicInfo> PicInfoList = TimelineActivity.PicInfoList;
 	private ArrayList<Integer> mSet;
-	//private MyOverlay mOverlay;
+	// private MyOverlay mOverlay;
 	private ImageDialog mDialog;
 	private ArrayList<ArrayList<Integer>> mPicSet;
 	private GridView mRel;
 	private LinearLayout ll;
 	private boolean llVisible = false;
 	private BitmapDescriptor[] cache;
-	private int cacheCount=0;
 	private MyOverlay pics, myLocOverlay;
 	private MyPoiOverlay poiOverlay;
 	private LatLngBounds llb;
 	private int addCount = 0, markerLength = 0;
-	private  Handler mHandler = new Handler(){
+	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Pair<Integer, Integer> p = (Pair<Integer, Integer>)msg.obj;
-			if (p.first.intValue() != addCount) return;
+			Pair<Integer, Integer> p = (Pair<Integer, Integer>) msg.obj;
+			if (p.first.intValue() != addCount)
+				return;
 			refreshOverlayMarker(p.second);
 		}
 	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		initComponents();
@@ -168,8 +170,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 						.toString();
 
 				mSuggestionSearch
-				.requestSuggestion(new SuggestionSearchOption()
-						.keyword(cs.toString()).city(city));
+						.requestSuggestion(new SuggestionSearchOption()
+								.keyword(cs.toString()).city(city));
 			}
 		});
 		setLocationManager();
@@ -178,8 +180,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 
 	private void initComponents() {
 		EditText et = (EditText) findViewById(R.id.city);
-		if (Main.s.get("city")!=null)
-			et.setText((String)Main.s.get("city"));
+		if (Main.s.get("city") != null)
+			et.setText((String) Main.s.get("city"));
 		et.setSelectAllOnFocus(true);
 	}
 
@@ -201,13 +203,12 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		mMapView.onDestroy();
 	}
 
-
 	private void initMapView() {
 		mMapView.setLongClickable(true);
 		mBaiduMap.setOnMapStatusChangeListener(new OnMapStatusChangeListener() {
 			@Override
 			public void onMapStatusChange(MapStatus status) {
-				
+
 			}
 
 			@Override
@@ -219,44 +220,47 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			@Override
 			public void onMapStatusChangeStart(MapStatus arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		
+
 		cache = new BitmapDescriptor[DataGainUtil.getDataGain().getCount()];
 		pics = new MyOverlay(mBaiduMap);
 		mBaiduMap.setOnMarkerClickListener(pics);
-		//Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
-		
-		if ((Main.s.get("last-location-x"))!=null){
-			mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(
-					new LatLng(Double.parseDouble(Main.s.get("last-location-x").toString()),
-							   Double.parseDouble(Main.s.get("last-location-y").toString()))));
+		// Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
+
+		if ((Main.s.get("last-location-x")) != null) {
+			mBaiduMap
+					.setMapStatus(MapStatusUpdateFactory.newLatLng(new LatLng(
+							Double.parseDouble(Main.s.get("last-location-x")
+									.toString()), Double.parseDouble(Main.s
+									.get("last-location-y").toString()))));
 		}
 	}
 
 	private void addPicOverlays() {
-		//mBaiduMap.clear();
+		// mBaiduMap.clear();
 		addCount++;
 		mSet = DataGainUtil.getDataGain().getSetWithPlace();
+		for (int i = 0; i < pics.getOverlayOptions().size(); i++)
+			if (cache[i] != null) {
+				cache[i].recycle();
+				cache[i] = null;
+			}
 		pics.removeFromMap();
 		pics.clear();
-		for (int i=0;i<cacheCount;i++) if (cache[i]!=null){
-			cache[i].recycle();
-			cache[i]=null;
-		}
-		cacheCount=0;
+
 		mPicSet = new ArrayList<ArrayList<Integer>>();
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		int width = dm.widthPixels, height = dm.heightPixels;
-		markerLength = (int)(Math.min(width, height)*0.20);
-		//Log.i("photo", "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
+		markerLength = (int) (Math.min(width, height) * 0.20);
+		// Log.i("photo",
+		// "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
 		LatLngBounds.Builder builder = new LatLngBounds.Builder();
 		for (int i = 0; i < mSet.size(); i++) {
-			PicInfo info = PicInfoList.get(mSet.get(i)); 
-			builder.include(info.pl);		
+			PicInfo info = PicInfoList.get(mSet.get(i));
+			builder.include(info.pl);
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			if (screenOn.x < 0 || screenOn.y < 0 || screenOn.x > width
@@ -267,7 +271,8 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				ArrayList<Integer> p = mPicSet.get(j);
 				PicInfo infoP = PicInfoList.get(p.get(0));
 				Point screenOn1 = new Point();
-				screenOn1 = mBaiduMap.getProjection().toScreenLocation(infoP.pl);
+				screenOn1 = mBaiduMap.getProjection()
+						.toScreenLocation(infoP.pl);
 				if (Math.abs(screenOn.x - screenOn1.x) < 200
 						&& Math.abs(screenOn.y - screenOn1.y) < 200) {
 					p.add(mSet.get(i));
@@ -280,86 +285,98 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				p.add(mSet.get(i));
 				mPicSet.add(p);
 			}
-			
+
 		}
 		llb = builder.build();
-		//Log.i("pic", ""+mPicSet.size());
-		for (int i = 0; i < mPicSet.size(); i++){
+		// Log.i("pic", ""+mPicSet.size());
+		for (int i = 0; i < mPicSet.size(); i++) {
 			refreshOverlayMarker(i);
-			cacheCount++;
 		}
-		for (int i = 0; i < mPicSet.size(); i++){
-			for (int j = 0; j < 3; j++) if (j < mPicSet.get(i).size()){
-				int id = mPicSet.get(i).get(j);
-				String key = DataGainUtil.generateKey(id, DataGainUtil.SMALL);
-				if (DataGainUtil.getDataGain().getDataNow(key) == null)
-					DataGainUtil.getDataGain().getDataForOther(id, new Pair<Integer, Integer>(addCount, i), 
-							key, mHandler);
-			}
+		for (int i = 0; i < mPicSet.size(); i++) {
+			for (int j = 0; j < 3; j++)
+				if (j < mPicSet.get(i).size()) {
+					int id = mPicSet.get(i).get(j);
+					String key = DataGainUtil.generateKey(id,
+							DataGainUtil.SMALL);
+					if (DataGainUtil.getDataGain().getDataNow(key) == null)
+						DataGainUtil.getDataGain().getDataForOther(id,
+								new Pair<Integer, Integer>(addCount, i), key,
+								mHandler);
+				}
 		}
 		pics.addToMap();
 	}
-	private void refreshOverlayMarker(int set_id){
+
+	private void refreshOverlayMarker(int set_id) {
 		Log.i("MapActivty", "refresh");
 		int i = set_id;
 		Bitmap[] bitmaps = new Bitmap[3];
 		int m = 3;
 		for (int j = 0; j < 3; j++)
 			if (j < mPicSet.get(i).size()) {
-				String key = DataGainUtil.generateKey(mPicSet.get(i).get(j), DataGainUtil.SMALL);
+				String key = DataGainUtil.generateKey(mPicSet.get(i).get(j),
+						DataGainUtil.SMALL);
 				bitmaps[j] = DataGainUtil.getDataGain().getDataNow(key);
 			} else {
 				m = j;
 				break;
 			}
-		if (bitmaps[0] == null) return;
-		Bitmap b = Bitmap.createBitmap(markerLength - 20 + m * 20, markerLength - 10 + m * 10,
-				bitmaps[0].getConfig());
+		if (bitmaps[0] == null)
+			return;
+		Bitmap b = Bitmap.createBitmap(markerLength - 20 + m * 20, markerLength
+				- 10 + m * 10, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(b);
 		for (int j = m - 1; j >= 0; j--) {
-			if (bitmaps[j] != null){
-				int bitmap_length = Math.min(bitmaps[j].getWidth(), bitmaps[j].getHeight());
-				canvas.drawBitmap(bitmaps[j], new Rect(0, 0, bitmap_length, bitmap_length), new RectF(j * 20,
-						j * 10, markerLength + j * 20, markerLength + j * 10), null);
-			}
-			else {
+			if (bitmaps[j] != null) {
+				int bitmap_length = Math.min(bitmaps[j].getWidth(),
+						bitmaps[j].getHeight());
+				canvas.drawBitmap(bitmaps[j], new Rect(0, 0, bitmap_length,
+						bitmap_length), new RectF(j * 20, j * 10, markerLength
+						+ j * 20, markerLength + j * 10), null);
+			} else {
 				Paint p = new Paint();
 				p.setColor(Color.argb(255, 200, 200, 200));
-				canvas.drawRect(new RectF(j * 20,
-						j * 10, markerLength + j * 20, markerLength + j * 10), p);
-			} 
-				
+				canvas.drawRect(new RectF(j * 20, j * 10,
+						markerLength + j * 20, markerLength + j * 10), p);
+			}
+
 		}
-		if (cache[i] != null){
+		if (cache[i] != null) {
 			cache[i].recycle();
 			cache[i] = null;
 		}
-		Log.i("MapActivity","i "+(b==null)+" "+pics.getOverlayOptions().size());
-		cache[i] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null, b).getBitmap());
+		Log.i("MapActivity", "i " + (b == null) + " "
+				+ pics.getOverlayOptions().size());
+		cache[i] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null,
+				b).getBitmap());
 		LatLng gp = TimelineActivity.PicInfoList.get(mPicSet.get(i).get(0)).pl;
-		pics.setOverlayOption(i, new MarkerOptions().position(gp).icon(cache[i])
-				.zIndex(-1).title(String.valueOf(i)));
-		Log.i("MapActivity","i -----"+(b==null)+" "+pics.getOverlayOptions().size());
+		pics.setOverlayOption(i, new MarkerOptions().position(gp)
+				.icon(cache[i]).zIndex(-1).title(String.valueOf(i)));
+		Log.i("MapActivity", "i -----" + (b == null) + " "
+				+ pics.getOverlayOptions().size());
 		pics.addToMap();
 	}
+
 	/**
 	 * establish a Location Overlay
 	 */
-	private void createMyOverlay(){
+	private void createMyOverlay() {
 		myLocOverlay.removeFromMap();
 		myLocOverlay.clear();
-		BitmapDescriptor p  = BitmapDescriptorFactory.fromResource(R.drawable.icon_myloc);
-		OverlayOptions oo = new MarkerOptions().position(new LatLng(locData.latitude,locData.longitude))
+		BitmapDescriptor p = BitmapDescriptorFactory
+				.fromResource(R.drawable.icon_myloc);
+		OverlayOptions oo = new MarkerOptions()
+				.position(new LatLng(locData.latitude, locData.longitude))
 				.icon(p).zIndex(0).title("here");
 		myLocOverlay.add(oo);
 		myLocOverlay.addToMap();
 	}
+
 	private void setLocationManager() {
-		mLocClient = new LocationClient(getApplicationContext());	
+		mLocClient = new LocationClient(getApplicationContext());
 		LocationMode mCurrentMode = LocationMode.NORMAL;
-		mBaiduMap
-				.setMyLocationConfigeration(new MyLocationConfigeration(
-						mCurrentMode, false, null));
+		mBaiduMap.setMyLocationConfigeration(new MyLocationConfigeration(
+				mCurrentMode, false, null));
 		mLocClient.registerLocationListener(myListener);
 		LocationClientOption option = new LocationClientOption();
 		option.setOpenGps(true);
@@ -367,9 +384,9 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		option.setScanSpan(100000);
 		mLocClient.setLocOption(option);
 		myLocOverlay = new MyOverlay(mBaiduMap);
-	} 
+	}
 
-	public void resetCenterPoint(View v) {  
+	public void resetCenterPoint(View v) {
 		mBaiduMap.setMyLocationEnabled(true);
 		mLocClient.start();
 		mLocClient.requestLocation();
@@ -378,11 +395,11 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 
 	public void showSearchPanel(View v) {
 		ll = (LinearLayout) findViewById(R.id.mapSearchBlock);
-		if (llVisible){
+		if (llVisible) {
 			llVisible = false;
 			Animation a = new AlphaAnimation(1.0f, 0.0f);
 			a.setDuration(800);
-			a.setAnimationListener(new AnimationListener(){
+			a.setAnimationListener(new AnimationListener() {
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
@@ -393,23 +410,22 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				@Override
 				public void onAnimationRepeat(Animation animation) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void onAnimationStart(Animation animation) {
 					// TODO Auto-generated method stub
-					
+
 				}
-				
+
 			});
 			ll.startAnimation(a);
-		}
-		else{
+		} else {
 			llVisible = true;
 			Animation a = new AlphaAnimation(0.0f, 1.0f);
 			a.setDuration(800);
-			a.setAnimationListener(new AnimationListener(){
+			a.setAnimationListener(new AnimationListener() {
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
@@ -420,30 +436,31 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				@Override
 				public void onAnimationRepeat(Animation animation) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void onAnimationStart(Animation animation) {
 					// TODO Auto-generated method stub
-					
+
 				}
-				
+
 			});
 			ll.startAnimation(a);
 		}
 	}
-	public void spanMapToSeePics(View v){
-		if (mSet != null && mSet.size() > 0 && pics != null){
+
+	public void spanMapToSeePics(View v) {
+		if (mSet != null && mSet.size() > 0 && pics != null) {
 			pics.zoomToSpan();
 			MapStatusUpdate m = MapStatusUpdateFactory.newLatLngBounds(llb);
-			//mBaiduMap.setMapStatus(m);
+			// mBaiduMap.setMapStatus(m);
 			mBaiduMap.animateMapStatus(m);
 			Toast.makeText(this, "所有图片可见", Toast.LENGTH_SHORT).show();
-		} else 
-		if (mSet != null && mSet.size() == 0){
-			Toast.makeText(this, "无带坐标图片，请确认拍照时开启定位。", Toast.LENGTH_SHORT).show();
-		} else{
+		} else if (mSet != null && mSet.size() == 0) {
+			Toast.makeText(this, "无带坐标图片，请确认拍照时开启定位。", Toast.LENGTH_SHORT)
+					.show();
+		} else {
 			Toast.makeText(this, "未载入...请重试", Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -451,24 +468,31 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	public void searchButtonProcess(View v) {
 		EditText editCity = (EditText) findViewById(R.id.city);
 		EditText editSearchKey = (EditText) findViewById(R.id.searchkey);
-		mSearch.searchInCity(new PoiCitySearchOption().city(editCity.getText().toString()).keyword(editSearchKey
-				.getText().toString()).pageNum(load_index).pageCapacity(9));
-		InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.hideSoftInputFromWindow(MapActivity.this.getCurrentFocus().getWindowToken(),
+		mSearch.searchInCity(new PoiCitySearchOption()
+				.city(editCity.getText().toString())
+				.keyword(editSearchKey.getText().toString())
+				.pageNum(load_index).pageCapacity(9));
+		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.hideSoftInputFromWindow(MapActivity.this
+				.getCurrentFocus().getWindowToken(),
 				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
-	public void goToLastPage(View v){
-		if (load_index == 0 ){
-			Toast.makeText(this, "这已是最前页索引", Toast.LENGTH_SHORT).show();;
-		} else{
+
+	public void goToLastPage(View v) {
+		if (load_index == 0) {
+			Toast.makeText(this, "这已是最前页索引", Toast.LENGTH_SHORT).show();
+			;
+		} else {
 			load_index--;
 			searchButtonProcess(null);
 		}
 	}
+
 	public void goToNextPage(View v) {
 		load_index++;
 		searchButtonProcess(null);
 	}
+
 	public class MyLocationListenner implements BDLocationListener {
 
 		@Override
@@ -476,40 +500,42 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			if (location == null)
 				return;
 			locData = new MyLocationData.Builder()
-			.accuracy(location.getRadius())
-			.latitude(location.getLatitude())
-			.longitude(location.getLongitude()).build();
+					.accuracy(location.getRadius())
+					.latitude(location.getLatitude())
+					.longitude(location.getLongitude()).build();
 			mBaiduMap.setMyLocationData(locData);
 			LatLng ll = new LatLng(location.getLatitude(),
 					location.getLongitude());
-			mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll),400);
-			new Handler().postDelayed(new Runnable(){
+			mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll),
+					400);
+			new Handler().postDelayed(new Runnable() {
 
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					mBaiduMap.animateMapStatus(MapStatusUpdateFactory.zoomTo(14));
+					mBaiduMap.animateMapStatus(MapStatusUpdateFactory
+							.zoomTo(14));
 				}
-				
+
 			}, 500);
 			GeoCoder ss = GeoCoder.newInstance();
-			ss.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener(){
+			ss.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
 
 				@Override
 				public void onGetGeoCodeResult(GeoCodeResult arg0) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
-				public void onGetReverseGeoCodeResult(
-						ReverseGeoCodeResult res) {
+				public void onGetReverseGeoCodeResult(ReverseGeoCodeResult res) {
 					// TODO Auto-generated method stub
-					EditText et = (EditText)MapActivity.this.findViewById(R.id.city);
+					EditText et = (EditText) MapActivity.this
+							.findViewById(R.id.city);
 					et.setText(res.getAddressDetail().city);
 					Main.s.put("city", res.getAddressDetail().city);
 				}
-				
+
 			});
 			ss.reverseGeoCode(new ReverseGeoCodeOption().location(ll));
 			createMyOverlay();
@@ -518,32 +544,37 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			Main.s.put("last-location-x", ll.latitude);
 			Main.s.put("last-location-y", ll.longitude);
 		}
+
 		public void onReceivePoi(BDLocation poiLocation) {
 			if (poiLocation == null) {
 				return;
 			}
 		}
 	}
+
 	public class MyOverlay extends OverlayManager {
 		private List<OverlayOptions> loo;
+
 		public MyOverlay(BaiduMap arg0) {
 			super(arg0);
 			loo = new ArrayList<OverlayOptions>();
 			// TODO Auto-generated constructor stub
 		}
-		public void add(OverlayOptions oo){
+
+		public void add(OverlayOptions oo) {
 			loo.add(oo);
 		}
-		
-		public void clear(){
+
+		public void clear() {
 			loo.clear();
 		}
-		
+
 		@Override
 		public boolean onMarkerClick(Marker m) {
 			// TODO Auto-generated method stub
 			if (m.getTitle().equals("here")) {
-				Toast.makeText(MapActivity.this, "我在这里", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MapActivity.this, "我在这里", Toast.LENGTH_SHORT)
+						.show();
 				return true;
 			}
 			index = Integer.parseInt(m.getTitle());
@@ -565,7 +596,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 					// TODO Auto-generated method stub
 					Intent intent = new Intent(MapActivity.this,
 							ShowImageActivity.class);
-					intent.putExtra("image",mPicSet.get(index).get(arg2));
+					intent.putExtra("image", mPicSet.get(index).get(arg2));
 					startActivity(intent);
 				}
 
@@ -578,13 +609,15 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 			// TODO Auto-generated method stub
 			return loo;
 		}
-		
-		public OverlayOptions getOverlayOption(int index){
+
+		public OverlayOptions getOverlayOption(int index) {
 			return loo.get(index);
 		}
-		
-		public void setOverlayOption(int index, OverlayOptions oo){
-			if (index >= loo.size()) loo.add(oo); else
+
+		public void setOverlayOption(int index, OverlayOptions oo) {
+			if (index >= loo.size())
+				loo.add(oo);
+			else
 				loo.set(index, oo);
 		}
 	}
@@ -604,19 +637,18 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				int lid = R.layout.map_tap_image_show_image;
 				holder = new SquareLayout(MapActivity.this);
 				convertView = mInflater.inflate(lid, null);
-				holder = (SquareLayout) convertView
-						.findViewById(R.id.square);
+				holder = (SquareLayout) convertView.findViewById(R.id.square);
 				convertView.setTag(holder);
 			} else {
 				holder = (SquareLayout) convertView.getTag();
 			}
-			ImageView iv = (ImageView)holder.findViewById(R.id.image);
+			ImageView iv = (ImageView) holder.findViewById(R.id.image);
 			iv.setImageBitmap(null);
 			int id = mPicSet.get(index).get(position);
 			String key = DataGainUtil.generateKey(id, DataGainUtil.SMALL);
 			DataGainUtil.getDataGain().getDataForImageView(id, iv, key);
-			ScaleAnimation a = new ScaleAnimation(0.9f, 1f,
-					0.9f, 1f, Animation.RELATIVE_TO_SELF, 0.5f,
+			ScaleAnimation a = new ScaleAnimation(0.9f, 1f, 0.9f, 1f,
+					Animation.RELATIVE_TO_SELF, 0.5f,
 					Animation.RELATIVE_TO_SELF, 0.5f);
 			a.setDuration(400);
 			holder.setAnimation(a);
@@ -687,18 +719,17 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 	public void onGetPoiDetailResult(PoiDetailResult result) {
 		// TODO Auto-generated method stub
 		if (result.error != SearchResult.ERRORNO.NO_ERROR) {
-			Toast.makeText(MapActivity.this, "加载完成", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(MapActivity.this, "加载完成", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(MapActivity.this, "网络错误", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(MapActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
 		}
 	}
 
 	@Override
 	public void onGetPoiResult(PoiResult result) {
 		// TODO Auto-generated method stub
-		if (poiOverlay!=null)poiOverlay.removeFromMap();
+		if (poiOverlay != null)
+			poiOverlay.removeFromMap();
 		if (result == null
 				|| result.error == SearchResult.ERRORNO.RESULT_NOT_FOUND) {
 			Toast.makeText(this, "没有找到内容", Toast.LENGTH_SHORT);
@@ -720,8 +751,7 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 				strInfo += ",";
 			}
 			strInfo += "找到相关内容";
-			Toast.makeText(MapActivity.this, strInfo, Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(MapActivity.this, strInfo, Toast.LENGTH_LONG).show();
 		}
 
 	}
@@ -739,5 +769,5 @@ public class MapActivity extends Activity implements OnGetPoiSearchResultListene
 		}
 		sugAdapter.notifyDataSetChanged();
 	}
-	
+
 }

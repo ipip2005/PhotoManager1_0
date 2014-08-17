@@ -58,7 +58,7 @@ public class DataGain {
 	/**
 	 * @param contentResolver
 	 * @param context
-	 * @param handler
+	 * @param handle 
 	 */
 	public DataGain(Context context, Handler handler) {
 		// TODO Auto-generated constructor stub
