@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import utils.DataGainUtil;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.photomagner.widgets.JazzyViewPager;
 import com.photomagner.widgets.JazzyViewPager.TransitionEffect;
 import com.polites.android.GestureImageView;
@@ -17,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
@@ -43,10 +46,10 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * 
@@ -66,21 +69,20 @@ public class ShowImageActivity extends Activity {
 	private Animation anim_s;
 	private Button b;
 	private float px = 0, py = 0;
-	private Handler mHandler;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.image_show);
 		id = getIntent().getIntExtra("image", -1);
-		n = TimelineActivity.PicInfoList.size();
+		n = DataGainUtil.getDataGain().getPicInfoList().size();
 		
 		InitViewPager();
 		ll = (LinearLayout) findViewById(R.id.ivImageCover);
 		ll.bringToFront();
 		b = (Button) findViewById(R.id.ivBackButton);
 		b.setText(" < 相册(" + (id + 1) + "/"
-				+ TimelineActivity.PicInfoList.size() + ")");
+				+ DataGainUtil.getDataGain().getPicInfoList().size() + ")");
 		b.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -126,7 +128,7 @@ public class ShowImageActivity extends Activity {
 				// TODO Auto-generated method stub
 				id = index;
 				b.setText(" < 相册(" + (id + 1) + "/"
-						+ TimelineActivity.PicInfoList.size() + ")");
+						+ DataGainUtil.getDataGain().getPicInfoList().size() + ")");
 			}
 			
 		});
@@ -227,16 +229,12 @@ public class ShowImageActivity extends Activity {
 		});
 	}
 
-	private int last_id(int id) {
-		return (id + n - 1) % n;
-	}
-
 	private int next_id(int id) {
 		return (id + 1) % n;
 	}
 
 
-	/*
+	/**
 	 * when click 'info' button, invoke this
 	 */
 	public void listInfomation(View v) {
@@ -259,7 +257,19 @@ public class ShowImageActivity extends Activity {
 
 		mDialog.show();
 	}
-
+	/**
+	 * when click 'panorama' button, invoke this
+	 */
+	public void panorama(View v){
+		if (DataGainUtil.getDataGain().getPicInfoList().get(id).pl == null) {
+			Toast.makeText(this, "该图片没有坐标，无法显示全景图", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		DataGainUtil.getDataGain().requirePoiDataAndWrite(id);
+		Intent intent = new Intent(ShowImageActivity.this, PanoramaActivity.class);
+		intent.putExtra("index", id);
+		startActivity(intent);
+	}
 	/*
 	 * invoke in cycles, show next picture
 	 */
@@ -293,7 +303,7 @@ public class ShowImageActivity extends Activity {
 
 	@SuppressLint("InlinedApi")
 	private ArrayList<String> getPicInfo() {
-		fileRoute = TimelineActivity.PicInfoList.get(id).fileRoute;
+		fileRoute = DataGainUtil.getDataGain().getPicInfoList().get(id).fileRoute;
 		ArrayList<String> info = new ArrayList<String>();
 		ExifInterface et = null;
 		try {
@@ -332,16 +342,16 @@ public class ShowImageActivity extends Activity {
 		BitmapFactory.Options op = new BitmapFactory.Options();
 		op.inJustDecodeBounds = true;
 		op.inSampleSize = 1;
-		BitmapFactory.decodeFile(TimelineActivity.PicInfoList.get(id).fileRoute, op);
+		BitmapFactory.decodeFile(DataGainUtil.getDataGain().getPicInfoList().get(id).fileRoute, op);
 		info.add("文件大小: " + strSize + "(" + fileSize + "Byte)");
 		info.add("宽高: " + op.outWidth + "*" + op.outHeight);
 		if (et.getAttribute(ExifInterface.TAG_DATETIME) != null)
 			info.add("拍摄日期: "
 					+ et.getAttribute(ExifInterface.TAG_DATETIME)
 							.replaceFirst(":", "/").replaceFirst(":", "/"));
-		if (TimelineActivity.PicInfoList.get(id).pl != null)
-			info.add("经纬度: " + TimelineActivity.PicInfoList.get(id).pl.latitude
-					+ "," + TimelineActivity.PicInfoList.get(id).pl.longitude);
+		if (DataGainUtil.getDataGain().getPicInfoList().get(id).pl != null)
+			info.add("经纬度: " + DataGainUtil.getDataGain().getPicInfoList().get(id).pl.longitude
+					+ "," + DataGainUtil.getDataGain().getPicInfoList().get(id).pl.latitude);
 		if (et.getAttribute(ExifInterface.TAG_APERTURE) != null)
 			info.add("光圈值: " + et.getAttribute(ExifInterface.TAG_APERTURE));
 		if (et.getAttribute(ExifInterface.TAG_MAKE) != null)
@@ -417,10 +427,9 @@ public class ShowImageActivity extends Activity {
 	private void deleteThisImage(){
 		ImageView iv = (ImageView)(mAdapter.getCurrentView());
 		iv.clearAnimation();
-		Animation a = new AlphaAnimation(1.0f, 0f);
-		final int anim_time = 1500;
-		a.setDuration(anim_time);
-		iv.startAnimation(a);
+		
+		YoYo.with(Techniques.Flash).duration(1000).playOn(iv);
+		YoYo.with(Techniques.TakingOff).duration(700).delay(1100).playOn(iv);
 		
 		new Handler().postDelayed(new Runnable(){
 
@@ -428,19 +437,19 @@ public class ShowImageActivity extends Activity {
 			public void run() {
 				// TODO Auto-generated method stub
 				DataGainUtil.getDataGain().delData(id);
-				if (TimelineActivity.PicInfoList.size() == 0) ShowImageActivity.this.finish();
+				if (DataGainUtil.getDataGain().getPicInfoList().size() == 0) ShowImageActivity.this.finish();
 				mViewPager.setCurrentItem(id);
 				b.setText(" < 相册(" + (id + 1) + "/"
-						+ TimelineActivity.PicInfoList.size() + ")");
+						+ DataGainUtil.getDataGain().getPicInfoList().size() + ")");
 				mAdapter.notifyDataSetChanged();
 				Animation b = new AlphaAnimation(0f, 1f);
 				b.setDuration(1000);
 				mViewPager.clearAnimation();
 				mViewPager.startAnimation(b);
+				Toast.makeText(ShowImageActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
 			}
 			
-		}, anim_time);
-		
+		}, 1800);
 	}
 	public void delImage(View v){
 		Dialog dialog = new AlertDialog.Builder(this).setTitle("删除图片")

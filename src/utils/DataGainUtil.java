@@ -1,6 +1,5 @@
 package utils;
 
-import com.photomanager.main.TimelineActivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -50,12 +49,16 @@ public class DataGainUtil {
 	 * @return	一个String表示生成的key
 	 */
 	public static String generateKey(int id, int type){
-		if (id >= TimelineActivity.PicInfoList.size()) return null;
-		return "" + TimelineActivity.PicInfoList.get(id).id + type;
+		if (id >= dataGain.getPicInfoList().size()) return null;
+		return "" + dataGain.getPicInfoList().get(id).id + type;
 	}
+	/**
+	 * 根据屏幕密度，获取该应用标准正方形格子的长度，用于在各个布局中规范图片的尺寸。
+	 * @return
+	 */
 	public static int getStandarLength(){
 		DisplayMetrics dm = new DisplayMetrics();
-		((Activity)mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
+		((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
 		return (int)(dm.density * 100);
 	}
 }

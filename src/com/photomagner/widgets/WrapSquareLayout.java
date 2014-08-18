@@ -2,8 +2,6 @@ package com.photomagner.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.View.MeasureSpec;
 import android.widget.RelativeLayout;
 
 public class WrapSquareLayout extends RelativeLayout {

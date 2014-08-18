@@ -11,25 +11,18 @@ import utils.ViewHolder;
 import com.photomagner.widgets.MyRecyclerGallery;
 import com.photomanager.adapters.MyRecyclerGalleryAdapter;
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ItemAnimator;
-import android.text.Layout;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AlphaAnimation;
@@ -39,8 +32,6 @@ import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -49,7 +40,6 @@ import android.widget.TextView;
  * @author ipip 2014年7月16日下午2:50:04
  */
 public class TimelineActivity extends Activity implements OnItemClickListener {
-	static public ArrayList<PicInfo> PicInfoList;
 	private DataGain dg;
 	private PictureAdapter mAdapter;
 	private MyListView listView = null;
@@ -67,7 +57,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 	// The Animation for listView.
 	private Animation myLayoutAnimation, myAnimation, myAnimationB;
 	private LayoutAnimationController lac;
-	public static Calendar lastClickImage = Calendar.getInstance();
 
 	@SuppressLint("HandlerLeak")
 	@Override
@@ -80,14 +69,15 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		rl.addView(listView);
 		mAdapter = new PictureAdapter(this);
 		listView.setAdapter(mAdapter);
-		listView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		listView.setLayoutParams(new RelativeLayout.LayoutParams(
+				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		listView.setOnItemClickListener(this);
 		myLayoutAnimation = new AlphaAnimation(0.8f, 1.0f);
 		myLayoutAnimation.setDuration(500);
 		lac = new LayoutAnimationController(myLayoutAnimation);
 		lac.setDelay(0.1f);
 		listView.setLayoutAnimation(lac);
-
+		listView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
 		myAnimation = new ScaleAnimation(0.3f, 1.1f, 0.3f, 1.1f,
 				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
 				0.5f);
@@ -99,14 +89,12 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		myAnimationB.setDuration(400);
 	}
 
-	/*
+	/**
 	 * pre-processing initialize DataGain.class and set callback for loading
 	 * bitmaps.
 	 */
 	private void preData() {
-		lastClickImage.setTimeInMillis(0);
 		dg = DataGainUtil.getDataGainInstance(this, handler);
-		PicInfoList = dg.getPicInfoList();
 		granularity = 2;
 		mSet = dg.getSet(granularity);
 	}
@@ -139,7 +127,6 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			// TODO Auto-generated method stub
-			Log.i("getView", ""+position);
 			ViewHolder holder;
 			if (convertView == null) {
 				int lid;
@@ -157,8 +144,10 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			holder.view.setAdapter(new MyRecyclerGalleryAdapter(TimelineActivity.this, mSet.get(position)));
-			LinearLayoutManager llm = new LinearLayoutManager(TimelineActivity.this);
+			holder.view.setAdapter(new MyRecyclerGalleryAdapter(
+					TimelineActivity.this, mSet.get(position)));
+			LinearLayoutManager llm = new LinearLayoutManager(
+					TimelineActivity.this);
 			llm.setOrientation(LinearLayoutManager.HORIZONTAL);
 			holder.view.setLayoutManager(llm);
 			String openFlag = "";
@@ -169,24 +158,36 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			return convertView;
 		}
 	}
-	private String addZero(int i){
-		
-		if (i < 10) return "0" + i;
+	/**
+	 * adding spre-zero for numbers in calender.
+	 * @param i
+	 * @return
+	 */
+	private String addZero(int i) {
+
+		if (i < 10)
+			return "0" + i;
 		return "" + i;
 	}
+
 	private String dealTitle(ArrayList<Integer> list) {
-		String st = PicInfoList.get(list.get(0)).title;
-		String ed = PicInfoList.get(list.get(list.size() - 1)).title;
+		String st = DataGainUtil.getDataGain().getPicInfoList()
+				.get(list.get(0)).title;
+		String ed = DataGainUtil.getDataGain().getPicInfoList()
+				.get(list.get(list.size() - 1)).title;
 		String ret = st;
-		Calendar c = PicInfoList.get(list.get(0)).mdate;
+		Calendar c = DataGainUtil.getDataGain().getPicInfoList()
+				.get(list.get(0)).mdate;
 		if (list.size() == 1) {
 			ret += " " + addZero(c.get(Calendar.HOUR_OF_DAY)) + ":"
 					+ addZero(c.get(Calendar.MINUTE));
 			return ret;
 		}
-		if (!st.equals(ed)) ret = ed + "-" + st;
-		if (granularity == 4){
-			if (c.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)){
+		if (!st.equals(ed))
+			ret = ed + "-" + st;
+		if (granularity == 4) {
+			if (c.get(Calendar.YEAR) == Calendar.getInstance().get(
+					Calendar.YEAR)) {
 				ret = "今年 " + ret;
 			} else
 				ret = c.get(Calendar.YEAR) + "年 " + ret;
@@ -249,15 +250,31 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 
 	/**
 	 * 自定义listview 用于事件分发的处理。
-	 * @author ipip
-	 *  2014年8月4日上午10:46:53
+	 * 
+	 * @author ipip 2014年8月4日上午10:46:53
 	 */
 	private class MyListView extends ListView {
+		private static final int MAX_OVERSCROLL_DISTANCE = 100;
+		private int mMaxOverScrollDistance;
+
 		public MyListView(Context context) {
 			super(context);
-			this.setDivider(null);
+			init();
 			// TODO Auto-generated constructor stub
 		}
+
+		public MyListView(Context context, AttributeSet attrs) {
+			super(context, attrs);
+			init();
+		}
+
+		private void init() {
+			this.setDivider(null);
+			final DisplayMetrics dm = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(dm);
+			this.mMaxOverScrollDistance = (int) (dm.density * MAX_OVERSCROLL_DISTANCE);
+		}
+
 		/**
 		 * 处理listView的触摸事件
 		 */
@@ -275,6 +292,17 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				if (ev.getPointerCount() == 2 && ndst < dst) {
 					upGranularity();
 					dst = -1;
+				} else if (ev.getPointerCount() == 2 && ndst > dst) {
+					int st = listView.getFirstVisiblePosition();
+					int ed = listView.getLastVisiblePosition();
+					for (int i = (st + ed) / 2, j = 1, k = 1; i <= ed
+							&& i >= st; i = i + j * k, j++, k = -k) {
+						if (mSet.get(i).size() > 1){
+							downGranularity(i);
+							break;
+						}
+					}
+					dst = -1;
 				}
 				break;
 
@@ -288,6 +316,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 				return true;
 			return super.onTouchEvent(ev);
 		}
+
 		/**
 		 * 
 		 */
@@ -298,12 +327,22 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			}
 			return super.dispatchTouchEvent(ev);
 		}
+
+		@Override
+		protected boolean overScrollBy(int deltaX, int deltaY, int scrollX,
+				int scrollY, int scrollRangeX, int scrollRangeY,
+				int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+			return super.overScrollBy(deltaX, deltaY, scrollX, scrollY,
+					scrollRangeX, scrollRangeY, maxOverScrollX,
+					mMaxOverScrollDistance, isTouchEvent);
+		}
 	}
+
 	@Override
-	public void onResume(){
+	public void onResume() {
 		if (dg != null)
 			mSet = dg.getSet(granularity);
 		super.onResume();
-		//PicInfoList = dg.getPicInfoList();
+		// PicInfoList = dg.getPicInfoList();
 	}
 }

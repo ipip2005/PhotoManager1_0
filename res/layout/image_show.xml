@@ -53,7 +53,7 @@
     	   		    android:layout_width="50dip"
     	   		    android:layout_height="50dip"
     	   		    android:onClick="delImage"
-    	   		    android:padding="0dip"
+    	   		    android:layout_marginEnd="3dip"
     	   		    android:background="@drawable/discard_style"
     	   		    />
     	    </LinearLayout>
@@ -79,6 +79,28 @@
     	            android:background="@drawable/btn_bg"
     	            android:text="详细信息"
     	            android:onClick="listInfomation"
+    	            />
+    	        <Button
+    	            android:layout_width="wrap_content"
+    	            android:layout_height="wrap_content"
+    	            android:id="@+id/ivPanoramaButton"
+    	            android:padding="10dip"
+    	            android:textSize="@dimen/image_back_font_size"
+    	            android:textColor="#ffffffff"
+    	            android:background="@drawable/btn_bg"
+    	            android:text="全景图"
+    	            android:onClick="panorama"
+    	            />
+    	        <Button
+    	            android:layout_width="wrap_content"
+    	            android:layout_height="wrap_content"
+    	            android:id="@+id/ivSlide"
+    	            android:padding="10dip"
+    	            android:textSize="@dimen/image_back_font_size"
+    	            android:textColor="#ffffffff"
+    	            android:background="@drawable/btn_bg"
+    	            android:text="幻灯片"
+    	            android:onClick="slidePictures"
     	            />
     	        <!--Button
     	            android:layout_width="wrap_content"

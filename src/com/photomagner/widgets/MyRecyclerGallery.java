@@ -4,22 +4,28 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-public class MyRecyclerGallery extends RecyclerView{
+
+public class MyRecyclerGallery extends RecyclerView {
 
 	public MyRecyclerGallery(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 	}
+
 	public MyRecyclerGallery(Context context, AttributeSet attr) {
 		super(context, attr);
 		// TODO Auto-generated constructor stub
 	}
+
+
+
 	private float xDown;
 	private float xMove;
 	private float yDown;
 	private float yMove;
 	private boolean viewPagerScrolling = false;
 	private boolean fatherScrolling = false;
+
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		if (this.getChildCount() < 4)
@@ -49,7 +55,8 @@ public class MyRecyclerGallery extends RecyclerView{
 			if (viewPagerScrolling) {
 				return super.dispatchTouchEvent(ev);
 			}
-			float dx = Math.abs(xMove - xDown), dy = Math.abs(yMove - yDown);
+			float dx = Math.abs(xMove - xDown),
+			dy = Math.abs(yMove - yDown);
 			if (dx > 3 && dx > dy && this.getChildCount() >= 4) {
 				this.getParent().requestDisallowInterceptTouchEvent(true);
 				viewPagerScrolling = true;
@@ -66,4 +73,6 @@ public class MyRecyclerGallery extends RecyclerView{
 		}
 		return super.dispatchTouchEvent(ev);
 	}
+
+
 }

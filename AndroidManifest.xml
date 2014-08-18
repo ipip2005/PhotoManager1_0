@@ -5,8 +5,25 @@
     android:versionName="1.0" >
 	
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="9"
         android:targetSdkVersion="20" />
+    <permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
+    </permission>
+
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" >
+    </uses-permission>
+    <!-- <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"></uses-permission> -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.GET_TASKS" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />  
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -22,11 +39,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:name="com.photomanager.main.BasicApplication"
-        android:logo="@drawable/ic_launcher" 
         android:theme="@style/AppBaseTheme">"
         	<meta-data
        	      android:name="com.baidu.lbsapi.API_KEY"
-       	      android:value="WkCgNIE0qaT6du7j72Doe7n2"/>
+       	      android:value="VLYYUAuWBBlmNKXIqSAVHWkg"/>
         <service 
             android:name="com.baidu.location.f"
             android:enabled="true"
@@ -67,6 +83,11 @@
         <activity
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:name="com.photomanager.main.ShowImageActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:name="com.photomanager.main.PanoramaActivity"
             android:label="@string/app_name" >
         </activity>
     </application>

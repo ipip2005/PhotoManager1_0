@@ -1,12 +1,17 @@
 package com.photomanager.main;
 
+import java.io.File;
 import java.util.Calendar;
 
+import utils.DataGainUtil;
 import utils.Settings;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -27,7 +32,7 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 	private RadioGroup mGroup;
 	private Intent iTimeline,iMap,iTag;
 	private Calendar lastBack;
-	public static Settings s;
+	public Settings s;
 	@Override 
 	public boolean dispatchKeyEvent(KeyEvent event){
 		if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK){
@@ -51,9 +56,6 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 		case R.id.hostbutton_timeline:
 			tHost.setCurrentTabByTag("iTimeline");
 			break;
-		/*case R.id.hostbutton_place:
-			tHost.setCurrentTabByTag("iPlace");
-			break;*/
 		case R.id.hostbutton_map:
 			tHost.setCurrentTabByTag("iMap");
 			break;
@@ -69,7 +71,7 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
 		Log.i("Main", "new Settings()");
-		s = new Settings(this);
+		s = Settings.getInstance(this);
 		setTabHost();
 	}
 	@Override
@@ -96,4 +98,23 @@ public class Main extends TabActivity implements OnCheckedChangeListener{
 				.setContent(iTag));
 		
 	}
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+    	{
+    	        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    	        File f = new File("file://"+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
+    	        Uri contentUri = Uri.fromFile(f);
+    	        mediaScanIntent.setData(contentUri);
+    	        this.sendBroadcast(mediaScanIntent);
+    	}
+    	else
+    	{
+    	       sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+    	} 
+    	if (DataGainUtil.getDataGain() != null){
+    		DataGainUtil.getDataGain().preData();
+    	}
+    }
 }

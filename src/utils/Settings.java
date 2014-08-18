@@ -16,8 +16,9 @@ import android.util.Log;
 public class Settings {
 	private SettingsMap settings;
 	private Context context;
+	private static Settings mInstance;
 	private static final String filename = "settings.s";
-	public Settings(Context context){
+	protected Settings(Context context){
 		this.context = context;
 		settings = new SettingsMap();
 		if (!load()){
@@ -26,6 +27,15 @@ public class Settings {
 		}
 		Log.i("Settings", ""+(String)settings.get("first-create"));
 	}
+	public static Settings getInstance(Context context){
+		if (mInstance == null) 
+			mInstance = new Settings(context);
+		return mInstance;
+	}
+	public static Settings getInstance(){
+		return mInstance;
+	}
+	@SuppressWarnings("unused")
 	private void clear(){
 		context.deleteFile(filename);
 	}

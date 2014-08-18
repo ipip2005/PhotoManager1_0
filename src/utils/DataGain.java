@@ -1,6 +1,5 @@
 package utils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -62,14 +61,22 @@ public class DataGain {
 	 */
 	public DataGain(Context context, Handler handler) {
 		// TODO Auto-generated constructor stub
-		cr = context.getContentResolver();
-		cursor = cr.query(MediaUri,STORE_IMAGES, null, null, ""
-						+ MediaStore.Images.Media.DATE_TAKEN + " DESC");
-		mContext = context;
 		mHandler = handler;
+		mContext = context;
+		preData();
+	}
+
+	/**
+	 * preData()
+	 * 准备需要的数据
+	 */
+	public void preData() {
+		cr = mContext.getContentResolver();
+		cursor = cr.query(MediaUri,STORE_IMAGES, null, null, ""
+						+ MediaStore.Images.Media.DATE_TAKEN + " DESC");	
 		n = cursor.getCount();
 		gotPoi = new boolean[n];
-		preData();
+		
 		int maxMemory = (int) (Runtime.getRuntime().maxMemory());
 		int cacheSize = maxMemory / 4;
 		cache = new LruCache<String, Bitmap>(cacheSize) {
@@ -78,14 +85,6 @@ public class DataGain {
 				return value.getRowBytes() * value.getHeight();
 			};
 		};
-	}
-
-	@SuppressLint("SimpleDateFormat")
-	/**
-	 * preData()
-	 * 准备需要的数据
-	 */
-	private void preData() {
 		mPicInfoList = new ArrayList<PicInfo>();
 		cursor.moveToFirst();
 		do {
@@ -129,17 +128,10 @@ public class DataGain {
 			p = ps.searchEndAt();
 			mSet2.add(ps.getArrayList());
 		}
-		int st = 0;
 		boolean temp[] = new boolean[n];
 		for (int i = 0; i < mSet2.size(); i++) {
 			temp[mSet2.get(i).get(0)] = true;
-			st++;
 		}
-		for (int i = 0; i < n; i++)
-			if (!temp[i]) {
-				st++;
-			}
-
 		p = 0;
 		while (p < n) {
 			Calendar ed = (Calendar) mPicInfoList.get(p).mdate.clone();
@@ -404,6 +396,7 @@ public class DataGain {
 			});
 	}
 	public void requirePoiDataAndWrite(int i) {
+		if (mPicInfoList.get(i).poiConverted)return; 
 		LatLng sourceLatLng = mPicInfoList.get(i).pl;
 		CoordinateConverter converter = new CoordinateConverter();
 		converter.from(CoordType.GPS);
@@ -411,6 +404,7 @@ public class DataGain {
 		converter.coord(sourceLatLng);
 		LatLng desLatLng = converter.convert();
 		mPicInfoList.get(i).pl = desLatLng;
+		mPicInfoList.get(i).poiConverted = true;
 	}
 
 	public void checkAllPoiData() {

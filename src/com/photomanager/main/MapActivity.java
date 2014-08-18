@@ -5,6 +5,7 @@ import java.util.List;
 
 import utils.DataGainUtil;
 import utils.PicInfo;
+import utils.Settings;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -19,11 +20,9 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.MyLocationConfigeration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener;
-import com.baidu.mapapi.map.MyLocationConfigeration.LocationMode;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.overlayutil.OverlayManager;
@@ -104,7 +103,6 @@ public class MapActivity extends Activity implements
 	private AutoCompleteTextView keyWorldsView = null;
 	private ArrayAdapter<String> sugAdapter = null;
 	private int load_index, index;
-	private ArrayList<PicInfo> PicInfoList = TimelineActivity.PicInfoList;
 	private ArrayList<Integer> mSet;
 	// private MyOverlay mOverlay;
 	private ImageDialog mDialog;
@@ -119,6 +117,7 @@ public class MapActivity extends Activity implements
 	private int addCount = 0, markerLength = 0;
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
+			@SuppressWarnings("unchecked")
 			Pair<Integer, Integer> p = (Pair<Integer, Integer>) msg.obj;
 			if (p.first.intValue() != addCount)
 				return;
@@ -180,8 +179,9 @@ public class MapActivity extends Activity implements
 
 	private void initComponents() {
 		EditText et = (EditText) findViewById(R.id.city);
-		if (Main.s.get("city") != null)
-			et.setText((String) Main.s.get("city"));
+		Settings s = Settings.getInstance();
+		if (s.get("city") != null)
+			et.setText((String) s.get("city"));
 		et.setSelectAllOnFocus(true);
 	}
 
@@ -228,12 +228,12 @@ public class MapActivity extends Activity implements
 		pics = new MyOverlay(mBaiduMap);
 		mBaiduMap.setOnMarkerClickListener(pics);
 		// Log.i("MapActivity", "last_"+Main.s.get("last-location-x"));
-
-		if ((Main.s.get("last-location-x")) != null) {
+		Settings s = Settings.getInstance();
+		if ((s.get("last-location-x")) != null) {
 			mBaiduMap
 					.setMapStatus(MapStatusUpdateFactory.newLatLng(new LatLng(
-							Double.parseDouble(Main.s.get("last-location-x")
-									.toString()), Double.parseDouble(Main.s
+							Double.parseDouble(s.get("last-location-x")
+									.toString()), Double.parseDouble(s
 									.get("last-location-y").toString()))));
 		}
 	}
@@ -259,7 +259,7 @@ public class MapActivity extends Activity implements
 		// "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
 		LatLngBounds.Builder builder = new LatLngBounds.Builder();
 		for (int i = 0; i < mSet.size(); i++) {
-			PicInfo info = PicInfoList.get(mSet.get(i));
+			PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(mSet.get(i));
 			builder.include(info.pl);
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
@@ -269,7 +269,7 @@ public class MapActivity extends Activity implements
 			boolean side = false;
 			for (int j = 0; j < mPicSet.size(); j++) {
 				ArrayList<Integer> p = mPicSet.get(j);
-				PicInfo infoP = PicInfoList.get(p.get(0));
+				PicInfo infoP = DataGainUtil.getDataGain().getPicInfoList().get(p.get(0));
 				Point screenOn1 = new Point();
 				screenOn1 = mBaiduMap.getProjection()
 						.toScreenLocation(infoP.pl);
@@ -349,7 +349,7 @@ public class MapActivity extends Activity implements
 				+ pics.getOverlayOptions().size());
 		cache[i] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null,
 				b).getBitmap());
-		LatLng gp = TimelineActivity.PicInfoList.get(mPicSet.get(i).get(0)).pl;
+		LatLng gp = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(i).get(0)).pl;
 		pics.setOverlayOption(i, new MarkerOptions().position(gp)
 				.icon(cache[i]).zIndex(-1).title(String.valueOf(i)));
 		Log.i("MapActivity", "i -----" + (b == null) + " "
@@ -374,9 +374,6 @@ public class MapActivity extends Activity implements
 
 	private void setLocationManager() {
 		mLocClient = new LocationClient(getApplicationContext());
-		LocationMode mCurrentMode = LocationMode.NORMAL;
-		mBaiduMap.setMyLocationConfigeration(new MyLocationConfigeration(
-				mCurrentMode, false, null));
 		mLocClient.registerLocationListener(myListener);
 		LocationClientOption option = new LocationClientOption();
 		option.setOpenGps(true);
@@ -533,7 +530,7 @@ public class MapActivity extends Activity implements
 					EditText et = (EditText) MapActivity.this
 							.findViewById(R.id.city);
 					et.setText(res.getAddressDetail().city);
-					Main.s.put("city", res.getAddressDetail().city);
+					Settings.getInstance().put("city", res.getAddressDetail().city);
 				}
 
 			});
@@ -541,8 +538,9 @@ public class MapActivity extends Activity implements
 			createMyOverlay();
 			mBaiduMap.setMyLocationEnabled(false);
 			mLocClient.stop();
-			Main.s.put("last-location-x", ll.latitude);
-			Main.s.put("last-location-y", ll.longitude);
+			Settings s = Settings.getInstance();
+			s.put("last-location-x", ll.latitude);
+			s.put("last-location-y", ll.longitude);
 		}
 
 		public void onReceivePoi(BDLocation poiLocation) {
@@ -582,7 +580,7 @@ public class MapActivity extends Activity implements
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			PicInfo info = PicInfoList.get(mPicSet.get(index).get(0));
+			PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(index).get(0));
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 			mDialog.showDialog(screenOn.x, screenOn.y);
@@ -665,7 +663,7 @@ public class MapActivity extends Activity implements
 		@Override
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
-			return PicInfoList.get(mPicSet.get(index).get(position)).bitmap;
+			return DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(index).get(position)).bitmap;
 		}
 
 		@Override

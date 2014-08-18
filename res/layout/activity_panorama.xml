@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.baidu.lbsapi.panoramaview.PanoramaView
+        android:id="@+id/panorama"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#AA000000"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/panoBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00ffffff"
+            android:paddingBottom="5dip"
+            android:paddingTop="5dip"
+            android:textColor="@drawable/text_color"
+            android:text=" &lt;返回"
+            android:onClick="backToImageShow"
+            android:textSize="@dimen/image_back_font_size" />
+
+        <ImageView
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:background="@null" />
+
+        <Button
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:padding="0dip" />
+    </LinearLayout>
+
+</RelativeLayout>

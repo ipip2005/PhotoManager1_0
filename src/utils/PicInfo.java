@@ -16,4 +16,5 @@ public class PicInfo {
 	public Long id;
 	public String fileRoute;
 	public Uri uri =null;
+	public boolean poiConverted = false;
 }
