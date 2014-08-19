@@ -78,11 +78,11 @@ public class DataGain {
 		gotPoi = new boolean[n];
 		
 		int maxMemory = (int) (Runtime.getRuntime().maxMemory());
-		int cacheSize = maxMemory / 4;
+		int cacheSize = maxMemory / 6;
 		cache = new LruCache<String, Bitmap>(cacheSize) {
 			@Override
 			protected int sizeOf(String key, Bitmap value) {
-				return value.getRowBytes() * value.getHeight();
+				return value.getByteCount();
 			};
 		};
 		mPicInfoList = new ArrayList<PicInfo>();
@@ -182,6 +182,7 @@ public class DataGain {
 			if (bitmap != null)
 				cache.put(key, bitmap);
 		}
+		Log.i("DataGain", "now: "+cache.size()+" "+cache.maxSize());
 	}
 
 	public ArrayList<PicInfo> getPicInfoList() {

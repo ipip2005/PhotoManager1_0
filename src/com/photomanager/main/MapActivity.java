@@ -255,14 +255,13 @@ public class MapActivity extends Activity implements
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		int width = dm.widthPixels, height = dm.heightPixels;
 		markerLength = (int) (Math.min(width, height) * 0.20);
-		// Log.i("photo",
-		// "dm.w: "+dm.widthPixels+" dm.h: "+dm.heightPixels+" dm.d"+dm.density);
 		LatLngBounds.Builder builder = new LatLngBounds.Builder();
 		for (int i = 0; i < mSet.size(); i++) {
 			PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(mSet.get(i));
 			builder.include(info.pl);
 			Point screenOn = new Point();
 			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
+			//Log.i("MapActivity", " screen: "+screenOn.x+" "+screenOn.y+"  "+width+" "+height);
 			if (screenOn.x < 0 || screenOn.y < 0 || screenOn.x > width
 					|| screenOn.y > height)
 				continue;
@@ -273,8 +272,8 @@ public class MapActivity extends Activity implements
 				Point screenOn1 = new Point();
 				screenOn1 = mBaiduMap.getProjection()
 						.toScreenLocation(infoP.pl);
-				if (Math.abs(screenOn.x - screenOn1.x) < 200
-						&& Math.abs(screenOn.y - screenOn1.y) < 200) {
+				if (Math.abs(screenOn.x - screenOn1.x) < markerLength
+						&& Math.abs(screenOn.y - screenOn1.y) < markerLength) {
 					p.add(mSet.get(i));
 					side = true;
 					break;
@@ -308,7 +307,7 @@ public class MapActivity extends Activity implements
 	}
 
 	private void refreshOverlayMarker(int set_id) {
-		Log.i("MapActivty", "refresh");
+		//Log.i("MapActivty", "refresh");
 		int i = set_id;
 		Bitmap[] bitmaps = new Bitmap[3];
 		int m = 3;
@@ -345,15 +344,15 @@ public class MapActivity extends Activity implements
 			cache[i].recycle();
 			cache[i] = null;
 		}
-		Log.i("MapActivity", "i " + (b == null) + " "
-				+ pics.getOverlayOptions().size());
+		//Log.i("MapActivity", "i " + (b == null) + " "
+		//		+ pics.getOverlayOptions().size());
 		cache[i] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null,
 				b).getBitmap());
 		LatLng gp = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(i).get(0)).pl;
 		pics.setOverlayOption(i, new MarkerOptions().position(gp)
 				.icon(cache[i]).zIndex(-1).title(String.valueOf(i)));
-		Log.i("MapActivity", "i -----" + (b == null) + " "
-				+ pics.getOverlayOptions().size());
+		///Log.i("MapActivity", "i -----" + (b == null) + " "
+		//		+ pics.getOverlayOptions().size());
 		pics.addToMap();
 	}
 

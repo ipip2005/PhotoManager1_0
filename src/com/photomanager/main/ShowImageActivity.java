@@ -69,6 +69,8 @@ public class ShowImageActivity extends Activity {
 	private Animation anim_s;
 	private Button b;
 	private float px = 0, py = 0;
+	private boolean stopped;
+	private ImageView slideImageView;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -196,7 +198,9 @@ public class ShowImageActivity extends Activity {
 
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
-			View view = (View) object;  
+			Log.i("ShowImageActivity", "destroy");
+			View view = (View) object;
+			((ImageView)view).setImageDrawable(null);
             container.removeView(view);  
 		}
 	}
@@ -212,7 +216,8 @@ public class ShowImageActivity extends Activity {
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				// TODO Auto-generated method stub
-				slideNext();
+				if (!stopped)
+					slideNext();
 			}
 
 			@Override
@@ -283,14 +288,15 @@ public class ShowImageActivity extends Activity {
 	 * set the animation of the picture on sliding
 	 */
 	public void startSlide() {
-		Log.i("photo", "slide");
-		ImageView iv = (ImageView) mViewPager.getChildAt(id);
-		iv.clearAnimation();
-		iv.setAnimation(anim_s);
-		iv.startAnimation(anim_s);
+		slideImageView = (ImageView) mAdapter.getCurrentView();
+		slideImageView.clearAnimation();
+		slideImageView.setAnimation(anim_s);
+		slideImageView.startAnimation(anim_s);
 	}
 
 	public void slidePictures(View v) {
+		stopped = false;
+		ll.setVisibility(View.INVISIBLE);
 		startSlide();
 	}
 
@@ -298,7 +304,9 @@ public class ShowImageActivity extends Activity {
 	 * when the image was clicked, stop sliding
 	 */
 	public void stopSliding() {
-
+		if (slideImageView != null){
+			slideImageView.clearAnimation();
+		}
 	}
 
 	@SuppressLint("InlinedApi")
@@ -521,6 +529,8 @@ public class ShowImageActivity extends Activity {
 				break;
 			case MotionEvent.ACTION_UP:
 				if (Math.abs(px - ev.getX()) < 5 && Math.abs(py - ev.getY()) < 5) {
+					stopped = true;
+					stopSliding();
 					if (ll.getVisibility() == View.VISIBLE)
 						ll.setVisibility(View.INVISIBLE);
 					else

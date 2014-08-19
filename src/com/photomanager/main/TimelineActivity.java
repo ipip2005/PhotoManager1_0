@@ -153,7 +153,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			String openFlag = "";
 			if (mSet.get(position).size() > 1)
 				openFlag = ">>>";
-			holder.title.setText(dealTitle(mSet.get(position)));
+			holder.title.setText(dealTitle(mSet.get(position))+" ("+mSet.get(position).size()+")");
 			holder.text.setText(openFlag);
 			return convertView;
 		}
