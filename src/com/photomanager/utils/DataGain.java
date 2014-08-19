@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.mapapi.utils.CoordinateConverter.CoordType;
+import com.baidu.mapapi.utils.DistanceUtil;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -46,11 +49,11 @@ public class DataGain {
 	private ArrayList<PicInfo> mPicInfoList;
 	private ArrayList<ArrayList<Integer>> mSet1, mSet2, mSet3, mSet4;
 	private ArrayList<Integer> mSetWithPlace;
+	private ArrayList<String> text;
 	private static final String[] STORE_IMAGES = {
 			MediaStore.Images.Media.DATE_TAKEN,
 			MediaStore.Images.Media.LATITUDE,
-			MediaStore.Images.Media.LONGITUDE, 
-			MediaStore.Images.Media._ID,
+			MediaStore.Images.Media.LONGITUDE, MediaStore.Images.Media._ID,
 			MediaStore.Images.Media.DATA };
 	private Uri MediaUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 	ExecutorService pool = Executors.newFixedThreadPool(4);
@@ -101,9 +104,10 @@ public class DataGain {
 				info.pl = new LatLng(cursor.getDouble(1), cursor.getDouble(2));
 			info.id = cursor.getLong(3);
 			info.fileRoute = cursor.getString(4);
-			String folder = info.fileRoute.substring(0, info.fileRoute.lastIndexOf('/')-1);
-			info.folderName = folder.substring(folder.lastIndexOf('/')+1);
-			//Log.i("DataGain", info.folderName);
+			String folder = info.fileRoute.substring(0,
+					info.fileRoute.lastIndexOf('/') - 1);
+			info.folderName = folder.substring(folder.lastIndexOf('/') + 1);
+			// Log.i("DataGain", info.folderName);
 			mPicInfoList.add(info);
 		} while (cursor.moveToNext());
 		cursor.close();
@@ -187,7 +191,7 @@ public class DataGain {
 			if (bitmap != null)
 				cache.put(key, bitmap);
 		}
-		//Log.i("DataGain", "now: " + cache.size() + " " + cache.maxSize());
+		// Log.i("DataGain", "now: " + cache.size() + " " + cache.maxSize());
 	}
 
 	public ArrayList<PicInfo> getPicInfoList() {
@@ -196,6 +200,45 @@ public class DataGain {
 
 	public ArrayList<Integer> getSetWithPlace() {
 		return mSetWithPlace;
+	}
+
+	private double calcDist(LatLng a, LatLng b) {
+		return DistanceUtil.getDistance(a, b);
+	}
+
+	public ArrayList<Integer> getSetInOrderDistance(LatLng center, final boolean isRevert) {
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		final ArrayList<Double> dis = new ArrayList<Double>();
+		for (int i = 0; i < mSetWithPlace.size(); i++) {
+			ret.add(i);
+			dis.add(calcDist(center, mPicInfoList.get(mSetWithPlace.get(i)).pl));
+		}
+		Collections.sort(ret, new Comparator<Integer>() {
+
+			@Override
+			public int compare(Integer p, Integer q) {
+				// TODO Auto-generated method stub
+				if (!isRevert)
+					return dis.get(p).compareTo(dis.get(q));
+				else 
+					return dis.get(q).compareTo(dis.get(p));
+			}
+
+		});
+		text = new ArrayList<String>();
+		for (int i = 0; i < ret.size(); i++) {
+			long meter = Math.round(dis.get(ret.get(i)));
+			if (meter >= 10000)
+				text.add("" + meter / 1000 + "km");
+			else
+				text.add("" + meter + "m");
+			ret.set(i, mSetWithPlace.get(ret.get(i)));
+		}
+		return ret;
+	}
+
+	public ArrayList<String> getSetDistanceMeter() {
+		return text;
 	}
 
 	public int getCount() {
@@ -243,7 +286,7 @@ public class DataGain {
 					// TODO Auto-generated method stub
 					if (!iv.getTag().toString().equals(key))
 						return;
-					//Log.i("DataGain", "obtain: " + index);
+					// Log.i("DataGain", "obtain: " + index);
 					int id = index;
 					String filename = key + mPicInfoList.get(id).id + ".thumb";
 					Boolean fileExists = false;

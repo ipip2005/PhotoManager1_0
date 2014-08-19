@@ -5,11 +5,22 @@
     android:layout_height="wrap_content" 
     android:id="@+id/square"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/squareImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:padding="0dip">
     </ImageView>
+    <TextView
+        android:id="@+id/squareText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#77111111"
+        android:textSize="20sp"
+        android:gravity="center"
+        />
+    
 </com.photomanager.widgets.SquareLayout>

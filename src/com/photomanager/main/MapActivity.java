@@ -89,6 +89,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -123,6 +124,7 @@ public class MapActivity extends Activity implements
 	private RadialMenuWidget mainMenu;
 	private LatLng longPressed;
 	private ArrayList<Integer> dialogSet;
+	private ArrayList<String> dialogText = null;
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			@SuppressWarnings("unchecked")
@@ -196,7 +198,7 @@ public class MapActivity extends Activity implements
 	private void initRadialMenu(){
 		mainMenu = new RadialMenuWidget(this);
 		final RadialMenuItem menuItem, menuCloseItem, menuExpandItem;
-		final RadialMenuItem firstChildItem, secondChildItem, thirdChildItem;
+		final RadialMenuItem firstChildItem, secondChildItem, thirdChildItem, forthChildItem;
 		final List<RadialMenuItem> children = new ArrayList<RadialMenuItem>();
 		menuCloseItem = new RadialMenuItem("close", null);
 		menuCloseItem
@@ -222,13 +224,18 @@ public class MapActivity extends Activity implements
 			}
 		});
 		menuExpandItem = new RadialMenuItem("distance_expandable","距离");
-		firstChildItem = new RadialMenuItem("closest", "最近的记录");
+		firstChildItem = new RadialMenuItem("closest", "最近的");
 		firstChildItem
 				.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
 					@Override
 					public void execute() {
 						// Can edit based on preference. Also can add animations
 						// here.
+						dialogSet = new ArrayList<Integer>();
+						dialogSet.add(DataGainUtil.getDataGain().getSetInOrderDistance(longPressed, false).get(0));
+						dialogText = new ArrayList<String>();
+						dialogText.add(DataGainUtil.getDataGain().getSetDistanceMeter().get(0));
+						createDialog();
 						mainMenu.dismiss();
 					}
 				});
@@ -239,26 +246,46 @@ public class MapActivity extends Activity implements
 					public void execute() {
 						// Can edit based on preference. Also can add animations
 						// here.
-						dialogSet = mPicSet.get(0);
+						dialogSet = DataGainUtil.getDataGain().getSetInOrderDistance(longPressed, false);
+						dialogText = DataGainUtil.getDataGain().getSetDistanceMeter();
 						createDialog();
 						mainMenu.dismiss();
 					}
 				});
-		thirdChildItem = new RadialMenuItem("all2", "....");
+		thirdChildItem = new RadialMenuItem("allr", "从远到近");
 		thirdChildItem
 				.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
 					@Override
 					public void execute() {
 						// Can edit based on preference. Also can add animations
 						// here.
+						dialogSet = DataGainUtil.getDataGain().getSetInOrderDistance(longPressed, true);
+						dialogText = DataGainUtil.getDataGain().getSetDistanceMeter();
+						createDialog();
+						mainMenu.dismiss();
+					}
+				});
+		forthChildItem = new RadialMenuItem("all2", "最远的");
+		forthChildItem
+				.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
+					@Override
+					public void execute() {
+						// Can edit based on preference. Also can add animations
+						// here.
+						dialogSet = new ArrayList<Integer>();
+						dialogSet.add(DataGainUtil.getDataGain().getSetInOrderDistance(longPressed, true).get(0));
+						dialogText = new ArrayList<String>();
+						dialogText.add(DataGainUtil.getDataGain().getSetDistanceMeter().get(0));
+						createDialog();
 						mainMenu.dismiss();
 					}
 				});
 		children.add(firstChildItem);
 		children.add(secondChildItem);
 		children.add(thirdChildItem);
+		children.add(forthChildItem);
 		menuExpandItem.setMenuChildren(children);
-		mainMenu.setAnimationSpeed(500L);
+		mainMenu.setAnimationSpeed(0L);
 		mainMenu.setIconSize(15, 30);
 		mainMenu.setTextSize(13);
 		mainMenu.setOutlineColor(Color.BLACK, 225);
@@ -305,9 +332,10 @@ public class MapActivity extends Activity implements
 				// TODO Auto-generated method stub
 				longPressed = arg;
 				Point screenOn = mBaiduMap.getProjection().toScreenLocation(arg);
-				Log.i("MapActivity", "MenuClicked: "+screenOn.x+" "+screenOn.y);
+				initRadialMenu();
 				mainMenu.setCenterLocation(screenOn.x, screenOn.y);
-				mainMenu.show(mMapView);
+				LinearLayout mainLayout = (LinearLayout)findViewById(R.id.mapLinearLayout);
+				mainMenu.show(mainLayout);
 			}
 			
 		});
@@ -659,7 +687,7 @@ public class MapActivity extends Activity implements
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(index).get(0));
+		PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(dialogSet.get(0));
 		Point screenOn = new Point();
 		screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
 		mDialog.showDialog(screenOn.x, screenOn.y);
@@ -673,7 +701,7 @@ public class MapActivity extends Activity implements
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(MapActivity.this,
 						ShowImageActivity.class);
-				intent.putExtra("image", mPicSet.get(index).get(arg2));
+				intent.putExtra("image", dialogSet.get(arg2));
 				startActivity(intent);
 			}
 
@@ -706,6 +734,7 @@ public class MapActivity extends Activity implements
 			}
 			index = Integer.parseInt(m.getTitle());
 			dialogSet = mPicSet.get(index);
+			dialogText = null;
 			createDialog();
 			return true;
 		}
@@ -748,11 +777,19 @@ public class MapActivity extends Activity implements
 			} else {
 				holder = (SquareLayout) convertView.getTag();
 			}
-			ImageView iv = (ImageView) holder.findViewById(R.id.image);
+			ImageView iv = (ImageView) holder.findViewById(R.id.squareImage);
 			iv.setImageBitmap(null);
 			int id = dialogSet.get(position);
 			String key = DataGainUtil.generateKey(id, DataGainUtil.SMALL);
 			DataGainUtil.getDataGain().getDataForImageView(id, iv, key);
+			
+			TextView tv = (TextView) holder.findViewById(R.id.squareText);
+			if (dialogText == null){
+				tv.setVisibility(View.GONE);
+			} else {
+				tv.setVisibility(View.VISIBLE);
+				tv.setText(dialogText.get(position));
+			}
 			ScaleAnimation a = new ScaleAnimation(0.9f, 1f, 0.9f, 1f,
 					Animation.RELATIVE_TO_SELF, 0.5f,
 					Animation.RELATIVE_TO_SELF, 0.5f);
@@ -765,13 +802,13 @@ public class MapActivity extends Activity implements
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
-			return mPicSet.get(index).size();
+			return dialogSet.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
-			return DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(index).get(position)).bitmap;
+			return DataGainUtil.getDataGain().getPicInfoList().get(dialogSet.get(position)).bitmap;
 		}
 
 		@Override
@@ -779,7 +816,6 @@ public class MapActivity extends Activity implements
 			// TODO Auto-generated method stub
 			return position;
 		}
-
 	}
 
 	private class ImageDialog extends Dialog {
