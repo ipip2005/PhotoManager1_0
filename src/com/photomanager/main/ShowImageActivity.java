@@ -5,12 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import utils.DataGainUtil;
 
+import com.baidu.mapapi.model.LatLng;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.photomagner.widgets.JazzyViewPager;
-import com.photomagner.widgets.JazzyViewPager.TransitionEffect;
+import com.photomanager.utils.DataGainUtil;
+import com.photomanager.widgets.JazzyViewPager;
+import com.photomanager.widgets.JazzyViewPager.TransitionEffect;
 import com.polites.android.GestureImageView;
 
 import android.annotation.SuppressLint;
@@ -272,7 +273,9 @@ public class ShowImageActivity extends Activity {
 		}
 		DataGainUtil.getDataGain().requirePoiDataAndWrite(id);
 		Intent intent = new Intent(ShowImageActivity.this, PanoramaActivity.class);
-		intent.putExtra("index", id);
+		LatLng pl = DataGainUtil.getDataGain().getPicInfoList().get(id).pl;
+		intent.putExtra("lontitude", pl.longitude);
+		intent.putExtra("latitude", pl.latitude);
 		startActivity(intent);
 	}
 	/*

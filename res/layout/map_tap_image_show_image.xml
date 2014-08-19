@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.photomagner.widgets.SquareLayout
+<com.photomanager.widgets.SquareLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content" 
     android:id="@+id/square"
@@ -12,4 +12,4 @@
         android:scaleType="centerCrop"
         android:padding="0dip">
     </ImageView>
-</com.photomagner.widgets.SquareLayout>
+</com.photomanager.widgets.SquareLayout>

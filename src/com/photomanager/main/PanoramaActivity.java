@@ -1,17 +1,18 @@
 package com.photomanager.main;
 
-import utils.DataGainUtil;
 
 import com.baidu.lbsapi.BMapManager;
 import com.baidu.lbsapi.panoramaview.PanoramaView;
 import com.baidu.lbsapi.panoramaview.PanoramaViewListener;
 import com.baidu.mapapi.model.LatLng;
+import com.photomanager.utils.DataGainUtil;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 public class PanoramaActivity extends Activity implements PanoramaViewListener{
 	private PanoramaView mPanoramaView;
@@ -33,9 +34,8 @@ public class PanoramaActivity extends Activity implements PanoramaViewListener{
         mPanoramaView.setRotateGestureEnabled(true);
         mPanoramaView.setPanoramaViewListener(this);
         Intent intent = getIntent();
-        int index = intent.getIntExtra("index", -1);
-        LatLng pl = DataGainUtil.getDataGain().getPicInfoList().get(index).pl;
-        mPanoramaView.setPanorama(pl.longitude, pl.latitude);
+        mPanoramaView.setPanorama(intent.getDoubleExtra("longitude", -1), 
+        		intent.getDoubleExtra("latitude", -1));
 	}
 	public void backToImageShow(View v){
 		this.finish();
@@ -73,5 +73,6 @@ public class PanoramaActivity extends Activity implements PanoramaViewListener{
 	@Override
 	public void onLoadPanoramaError() {
 		Log.d("Paro", "loadPanoramaError");
+		Toast.makeText(this, "加载全景图出错,再试一试？",Toast.LENGTH_SHORT).show(); 
 	}
 }

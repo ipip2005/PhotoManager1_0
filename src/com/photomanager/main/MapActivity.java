@@ -3,15 +3,13 @@ package com.photomanager.main;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.DataGainUtil;
-import utils.PicInfo;
-import utils.Settings;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BaiduMap.OnMapLongClickListener;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
@@ -42,8 +40,13 @@ import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
-import com.photomagner.widgets.MyPoiOverlay;
-import com.photomagner.widgets.SquareLayout;
+import com.photomanager.utils.DataGainUtil;
+import com.photomanager.utils.PicInfo;
+import com.photomanager.utils.Settings;
+import com.photomanager.widgets.MyPoiOverlay;
+import com.photomanager.widgets.SquareLayout;
+import com.touchmenotapps.widget.radialmenu.menu.v1.RadialMenuItem;
+import com.touchmenotapps.widget.radialmenu.menu.v1.RadialMenuWidget;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -60,6 +63,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -67,6 +71,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
@@ -115,6 +120,9 @@ public class MapActivity extends Activity implements
 	private MyPoiOverlay poiOverlay;
 	private LatLngBounds llb;
 	private int addCount = 0, markerLength = 0;
+	private RadialMenuWidget mainMenu;
+	private LatLng longPressed;
+	private ArrayList<Integer> dialogSet;
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			@SuppressWarnings("unchecked")
@@ -127,10 +135,18 @@ public class MapActivity extends Activity implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		initComponents();
+		
+	}
+
+	private void initComponents() {
+		EditText et = (EditText) findViewById(R.id.city);
+		Settings s = Settings.getInstance();
+		if (s.get("city") != null)
+			et.setText((String) s.get("city"));
+		et.setSelectAllOnFocus(true);
 		mMapView = (MapView) findViewById(R.id.bmapView);
 		mMapView.removeViewAt(2);
 		mMapView.removeViewAt(1);
@@ -175,16 +191,93 @@ public class MapActivity extends Activity implements
 		});
 		setLocationManager();
 		resetCenterPoint(null);
+		initRadialMenu();
 	}
+	private void initRadialMenu(){
+		mainMenu = new RadialMenuWidget(this);
+		final RadialMenuItem menuItem, menuCloseItem, menuExpandItem;
+		final RadialMenuItem firstChildItem, secondChildItem, thirdChildItem;
+		final List<RadialMenuItem> children = new ArrayList<RadialMenuItem>();
+		menuCloseItem = new RadialMenuItem("close", null);
+		menuCloseItem
+				.setDisplayIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menuCloseItem
+		.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
+			@Override
+			public void execute() {
+				// menuLayout.removeAllViews();
+				mainMenu.dismiss();
+			}
+		});
+		menuItem = new RadialMenuItem("panorama", "全景图");
+		menuItem.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
+			@Override
+			public void execute() {
+				Intent intent = new Intent(MapActivity.this, PanoramaActivity.class);
+				Log.i("MapActivity", "Panorama: "+longPressed.toString());
+				intent.putExtra("lontitude", longPressed.longitude);
+				intent.putExtra("latitude", longPressed.latitude);
+				startActivity(intent);
+				mainMenu.dismiss();
+			}
+		});
+		menuExpandItem = new RadialMenuItem("distance_expandable","距离");
+		firstChildItem = new RadialMenuItem("closest", "最近的记录");
+		firstChildItem
+				.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
+					@Override
+					public void execute() {
+						// Can edit based on preference. Also can add animations
+						// here.
+						mainMenu.dismiss();
+					}
+				});
+		secondChildItem = new RadialMenuItem("all", "从近到远");
+		secondChildItem
+				.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
+					@Override
+					public void execute() {
+						// Can edit based on preference. Also can add animations
+						// here.
+						dialogSet = mPicSet.get(0);
+						createDialog();
+						mainMenu.dismiss();
+					}
+				});
+		thirdChildItem = new RadialMenuItem("all2", "....");
+		thirdChildItem
+				.setOnMenuItemPressed(new RadialMenuItem.RadialMenuItemClickListener() {
+					@Override
+					public void execute() {
+						// Can edit based on preference. Also can add animations
+						// here.
+						mainMenu.dismiss();
+					}
+				});
+		children.add(firstChildItem);
+		children.add(secondChildItem);
+		children.add(thirdChildItem);
+		menuExpandItem.setMenuChildren(children);
+		mainMenu.setAnimationSpeed(500L);
+		mainMenu.setIconSize(15, 30);
+		mainMenu.setTextSize(13);
+		mainMenu.setOutlineColor(Color.BLACK, 225);
+		mainMenu.setInnerRingColor(0xAA66CC, 180);
+		mainMenu.setOuterRingColor(0x0099CC, 180);
+		mainMenu.setCenterCircle(menuCloseItem);
+		mainMenu.addMenuEntry(new ArrayList<RadialMenuItem>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
 
-	private void initComponents() {
-		EditText et = (EditText) findViewById(R.id.city);
-		Settings s = Settings.getInstance();
-		if (s.get("city") != null)
-			et.setText((String) s.get("city"));
-		et.setSelectAllOnFocus(true);
+			{
+				add(menuItem);
+				add(menuExpandItem);
+			}
+		});
+
 	}
-
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -205,6 +298,19 @@ public class MapActivity extends Activity implements
 
 	private void initMapView() {
 		mMapView.setLongClickable(true);
+		mBaiduMap.setOnMapLongClickListener(new OnMapLongClickListener(){
+
+			@Override
+			public void onMapLongClick(LatLng arg) {
+				// TODO Auto-generated method stub
+				longPressed = arg;
+				Point screenOn = mBaiduMap.getProjection().toScreenLocation(arg);
+				Log.i("MapActivity", "MenuClicked: "+screenOn.x+" "+screenOn.y);
+				mainMenu.setCenterLocation(screenOn.x, screenOn.y);
+				mainMenu.show(mMapView);
+			}
+			
+		});
 		mBaiduMap.setOnMapStatusChangeListener(new OnMapStatusChangeListener() {
 			@Override
 			public void onMapStatusChange(MapStatus status) {
@@ -548,7 +654,31 @@ public class MapActivity extends Activity implements
 			}
 		}
 	}
+	private void createDialog(){
+		mDialog = new ImageDialog(MapActivity.this, R.style.dialog);
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(index).get(0));
+		Point screenOn = new Point();
+		screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
+		mDialog.showDialog(screenOn.x, screenOn.y);
+		PictureAdapter pa = new PictureAdapter(MapActivity.this);
+		mRel.setAdapter(pa);
+		mRel.setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(MapActivity.this,
+						ShowImageActivity.class);
+				intent.putExtra("image", mPicSet.get(index).get(arg2));
+				startActivity(intent);
+			}
+
+		});
+	}
 	public class MyOverlay extends OverlayManager {
 		private List<OverlayOptions> loo;
 
@@ -575,29 +705,8 @@ public class MapActivity extends Activity implements
 				return true;
 			}
 			index = Integer.parseInt(m.getTitle());
-			mDialog = new ImageDialog(MapActivity.this, R.style.dialog);
-			DisplayMetrics dm = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			PicInfo info = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(index).get(0));
-			Point screenOn = new Point();
-			screenOn = mBaiduMap.getProjection().toScreenLocation(info.pl);
-			mDialog.showDialog(screenOn.x, screenOn.y);
-			PictureAdapter pa = new PictureAdapter(MapActivity.this);
-			mRel.setAdapter(pa);
-			mRel.setOnItemClickListener(new OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					// TODO Auto-generated method stub
-					Intent intent = new Intent(MapActivity.this,
-							ShowImageActivity.class);
-					intent.putExtra("image", mPicSet.get(index).get(arg2));
-					startActivity(intent);
-				}
-
-			});
+			dialogSet = mPicSet.get(index);
+			createDialog();
 			return true;
 		}
 
@@ -641,7 +750,7 @@ public class MapActivity extends Activity implements
 			}
 			ImageView iv = (ImageView) holder.findViewById(R.id.image);
 			iv.setImageBitmap(null);
-			int id = mPicSet.get(index).get(position);
+			int id = dialogSet.get(position);
 			String key = DataGainUtil.generateKey(id, DataGainUtil.SMALL);
 			DataGainUtil.getDataGain().getDataForImageView(id, iv, key);
 			ScaleAnimation a = new ScaleAnimation(0.9f, 1f, 0.9f, 1f,

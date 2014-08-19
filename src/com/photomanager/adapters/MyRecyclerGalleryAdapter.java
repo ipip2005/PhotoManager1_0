@@ -2,10 +2,10 @@ package com.photomanager.adapters;
 
 import java.util.ArrayList;
 
-import utils.DataGainUtil;
 
-import com.photomagner.widgets.SquareLayout;
 import com.photomanager.main.ShowImageActivity;
+import com.photomanager.utils.DataGainUtil;
+import com.photomanager.widgets.SquareLayout;
 
 import android.content.Context;
 import android.content.Intent;

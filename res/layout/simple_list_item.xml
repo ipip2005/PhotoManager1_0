@@ -26,7 +26,7 @@
             android:paddingRight="6dip"
 		    />
 	</RelativeLayout>
-    <com.photomagner.widgets.MyRecyclerGallery
+    <com.photomanager.widgets.MyRecyclerGallery
             android:layout_width="match_parent"
             android:layout_height="100dip"
             android:id="@+id/timeline_recycler_view"

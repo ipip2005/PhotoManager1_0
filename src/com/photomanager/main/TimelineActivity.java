@@ -3,13 +3,13 @@ package com.photomanager.main;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import utils.DataGain;
-import utils.DataGainUtil;
-import utils.PicInfo;
-import utils.ViewHolder;
 
-import com.photomagner.widgets.MyRecyclerGallery;
 import com.photomanager.adapters.MyRecyclerGalleryAdapter;
+import com.photomanager.utils.DataGain;
+import com.photomanager.utils.DataGainUtil;
+import com.photomanager.utils.PicInfo;
+import com.photomanager.utils.ViewHolder;
+import com.photomanager.widgets.MyRecyclerGallery;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -86,7 +86,7 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 		myAnimationB = new ScaleAnimation(1.5f, 0.9f, 1.5f, 0.9f,
 				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
 				0.5f);
-		myAnimationB.setDuration(400);
+		myAnimationB.setDuration(250);
 	}
 
 	/**
