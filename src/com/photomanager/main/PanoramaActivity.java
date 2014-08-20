@@ -34,8 +34,9 @@ public class PanoramaActivity extends Activity implements PanoramaViewListener{
         mPanoramaView.setRotateGestureEnabled(true);
         mPanoramaView.setPanoramaViewListener(this);
         Intent intent = getIntent();
-        mPanoramaView.setPanorama(intent.getDoubleExtra("longitude", -1), 
-        		intent.getDoubleExtra("latitude", -1));
+        double lo = intent.getDoubleExtra("longitude", -1), la = intent.getDoubleExtra("latitude", -1); 
+        mPanoramaView.setPanorama(lo, la);
+        //Log.i("Panorama", ""+lo+" "+la);
 	}
 	public void backToImageShow(View v){
 		this.finish();

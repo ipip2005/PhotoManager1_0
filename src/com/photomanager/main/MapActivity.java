@@ -71,12 +71,10 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -217,7 +215,7 @@ public class MapActivity extends Activity implements
 			public void execute() {
 				Intent intent = new Intent(MapActivity.this, PanoramaActivity.class);
 				Log.i("MapActivity", "Panorama: "+longPressed.toString());
-				intent.putExtra("lontitude", longPressed.longitude);
+				intent.putExtra("longitude", longPressed.longitude);
 				intent.putExtra("latitude", longPressed.latitude);
 				startActivity(intent);
 				mainMenu.dismiss();
@@ -478,15 +476,11 @@ public class MapActivity extends Activity implements
 			cache[i].recycle();
 			cache[i] = null;
 		}
-		//Log.i("MapActivity", "i " + (b == null) + " "
-		//		+ pics.getOverlayOptions().size());
 		cache[i] = BitmapDescriptorFactory.fromBitmap(new BitmapDrawable(null,
 				b).getBitmap());
 		LatLng gp = DataGainUtil.getDataGain().getPicInfoList().get(mPicSet.get(i).get(0)).pl;
 		pics.setOverlayOption(i, new MarkerOptions().position(gp)
 				.icon(cache[i]).zIndex(-1).title(String.valueOf(i)));
-		///Log.i("MapActivity", "i -----" + (b == null) + " "
-		//		+ pics.getOverlayOptions().size());
 		pics.addToMap();
 	}
 
@@ -527,8 +521,9 @@ public class MapActivity extends Activity implements
 		ll = (LinearLayout) findViewById(R.id.mapSearchBlock);
 		if (llVisible) {
 			llVisible = false;
-			Animation a = new AlphaAnimation(1.0f, 0.0f);
-			a.setDuration(800);
+			Animation a = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+			ll.startAnimation(a);
+			ll.setVisibility(View.GONE);/*
 			a.setAnimationListener(new AnimationListener() {
 
 				@Override
@@ -550,12 +545,13 @@ public class MapActivity extends Activity implements
 				}
 
 			});
-			ll.startAnimation(a);
+			*/
 		} else {
 			llVisible = true;
-			Animation a = new AlphaAnimation(0.0f, 1.0f);
-			a.setDuration(800);
-			a.setAnimationListener(new AnimationListener() {
+			Animation a = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+			ll.startAnimation(a);
+			ll.setVisibility(View.VISIBLE);
+			/*a.setAnimationListener(new AnimationListener() {
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
@@ -575,8 +571,8 @@ public class MapActivity extends Activity implements
 
 				}
 
-			});
-			ll.startAnimation(a);
+			});*/
+			
 		}
 	}
 

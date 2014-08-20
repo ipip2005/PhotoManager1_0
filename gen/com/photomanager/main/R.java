@@ -11,6 +11,8 @@ public final class R {
     public static final class anim {
         public static final int grid_anim_in=0x7f040000;
         public static final int grid_anim_out=0x7f040001;
+        public static final int slide_down=0x7f040002;
+        public static final int slide_up=0x7f040003;
     }
     public static final class array {
         public static final int jazzy_effects=0x7f090000;

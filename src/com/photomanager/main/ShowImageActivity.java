@@ -274,7 +274,7 @@ public class ShowImageActivity extends Activity {
 		DataGainUtil.getDataGain().requirePoiDataAndWrite(id);
 		Intent intent = new Intent(ShowImageActivity.this, PanoramaActivity.class);
 		LatLng pl = DataGainUtil.getDataGain().getPicInfoList().get(id).pl;
-		intent.putExtra("lontitude", pl.longitude);
+		intent.putExtra("longitude", pl.longitude);
 		intent.putExtra("latitude", pl.latitude);
 		startActivity(intent);
 	}
