@@ -94,11 +94,11 @@ public class DataGain {
 			PicInfo info = new PicInfo();
 			info.mdate = Calendar.getInstance();
 			info.mdate.setTimeInMillis(cursor.getLong(0));
-			info.title = "" + (info.mdate.get(Calendar.MONTH) + 1) + "月"
-					+ info.mdate.get(Calendar.DATE) + "日";
+			info.title = "" + (info.mdate.get(Calendar.MONTH) + 1) + "-"
+					+ info.mdate.get(Calendar.DATE);
 			if (info.mdate.get(Calendar.YEAR) != Calendar.getInstance().get(
 					Calendar.YEAR))
-				info.title = "" + info.mdate.get(Calendar.YEAR) + "年"
+				info.title = "" + info.mdate.get(Calendar.YEAR) + "-"
 						+ info.title;
 			if (cursor.getDouble(1) > 0)
 				info.pl = new LatLng(cursor.getDouble(1), cursor.getDouble(2));
@@ -310,7 +310,6 @@ public class DataGain {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
 					if (!fileExists) {
 						BitmapFactory.Options op = new BitmapFactory.Options();
 						op.inJustDecodeBounds = true;

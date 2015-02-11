@@ -184,13 +184,12 @@ public class TimelineActivity extends Activity implements OnItemClickListener {
 			return ret;
 		}
 		if (!st.equals(ed))
-			ret = ed + "-" + st;
+			ret = ed + " ~ " + st;
 		if (granularity == 4) {
 			if (c.get(Calendar.YEAR) == Calendar.getInstance().get(
 					Calendar.YEAR)) {
 				ret = "今年 " + ret;
-			} else
-				ret = c.get(Calendar.YEAR) + "年 " + ret;
+			} 
 		}
 		return ret;
 	}

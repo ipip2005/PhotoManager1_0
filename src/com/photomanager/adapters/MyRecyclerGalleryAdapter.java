@@ -111,7 +111,7 @@ public class MyRecyclerGalleryAdapter extends
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
 		public SquareLayout layout;
-
+		
 		public ViewHolder(View itemView) {
 			super(itemView);
 			layout = (SquareLayout) itemView;

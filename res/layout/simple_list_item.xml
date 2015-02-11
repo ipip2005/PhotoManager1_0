@@ -15,14 +15,14 @@
             android:paddingLeft="2dip"
             android:layout_alignParentLeft="true"
             android:textColor="#eeeeee"
-            android:textSize="25sp" />
+            android:textSize="20sp" />
 		<TextView
 		    android:id="@+id/item_more"
 		    android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:textColor="#eeeeee"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:paddingRight="6dip"
 		    />
 	</RelativeLayout>
